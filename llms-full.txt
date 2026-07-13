@@ -4123,7 +4123,7 @@ $ git checkout -b port-lists-filter-2
 
 Hologram uses value boxing to maintain Elixir type information in JavaScript. Each compiled term is wrapped in an object with a `type` field that specifies its original type. For example, the integer `42` becomes `{type: "integer", value: 42n}`.
 
-You can explore the type system in assets/js/type.mjs in the Hologram repository. The `Type` class provides utilities like `Type.boolean()`, `Type.isTuple()`, and `Type.encodeMapKey()` that you'll use when porting functions.
+You can explore the type system in priv/ts/type.ts in the Hologram repository. The `Type` class provides utilities like `Type.boolean()`, `Type.isTuple()`, and `Type.encodeMapKey()` that you'll use when porting functions.
 
 ##### Function Structure
 
@@ -4160,7 +4160,7 @@ Or browse the official Erlang documentation directly: https://www.erlang.org/doc
 
 ##### 2. Locate the Target File
 
-Manually ported Erlang functions are located in `assets/js/erlang/` directory, organized by module. For example, `:lists` functions go in `assets/js/erlang/lists.mjs`.
+Manually ported Erlang functions are located in `priv/ts/erlang/` directory, organized by module. For example, `:lists` functions go in `priv/ts/erlang/lists.ts`.
 
 ##### 3. Look at Similar Functions
 
@@ -4226,7 +4226,7 @@ Every ported function requires two types of tests to ensure correctness and cons
 
 ##### JavaScript Unit Tests
 
-Add comprehensive test cases in a dedicated test file for each ported module. For example, tests for `:lists` functions are in `test/javascript/erlang/lists_test.mjs`, while the implementation is in `assets/js/erlang/lists.mjs`.
+Add comprehensive test cases in a dedicated test file for each ported module. For example, tests for `:lists` functions are in `test/javascript/erlang/lists_test.mjs`, while the implementation is in `priv/ts/erlang/lists.ts`.
 
 Your tests should:
 
@@ -4337,7 +4337,7 @@ Order imports (including classes like `Type`, `Interpreter`, etc.) and functions
 
 - **Client Runtime Reference** - https://hologram.page/reference/client-runtime
 - **Hologram Repository** - https://github.com/bartblast/hologram
-- **Ported Functions** - https://github.com/bartblast/hologram/tree/dev/assets/js/erlang
+- **Ported Functions** - https://github.com/bartblast/hologram/tree/dev/priv/ts/erlang
 - **JavaScript Tests** - https://github.com/bartblast/hologram/tree/dev/test/javascript/erlang
 - **Elixir Consistency Tests** - https://github.com/bartblast/hologram/tree/dev/test/elixir/hologram/ex_js_consistency/erlang
 - **Erlang Documentation** - https://www.erlang.org/doc

@@ -15,8 +15,8 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Erlang_Lists from "../../../assets/js/erlang/lists.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Lists from "hologram:runtime/erlang/lists";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

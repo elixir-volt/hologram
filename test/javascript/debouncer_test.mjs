@@ -2,7 +2,7 @@
 
 import {assert, sinon} from "./support/helpers.mjs";
 
-import Debouncer from "../../assets/js/debouncer.mjs";
+import Debouncer from "hologram:runtime/debouncer";
 
 describe("Debouncer", () => {
   let clock;

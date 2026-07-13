@@ -24,7 +24,6 @@ Benchee.run(
     page_modules = Reflection.list_pages()
 
     opts = [
-      js_dir: Path.join([Reflection.root_dir(), "assets", "js"]),
       tmp_dir:
         Path.join([Reflection.tmp_dir(), "benchmarks", "compiler", "create_page_entry_files_5"])
     ]

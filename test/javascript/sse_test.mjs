@@ -4,18 +4,18 @@ import {
   assert,
   defineRuntimeGlobals,
   initComponentRegistryEntry,
-  sinon,
 } from "./support/helpers.mjs";
+import {sinon} from "./support/sinon_helpers.mjs";
 
-import App from "../../assets/js/app.mjs";
-import ComponentRegistry from "../../assets/js/component_registry.mjs";
-import GlobalRegistry from "../../assets/js/global_registry.mjs";
-import Hologram from "../../assets/js/hologram.mjs";
-import Interpreter from "../../assets/js/interpreter.mjs";
-import Logger from "../../assets/js/logger.mjs";
-import Sse from "../../assets/js/sse.mjs";
-import SubscriptionReceiptRegistry from "../../assets/js/subscription_receipt_registry.mjs";
-import Type from "../../assets/js/type.mjs";
+import App from "hologram:runtime/app";
+import ComponentRegistry from "hologram:runtime/component_registry";
+import GlobalRegistry from "hologram:runtime/global_registry";
+import Hologram from "hologram:runtime/hologram";
+import Interpreter from "hologram:runtime/interpreter";
+import Logger from "hologram:runtime/logger";
+import Sse from "hologram:runtime/sse";
+import SubscriptionReceiptRegistry from "hologram:runtime/subscription_receipt_registry";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

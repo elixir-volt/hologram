@@ -2,7 +2,7 @@
 
 import {assert} from "./support/helpers.mjs";
 
-import Once from "../../assets/js/once.mjs";
+import Once from "hologram:runtime/once";
 
 describe("Once", () => {
   describe("hasFired() / markFired()", () => {

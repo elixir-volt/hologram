@@ -1,7 +1,7 @@
 "use strict";
 
-import Interpreter from "../../../../../assets/js/interpreter.mjs";
-import Type from "../../../../../assets/js/type.mjs";
+import Interpreter from "hologram:runtime/interpreter";
+import Type from "hologram:runtime/type";
 
 export function defineModule45Fixture() {
   Interpreter.defineElixirFunction(

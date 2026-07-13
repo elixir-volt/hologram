@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "./support/helpers.mjs";
 
-import Utils from "../../assets/js/utils.mjs";
+import Utils from "hologram:runtime/utils";
 
 defineRuntimeGlobals();
 

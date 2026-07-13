@@ -6,8 +6,8 @@ import {
   encodedSubscriptionReceiptKey,
 } from "./support/helpers.mjs";
 
-import SubscriptionReceiptRegistry from "../../assets/js/subscription_receipt_registry.mjs";
-import Type from "../../assets/js/type.mjs";
+import SubscriptionReceiptRegistry from "hologram:runtime/subscription_receipt_registry";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

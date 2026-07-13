@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "./support/helpers.mjs";
 
-import GlobalRegistry from "../../assets/js/global_registry.mjs";
+import GlobalRegistry from "hologram:runtime/global_registry";
 
 defineRuntimeGlobals();
 

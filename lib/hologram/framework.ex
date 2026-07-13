@@ -556,7 +556,7 @@ defmodule Hologram.Framework do
 
   ## Parameters
 
-  - `erlang_js_dir` - Path to the directory containing manually ported Erlang functions JavaScript files in the Hologram library
+  - `erlang_js_dir` - Path to the directory containing manually ported Erlang function TypeScript files in the Hologram library
 
   ## Returns
 
@@ -564,7 +564,7 @@ defmodule Hologram.Framework do
 
   ## Example
 
-      iex> list_ported_erlang_funs("assets/js/erlang")
+      iex> list_ported_erlang_funs("priv/ts/erlang")
       [{:erlang, :*, 2}, {:lists, :flatten, 1}, {:maps, :get, 2}, ...]
   """
   @spec list_ported_erlang_funs(Path.t()) :: [mfa]

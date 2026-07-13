@@ -6,9 +6,9 @@ import {
   defineRuntimeGlobals,
 } from "../../support/helpers.mjs";
 
-import Elixir_String_Tokenizer from "../../../../assets/js/elixir/string/tokenizer.mjs";
-import Interpreter from "../../../../assets/js/interpreter.mjs";
-import Type from "../../../../assets/js/type.mjs";
+import Elixir_String_Tokenizer from "hologram:runtime/elixir/string/tokenizer";
+import Interpreter from "hologram:runtime/interpreter";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

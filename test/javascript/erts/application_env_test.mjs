@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import ApplicationEnv from "../../../assets/js/erts/application_env.mjs";
-import Type from "../../../assets/js/type.mjs";
+import ApplicationEnv from "hologram:runtime/erts/application_env";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

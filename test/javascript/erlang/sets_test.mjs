@@ -14,12 +14,12 @@ import {
   freeze,
 } from "../support/helpers.mjs";
 
-import Erlang_Erlang from "../../../assets/js/erlang/erlang.mjs";
-import Erlang_Lists from "../../../assets/js/erlang/lists.mjs";
-import Erlang_Sets from "../../../assets/js/erlang/sets.mjs";
-import HologramInterpreterError from "../../../assets/js/errors/interpreter_error.mjs";
-import Interpreter from "../../../assets/js/interpreter.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Erlang from "hologram:runtime/erlang/erlang";
+import Erlang_Lists from "hologram:runtime/erlang/lists";
+import Erlang_Sets from "hologram:runtime/erlang/sets";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
+import Interpreter from "hologram:runtime/interpreter";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

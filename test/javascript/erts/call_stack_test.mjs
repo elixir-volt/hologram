@@ -2,8 +2,8 @@
 
 import {assert} from "../support/helpers.mjs";
 
-import CallStack from "../../../assets/js/erts/call_stack.mjs";
-import Type from "../../../assets/js/type.mjs";
+import CallStack from "hologram:runtime/erts/call_stack";
+import Type from "hologram:runtime/type";
 
 const enumFrame = {
   module: "Enum",

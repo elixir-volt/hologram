@@ -6,7 +6,7 @@ import {
   defineRuntimeGlobals,
 } from "../../support/helpers.mjs";
 
-import RegexParser from "../../../../assets/js/erts/regex/regex_parser.mjs";
+import RegexParser from "hologram:runtime/erts/regex/regex_parser";
 
 defineRuntimeGlobals();
 

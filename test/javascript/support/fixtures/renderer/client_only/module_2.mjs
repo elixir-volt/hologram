@@ -2,8 +2,8 @@
 
 import {putAction, putState} from "../../../helpers.mjs";
 
-import Interpreter from "../../../../../../assets/js/interpreter.mjs";
-import Type from "../../../../../../assets/js/type.mjs";
+import Interpreter from "hologram:runtime/interpreter";
+import Type from "hologram:runtime/type";
 
 export function defineClientOnlyModule2Fixture() {
   Interpreter.defineElixirFunction(

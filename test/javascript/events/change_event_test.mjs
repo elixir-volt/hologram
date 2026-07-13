@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals, JSDOM} from "../support/helpers.mjs";
 
-import ChangeEvent from "../../../assets/js/events/change_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import ChangeEvent from "hologram:runtime/events/change_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

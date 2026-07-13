@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "./support/helpers.mjs";
 
-import Operation from "../../assets/js/operation.mjs";
-import Type from "../../assets/js/type.mjs";
+import Operation from "hologram:runtime/operation";
+import Type from "hologram:runtime/type";
 
 const defaultTarget = Type.bitstring("my_default_target");
 const eventParam = "my_event_param";

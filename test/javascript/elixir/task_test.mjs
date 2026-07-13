@@ -7,9 +7,9 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Elixir_Task from "../../../assets/js/elixir/task.mjs";
-import ERTS from "../../../assets/js/erts.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Elixir_Task from "hologram:runtime/elixir/task";
+import ERTS from "hologram:runtime/erts";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

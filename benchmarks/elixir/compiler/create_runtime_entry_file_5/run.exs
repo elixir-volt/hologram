@@ -17,7 +17,6 @@ Benchee.run(
     app_versions = Compiler.build_app_versions(call_graph)
 
     opts = [
-      js_dir: Path.join([Reflection.root_dir(), "assets", "js"]),
       tmp_dir:
         Path.join([Reflection.tmp_dir(), "benchmarks", "compiler", "create_runtime_entry_file_5"])
     ]

@@ -2,9 +2,9 @@
 
 import {assert, defineRuntimeGlobals} from "../../support/helpers.mjs";
 
-import Bitstring from "../../../../assets/js/bitstring.mjs";
-import RegexEngine from "../../../../assets/js/erts/regex/regex_engine.mjs";
-import Type from "../../../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import RegexEngine from "hologram:runtime/erts/regex/regex_engine";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

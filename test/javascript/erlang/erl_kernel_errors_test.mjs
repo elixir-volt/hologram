@@ -7,8 +7,8 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Erlang_Erl_Kernel_Errors from "../../../assets/js/erlang/erl_kernel_errors.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Erl_Kernel_Errors from "hologram:runtime/erlang/erl_kernel_errors";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

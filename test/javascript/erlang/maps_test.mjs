@@ -13,8 +13,8 @@ import {
   freeze,
 } from "../support/helpers.mjs";
 
-import Erlang_Maps from "../../../assets/js/erlang/maps.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Maps from "hologram:runtime/erlang/maps";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

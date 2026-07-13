@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "./support/helpers.mjs";
 
-import InitActionQueue from "../../assets/js/init_action_queue.mjs";
+import InitActionQueue from "hologram:runtime/init_action_queue";
 
 defineRuntimeGlobals();
 

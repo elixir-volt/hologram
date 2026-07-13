@@ -1,8 +1,8 @@
 "use strict";
 
-import {sinon} from "./support/helpers.mjs";
+import {sinon} from "./support/sinon_helpers.mjs";
 
-import Throttler from "../../assets/js/throttler.mjs";
+import Throttler from "hologram:runtime/throttler";
 
 describe("Throttler", () => {
   let clock;

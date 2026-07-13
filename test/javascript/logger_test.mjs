@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "./support/helpers.mjs";
 
-import Logger from "../../assets/js/logger.mjs";
+import Logger from "hologram:runtime/logger";
 
 defineRuntimeGlobals();
 

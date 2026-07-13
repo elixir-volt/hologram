@@ -1,7 +1,7 @@
 "use strict";
 
-import Bitstring from "../../../../../../assets/js/bitstring.mjs";
-import Type from "../../../../../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import Type from "hologram:runtime/type";
 
 import {benchmark} from "../../../../support/helpers.mjs";
 

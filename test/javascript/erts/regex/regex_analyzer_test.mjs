@@ -5,9 +5,9 @@ import {assert, defineRuntimeGlobals} from "../../support/helpers.mjs";
 import RegexAnalyzer, {
   resolveGroupNumbers,
   walkAst,
-} from "../../../../assets/js/erts/regex/regex_analyzer.mjs";
+} from "hologram:runtime/erts/regex/regex_analyzer";
 
-import RegexParser from "../../../../assets/js/erts/regex/regex_parser.mjs";
+import RegexParser from "hologram:runtime/erts/regex/regex_parser";
 
 defineRuntimeGlobals();
 

@@ -15,7 +15,7 @@ import {
   defineRuntimeGlobals,
 } from "./helpers.mjs";
 
-import Type from "../../../assets/js/type.mjs";
+import Type from "hologram:runtime/type";
 
 import {defineModule1Fixture} from "./fixtures/router/helpers/module_1.mjs";
 import {defineModule2Fixture} from "./fixtures/router/helpers/module_2.mjs";

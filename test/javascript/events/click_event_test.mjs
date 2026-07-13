@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import ClickEvent from "../../../assets/js/events/click_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import ClickEvent from "hologram:runtime/events/click_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

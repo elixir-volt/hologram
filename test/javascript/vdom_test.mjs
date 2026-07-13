@@ -7,7 +7,7 @@ import {
   vnode,
 } from "./support/helpers.mjs";
 
-import Vdom from "../../assets/js/vdom.mjs";
+import Vdom from "hologram:runtime/vdom";
 
 import {
   attributesModule,

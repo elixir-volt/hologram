@@ -79,16 +79,16 @@ import {defineModule91Fixture} from "./support/fixtures/renderer/module_91.mjs";
 import {defineClientOnlyModule1Fixture} from "./support/fixtures/renderer/client_only/module_1.mjs";
 import {defineClientOnlyModule2Fixture} from "./support/fixtures/renderer/client_only/module_2.mjs";
 
-import Bitstring from "../../assets/js/bitstring.mjs";
-import ComponentRegistry from "../../assets/js/component_registry.mjs";
-import EventListeners from "../../assets/js/event_listeners.mjs";
-import Hologram from "../../assets/js/hologram.mjs";
-import HologramRuntimeError from "../../assets/js/errors/runtime_error.mjs";
-import InitActionQueue from "../../assets/js/init_action_queue.mjs";
-import Interpreter from "../../assets/js/interpreter.mjs";
-import Once from "../../assets/js/once.mjs";
-import Renderer from "../../assets/js/renderer.mjs";
-import Type from "../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import ComponentRegistry from "hologram:runtime/component_registry";
+import EventListeners from "hologram:runtime/event_listeners";
+import Hologram from "hologram:runtime/hologram";
+import HologramRuntimeError from "hologram:runtime/errors/runtime_error";
+import InitActionQueue from "hologram:runtime/init_action_queue";
+import Interpreter from "hologram:runtime/interpreter";
+import Once from "hologram:runtime/once";
+import Renderer from "hologram:runtime/renderer";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

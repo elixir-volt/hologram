@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import KeyboardEvent from "../../../assets/js/events/keyboard_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import KeyboardEvent from "hologram:runtime/events/keyboard_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

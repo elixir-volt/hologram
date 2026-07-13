@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import ScrollEvent from "../../../assets/js/events/scroll_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import ScrollEvent from "hologram:runtime/events/scroll_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

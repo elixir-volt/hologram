@@ -1,6 +1,6 @@
 "use strict";
 
-import Vdom from "../../../../../assets/js/vdom.mjs";
+import Vdom from "hologram:runtime/vdom";
 
 import {benchmark} from "../../../support/helpers.mjs";
 import {defineRuntimeGlobals} from "../../../../../test/javascript/support/helpers.mjs";

@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../../support/helpers.mjs";
 
-import RegexParser from "../../../../assets/js/erts/regex/regex_parser.mjs";
-import RegexTranslator from "../../../../assets/js/erts/regex/regex_translator.mjs";
+import RegexParser from "hologram:runtime/erts/regex/regex_parser";
+import RegexTranslator from "hologram:runtime/erts/regex/regex_translator";
 
 defineRuntimeGlobals();
 

@@ -2,9 +2,9 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import BinaryPatternRegistry from "../../../assets/js/erts/binary_pattern_registry.mjs";
-import ERTS from "../../../assets/js/erts.mjs";
-import Type from "../../../assets/js/type.mjs";
+import BinaryPatternRegistry from "hologram:runtime/erts/binary_pattern_registry";
+import ERTS from "hologram:runtime/erts";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

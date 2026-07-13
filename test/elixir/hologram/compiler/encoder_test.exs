@@ -5,7 +5,8 @@ defmodule Hologram.Compiler.EncoderTest do
   alias Hologram.Commons.SystemUtils
   alias Hologram.Compiler.Context
   alias Hologram.Compiler.IR
-  alias Hologram.Reflection
+
+  @runtime_source {:hologram, "ts"}
 
   # for <<x <- <<1, 2>>>>, do: x
   @bitstring_generator_comprehension_ir %IR.Comprehension{
@@ -38,7 +39,7 @@ defmodule Hologram.Compiler.EncoderTest do
     mapper: %IR.Variable{name: :x}
   }
 
-  @erlang_js_dir Path.join([Reflection.root_dir(), "assets", "js", "erlang"])
+  @erlang_js_dir Volt.Priv.path(@runtime_source, "erlang")
 
   defdelegate encode_ir(ir, context \\ %Context{}), to: Hologram.Compiler.Encoder
 

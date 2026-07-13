@@ -7,10 +7,10 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Bitstring from "../../../assets/js/bitstring.mjs";
-import Erlang_Unicode from "../../../assets/js/erlang/unicode.mjs";
-import HologramInterpreterError from "../../../assets/js/errors/interpreter_error.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import Erlang_Unicode from "hologram:runtime/erlang/unicode";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

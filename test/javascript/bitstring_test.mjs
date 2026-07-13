@@ -6,10 +6,10 @@ import {
   defineRuntimeGlobals,
 } from "./support/helpers.mjs";
 
-import Bitstring from "../../assets/js/bitstring.mjs";
-import CallStack from "../../assets/js/erts/call_stack.mjs";
-import HologramInterpreterError from "../../assets/js/errors/interpreter_error.mjs";
-import Type from "../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import CallStack from "hologram:runtime/erts/call_stack";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

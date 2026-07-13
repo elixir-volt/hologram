@@ -8,10 +8,10 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Erlang_Binary from "../../../assets/js/erlang/binary.mjs";
-import Erlang_Erl_Stdlib_Errors from "../../../assets/js/erlang/erl_stdlib_errors.mjs";
-import Erlang_Re from "../../../assets/js/erlang/re.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Binary from "hologram:runtime/erlang/binary";
+import Erlang_Erl_Stdlib_Errors from "hologram:runtime/erlang/erl_stdlib_errors";
+import Erlang_Re from "hologram:runtime/erlang/re";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

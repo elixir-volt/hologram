@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import ClickOutsideEvent from "../../../assets/js/events/click_outside_event.mjs";
-import PointerEvent from "../../../assets/js/events/pointer_event.mjs";
+import ClickOutsideEvent from "hologram:runtime/events/click_outside_event";
+import PointerEvent from "hologram:runtime/events/pointer_event";
 
 defineRuntimeGlobals();
 

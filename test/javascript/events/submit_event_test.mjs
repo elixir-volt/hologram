@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals, JSDOM} from "../support/helpers.mjs";
 
-import SubmitEvent from "../../../assets/js/events/submit_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import SubmitEvent from "hologram:runtime/events/submit_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

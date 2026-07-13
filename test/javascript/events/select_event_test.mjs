@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import SelectEvent from "../../../assets/js/events/select_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import SelectEvent from "hologram:runtime/events/select_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

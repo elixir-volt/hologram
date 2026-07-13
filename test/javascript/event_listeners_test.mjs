@@ -1,8 +1,9 @@
 "use strict";
 
-import {assert, sinon} from "./support/helpers.mjs";
+import {assert} from "./support/helpers.mjs";
+import {sinon} from "./support/sinon_helpers.mjs";
 
-import EventListeners from "../../assets/js/event_listeners.mjs";
+import EventListeners from "hologram:runtime/event_listeners";
 
 describe("EventListeners", () => {
   describe("domEvent()", () => {

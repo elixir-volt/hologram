@@ -6,8 +6,8 @@ import {
   initComponentRegistryEntry,
 } from "./support/helpers.mjs";
 
-import ComponentRegistry from "../../assets/js/component_registry.mjs";
-import Type from "../../assets/js/type.mjs";
+import ComponentRegistry from "hologram:runtime/component_registry";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

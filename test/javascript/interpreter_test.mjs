@@ -20,15 +20,15 @@ import {
 import {defineModule1Fixture as defineInterpreterModule1Fixture} from "./support/fixtures/ex_js_consistency/interpreter/module_1.mjs";
 import {defineModule1Fixture as defineMatchOperatorModule1Fixture} from "./support/fixtures/ex_js_consistency/match_operator/module_1.mjs";
 
-import Bitstring from "../../assets/js/bitstring.mjs";
-import CallStack from "../../assets/js/erts/call_stack.mjs";
-import ERTS from "../../assets/js/erts.mjs";
-import Erlang from "../../assets/js/erlang/erlang.mjs";
-import HologramBoxedError from "../../assets/js/errors/boxed_error.mjs";
-import HologramInterpreterError from "../../assets/js/errors/interpreter_error.mjs";
-import Interpreter from "../../assets/js/interpreter.mjs";
-import NodeTable from "../../assets/js/erts/node_table.mjs";
-import Type from "../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import CallStack from "hologram:runtime/erts/call_stack";
+import ERTS from "hologram:runtime/erts";
+import Erlang from "hologram:runtime/erlang/erlang";
+import HologramBoxedError from "hologram:runtime/errors/boxed_error";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
+import Interpreter from "hologram:runtime/interpreter";
+import NodeTable from "hologram:runtime/erts/node_table";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 defineInterpreterModule1Fixture();

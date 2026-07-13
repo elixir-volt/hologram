@@ -6,9 +6,9 @@ import {
   sinon,
 } from "../support/helpers.mjs";
 
-import Elixir_IO from "../../../assets/js/elixir/io.mjs";
-import HologramInterpreterError from "../../../assets/js/errors/interpreter_error.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Elixir_IO from "hologram:runtime/elixir/io";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

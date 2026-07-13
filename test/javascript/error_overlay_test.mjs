@@ -7,7 +7,7 @@ import {
   registerWebApis,
 } from "./support/helpers.mjs";
 
-import ErrorOverlay from "../../assets/js/error_overlay.mjs";
+import ErrorOverlay from "hologram:runtime/error_overlay";
 
 defineRuntimeGlobals();
 registerWebApis();

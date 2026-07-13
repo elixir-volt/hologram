@@ -6,12 +6,12 @@ import {
   defineRuntimeGlobals,
 } from "./support/helpers.mjs";
 
-import Deserializer from "../../assets/js/deserializer.mjs";
-import Erlang_Re from "../../assets/js/erlang/re.mjs";
-import ERTS from "../../assets/js/erts.mjs";
-import Interpreter from "../../assets/js/interpreter.mjs";
-import Serializer from "../../assets/js/serializer.mjs";
-import Type from "../../assets/js/type.mjs";
+import Deserializer from "hologram:runtime/deserializer";
+import Erlang_Re from "hologram:runtime/erlang/re";
+import ERTS from "hologram:runtime/erts";
+import Interpreter from "hologram:runtime/interpreter";
+import Serializer from "hologram:runtime/serializer";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

@@ -8,9 +8,9 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Bitstring from "../../../assets/js/bitstring.mjs";
-import Erlang_Filename from "../../../assets/js/erlang/filename.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import Erlang_Filename from "hologram:runtime/erlang/filename";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

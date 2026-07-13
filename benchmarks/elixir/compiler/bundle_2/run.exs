@@ -10,14 +10,9 @@ Benchee.run(
     end
   },
   before_scenario: fn _input ->
-    assets_dir = Path.join(Reflection.root_dir(), "assets")
-    node_modules_path = Path.join(assets_dir, "node_modules")
     tmp_dir = Path.join([Reflection.tmp_dir(), "benchmarks", "compiler", "bundle_2"])
 
     opts = [
-      assets_dir: assets_dir,
-      esbuild_bin_path: Path.join([node_modules_path, ".bin", "esbuild"]),
-      js_dir: Path.join([assets_dir, "js"]),
       tmp_dir: tmp_dir,
       static_dir: Path.join(tmp_dir, "static")
     ]

@@ -1,7 +1,7 @@
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import Elixir_Kernel from "../../../assets/js/elixir/kernel.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Elixir_Kernel from "hologram:runtime/elixir/kernel";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

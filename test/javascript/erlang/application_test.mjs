@@ -7,10 +7,10 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Erlang_Application from "../../../assets/js/erlang/application.mjs";
-import ERTS from "../../../assets/js/erts.mjs";
-import Interpreter from "../../../assets/js/interpreter.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Application from "hologram:runtime/erlang/application";
+import ERTS from "hologram:runtime/erts";
+import Interpreter from "hologram:runtime/interpreter";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

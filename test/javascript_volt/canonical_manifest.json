@@ -1,0 +1,355 @@
+{
+  "version": 1,
+  "totalFiles": 87,
+  "totalTests": 4797,
+  "files": {
+    "test/javascript/app_test.mjs": {
+      "count": 2,
+      "namesSha256": "588cd76d4fe39ccd3c1fa9932ad269fd05b3be46e1b4ab0b196bd0f2b217d5fa"
+    },
+    "test/javascript/asset_path_registry_test.mjs": {
+      "count": 3,
+      "namesSha256": "c0663e0ec92fdda85ca0177f49c0502775d39bbddc13aa925b858bd7b009d2a8"
+    },
+    "test/javascript/bitstring_test.mjs": {
+      "count": 427,
+      "namesSha256": "546025d3be933fe68783ed30dd37e2b1f99387c55a67ffc76fc28fbde578e6a2"
+    },
+    "test/javascript/client_test.mjs": {
+      "count": 41,
+      "namesSha256": "2bc384b03ff2bfe1d1c5d72d30b13fe3cf08f184c320bd0e1b6a41831ee3b176"
+    },
+    "test/javascript/common/sequence_test.mjs": {
+      "count": 2,
+      "namesSha256": "3a3e14375cbae3ad22069b7ce86670446ce31d1c1955ed2aa9834a05c77b8a8a"
+    },
+    "test/javascript/component_registry_test.mjs": {
+      "count": 17,
+      "namesSha256": "f9e23103138e56a5c85dac153ec4c2a6351a868861aa3f93782cbbdef6ace734"
+    },
+    "test/javascript/connection_test.mjs": {
+      "count": 58,
+      "namesSha256": "1d685652690a2c356d38cc594913156ebfd680b59ea9d3e75d82b5f1f4d74835"
+    },
+    "test/javascript/debouncer_test.mjs": {
+      "count": 7,
+      "namesSha256": "d203d2df3e28b6d6ccb97c07bc352a26ea91e938f4c6cf29c1e56e32ee593a73"
+    },
+    "test/javascript/deserializer_test.mjs": {
+      "count": 50,
+      "namesSha256": "61a88e7bb681c26e9d1d29861eed70390f4fa3c533a0d1f0421209f7047bfd12"
+    },
+    "test/javascript/elixir/application_test.mjs": {
+      "count": 3,
+      "namesSha256": "3c5b789cbb22d7c5cacdee6e0b5c2b1613de709623e348ac636e72a78a7bd3ee"
+    },
+    "test/javascript/elixir/cldr/locale_test.mjs": {
+      "count": 1,
+      "namesSha256": "b044b6e99cf76dae0f5d0c221de958ca124fd93c1c2565b2946811512df6806b"
+    },
+    "test/javascript/elixir/cldr/validity/u_test.mjs": {
+      "count": 1,
+      "namesSha256": "ef5735e2564e0a539a2b03d698e8b6578637128e714e88f8327c33001d227e7c"
+    },
+    "test/javascript/elixir/code_test.mjs": {
+      "count": 3,
+      "namesSha256": "f64537c842bd1645f1dedd7c5854522f533f5d1125facaafd97076d68293cdab"
+    },
+    "test/javascript/elixir/hologram/js_test.mjs": {
+      "count": 110,
+      "namesSha256": "befddfe657ce2e67c469f88142ef809e791cd75eaa9be7f9b22a4b1e6db962c1"
+    },
+    "test/javascript/elixir/hologram/router/helpers_test.mjs": {
+      "count": 2,
+      "namesSha256": "1d7de6e75980a7e7a0e4fa5ead995142f4131dbb44c1548de6503cdeb404d093"
+    },
+    "test/javascript/elixir/io_test.mjs": {
+      "count": 11,
+      "namesSha256": "6d9af3a4477262d3b5d02aa1ecd3f987d910d889fbb7ce7e46729d023e913730"
+    },
+    "test/javascript/elixir/kernel_test.mjs": {
+      "count": 2,
+      "namesSha256": "0c8d7195211bd2abd710b3fbfb7fc48a43c1671554639f623a0faf30573ad33c"
+    },
+    "test/javascript/elixir/string_test.mjs": {
+      "count": 48,
+      "namesSha256": "d5b6b7e6daf388b7fb85e77314ae2fc9fb6df86a1ba4b82a0ee137f491497281"
+    },
+    "test/javascript/elixir/task_test.mjs": {
+      "count": 3,
+      "namesSha256": "4c50548bde91b08e7c8f79adf8526671009be2585daba7263f8b694233839e9d"
+    },
+    "test/javascript/elixir/uri_test.mjs": {
+      "count": 14,
+      "namesSha256": "1d4c3ea4863f423690e4006d2f860774df6f048d485dfa786e87373dd75d7893"
+    },
+    "test/javascript/erlang/binary_test.mjs": {
+      "count": 208,
+      "namesSha256": "8aec62676b917f94b95d64fb723cc8c1d2fb39ad954e760fa8cf47b329ec6b39"
+    },
+    "test/javascript/erlang/code_test.mjs": {
+      "count": 3,
+      "namesSha256": "fd48f9273d82185381258959bf6fc5140946d338c2d38459f1ee30f6a6150dbf"
+    },
+    "test/javascript/erlang/elixir_aliases_test.mjs": {
+      "count": 12,
+      "namesSha256": "999dd4cd6e40d6d2f06b9f15886a61c704845524428ca768bde69bdf72d8c1e6"
+    },
+    "test/javascript/erlang/elixir_locals_test.mjs": {
+      "count": 3,
+      "namesSha256": "55928caf56225ac2ee2af6b9e2402833bb255552e6dc47137d1a140e6d2e1052"
+    },
+    "test/javascript/erlang/elixir_utils_test.mjs": {
+      "count": 28,
+      "namesSha256": "f0f3c59ec3b049ed1c91f929c59a2892291f524b593b10cb2ac212f67b08c149"
+    },
+    "test/javascript/erlang/erlang_test.mjs": {
+      "count": 1095,
+      "namesSha256": "e547271b127ccfe5bcc26e2b0444f6f303172a80f6dd3936806658d4a24feb46"
+    },
+    "test/javascript/erlang/filelib_test.mjs": {
+      "count": 27,
+      "namesSha256": "a7ba32bd527e97929d564822d21d30501d084f3a4cc973e9040ba0a4c0d8cee8"
+    },
+    "test/javascript/erlang/filename_test.mjs": {
+      "count": 248,
+      "namesSha256": "e40250cdbc80a98254520e38a6c90bddb601aad3933b8060771ada4a09fec1fe"
+    },
+    "test/javascript/erlang/init_test.mjs": {
+      "count": 6,
+      "namesSha256": "c8d8ae27c2c988bac23d1d46905c33acdc9610499fc3aed71c86bd0ff044d001"
+    },
+    "test/javascript/erlang/lists_test.mjs": {
+      "count": 285,
+      "namesSha256": "a0f789142c4fcbbd88320d3f9f163109f8dcedff129760b6bca5f6cd7d797afe"
+    },
+    "test/javascript/erlang/maps_test.mjs": {
+      "count": 101,
+      "namesSha256": "fbaaf4e8c275b11b7f77d19ecf8e7b493be73aa3de4147f1a22823ad45331a6f"
+    },
+    "test/javascript/erlang/math_test.mjs": {
+      "count": 65,
+      "namesSha256": "7b983afd391720b5b6ec4c580792ee133567c3150a08606a689f6d0bb35b2bf2"
+    },
+    "test/javascript/erlang/os_test.mjs": {
+      "count": 9,
+      "namesSha256": "50e13091c064e8a855dff901bd1657a1048582b374cae351edba6c1c84414022"
+    },
+    "test/javascript/erlang/persistent_term_test.mjs": {
+      "count": 2,
+      "namesSha256": "4fb31204c3c389d225076df3fc5def03432b1343c2c5f714cff5faa52a6e4672"
+    },
+    "test/javascript/erlang/rand_test.mjs": {
+      "count": 7,
+      "namesSha256": "945fbfe58d0c248c11612d77343cfeba0b6097c5ecd0beccf145e2368347ad45"
+    },
+    "test/javascript/erlang/re_test.mjs": {
+      "count": 1,
+      "namesSha256": "0aa1d8ef2a4a975f0bb0cbae5b07d1b8f7d8e1edf830bd0aa01ca9bfdd5ca0a8"
+    },
+    "test/javascript/erlang/sets_test.mjs": {
+      "count": 98,
+      "namesSha256": "f78f10c8416362a2dbd116f85ebde6c39395c328bddc39375a0cc5af5fb53413"
+    },
+    "test/javascript/erlang/string_test.mjs": {
+      "count": 186,
+      "namesSha256": "d1889a308e101a9f9559909a5fb9b855539b7f8be79181ccf751ab35785d91fe"
+    },
+    "test/javascript/erlang/unicode_test.mjs": {
+      "count": 155,
+      "namesSha256": "4cf017f49b72c991b2718cccb6154ddd266b15d701b8028a45b62657481051b7"
+    },
+    "test/javascript/erlang/unicode_util_test.mjs": {
+      "count": 94,
+      "namesSha256": "585e436dc4e401c8b3271a96c2c98a4a34c4e7abfc9c3f445a09e8ca9ab370dd"
+    },
+    "test/javascript/erlang/uri_string_test.mjs": {
+      "count": 46,
+      "namesSha256": "644968588210762307ac594f92182bc2d8904565b92b6e66f60517bd1e27e517"
+    },
+    "test/javascript/errors/boxed_error_test.mjs": {
+      "count": 10,
+      "namesSha256": "d914d616e4b7a7aeb9f2c15f3594f62f1b76bb1e11cdb31d151fe6da9bc37607"
+    },
+    "test/javascript/errors/interpreter_error_test.mjs": {
+      "count": 1,
+      "namesSha256": "c8adb3df0d4b6589c3fd7e8278290d7c154d3cee0be50a7b13b0a5703b9d7dd7"
+    },
+    "test/javascript/erts/application_env_test.mjs": {
+      "count": 6,
+      "namesSha256": "b221496f3c3f75a1b26815aade04caa24c20bc2ce40c0d85aa89cd124fc22af2"
+    },
+    "test/javascript/erts/binary_pattern_registry_test.mjs": {
+      "count": 5,
+      "namesSha256": "06ec5a3f31a2c50da0e5ccf22361dd251a67e5cc17ccdfb4d3ae573e612ba557"
+    },
+    "test/javascript/erts/native_object_registry_test.mjs": {
+      "count": 5,
+      "namesSha256": "5b4d460689167c0f1b41d3223f6feb1dbd543ea927409709007a3b8c0edeefed"
+    },
+    "test/javascript/erts/node_table_test.mjs": {
+      "count": 8,
+      "namesSha256": "a120cc7ca10c6c977a781a2f093ae9cb262c8ee6aecdaea286da3e0e2211173d"
+    },
+    "test/javascript/erts/promise_registry_test.mjs": {
+      "count": 7,
+      "namesSha256": "1c36779c4b8a6ce4f6e983d4edb47f5504ace6f077b6b7a8aa8567473e80d66f"
+    },
+    "test/javascript/erts_test.mjs": {
+      "count": 11,
+      "namesSha256": "a3582a47fce279bb668734757a6c9933f47013f08113b933c42d28d5c097b7b1"
+    },
+    "test/javascript/event_listener_registry_test.mjs": {
+      "count": 8,
+      "namesSha256": "76b42dd69f51b00ed0ac5ed9c7907dbd3653a099d3d5d037dad0e5239ece579e"
+    },
+    "test/javascript/event_listeners_test.mjs": {
+      "count": 24,
+      "namesSha256": "c455abad53cb6ac74a7996fd1710735e2060f828cd7b4b2a357093eea208ef86"
+    },
+    "test/javascript/events/change_event_test.mjs": {
+      "count": 8,
+      "namesSha256": "232f4349fe10acb7cdefdfbcc79546e6f74000b1399da0575ee231c37360eb51"
+    },
+    "test/javascript/events/click_event_test.mjs": {
+      "count": 7,
+      "namesSha256": "d942a9b1cba362a80a36f5ab99a61698d7b60428fea11e5f7753447256d3c693"
+    },
+    "test/javascript/events/click_outside_event_test.mjs": {
+      "count": 2,
+      "namesSha256": "f59d74205b02802cfe8a4e3bb6089a08c83900d9483e427c8768b1ce81003dc0"
+    },
+    "test/javascript/events/focus_event_test.mjs": {
+      "count": 2,
+      "namesSha256": "7b4e0dedf4e133f05a33b9664f864e7d1225b34ba4b4d3604577dbedb3af162f"
+    },
+    "test/javascript/events/input_event_test.mjs": {
+      "count": 2,
+      "namesSha256": "289cdebd33b02f3eea9e52e2241b5bb05e2b3577ca784ad751417e432af7d0cc"
+    },
+    "test/javascript/events/keyboard_event_test.mjs": {
+      "count": 9,
+      "namesSha256": "53cfda09dde6eb17f40e5c2bb91c3403118c7040beea6eeb530a9c4aa05bd173"
+    },
+    "test/javascript/events/mouse_event_test.mjs": {
+      "count": 2,
+      "namesSha256": "eced918be5669b3c7e0cefd1eddc6dc1eb9fda109fe8bde51202d252f36a4549"
+    },
+    "test/javascript/events/pointer_event_test.mjs": {
+      "count": 3,
+      "namesSha256": "bff2eb6cb6b74f48b72445fb882ca5ffa5bcce2fceebc7946754861113535d32"
+    },
+    "test/javascript/events/reach_event_test.mjs": {
+      "count": 2,
+      "namesSha256": "893510adcc9d92e15574edf0022421a7f3cf3980e4f7d320fc7814733edd9649"
+    },
+    "test/javascript/events/resize_event_test.mjs": {
+      "count": 4,
+      "namesSha256": "f5d940fee9ea95a1fa6cef206cb99477e3210d9efbd2a8b01aa1de6561aff6b2"
+    },
+    "test/javascript/events/scroll_event_test.mjs": {
+      "count": 2,
+      "namesSha256": "95dac02d7952d5ee1fe3a4c8e5d2ecfe7f0c77875c27760691531b6d8c5b5391"
+    },
+    "test/javascript/events/select_event_test.mjs": {
+      "count": 2,
+      "namesSha256": "02f96b06821223ade78d413106905d5094d2c2ceb97cf257eb91f4d52433bdea"
+    },
+    "test/javascript/events/submit_event_test.mjs": {
+      "count": 5,
+      "namesSha256": "4557c19997d923648ba429998b2ce5baed5ddf275240e92e4f271cad3fce7a3e"
+    },
+    "test/javascript/events/transition_event_test.mjs": {
+      "count": 2,
+      "namesSha256": "86963accb14ec8d5235cd3c5bad13f33ae024b2df875f98229a3885647c153a6"
+    },
+    "test/javascript/global_registry_test.mjs": {
+      "count": 7,
+      "namesSha256": "8527a28d5cfec8b2b3a667e38cb3b1a012dcfbd9b100c1b303182bee48784b56"
+    },
+    "test/javascript/hologram_test.mjs": {
+      "count": 48,
+      "namesSha256": "ca2a1cafa370f765fd98fe6e427bef55d7dc18824e23a562ac9907ac6438426b"
+    },
+    "test/javascript/http_transport_test.mjs": {
+      "count": 20,
+      "namesSha256": "7ae528757acb31745bcbf64d2d3cf659aa901cccd0c727c467d6d0c6d16da801"
+    },
+    "test/javascript/init_action_queue_test.mjs": {
+      "count": 4,
+      "namesSha256": "a10b5419d4c6046cf5727f1338b003d02007dab5d316c7067e4ef0ef22ec1ac9"
+    },
+    "test/javascript/interpreter_test.mjs": {
+      "count": 450,
+      "namesSha256": "ade2b359244c41c69e930ffb35784b57f41dbc8d5d33f6c9ff37f1f1538c6795"
+    },
+    "test/javascript/js_interop_test.mjs": {
+      "count": 27,
+      "namesSha256": "aa2df63cd22b50f0cbed549bc562f49eba684a446d6c54137c6fad4e89b18659"
+    },
+    "test/javascript/live_reload_test.mjs": {
+      "count": 8,
+      "namesSha256": "d0525f765aef07d8e628962c58008d85c51df590c7d0f4af2ae1ef6699403579"
+    },
+    "test/javascript/logger_test.mjs": {
+      "count": 3,
+      "namesSha256": "e6830329ebebfb86ab0902536753c89e330dcf1c5f34f8103418b0403ad4d3ee"
+    },
+    "test/javascript/memory_storage_test.mjs": {
+      "count": 3,
+      "namesSha256": "fc4fce926cd4fdc3a9f8fdc435fff26d77bd1c1ccca8285d554c853d1547fe03"
+    },
+    "test/javascript/once_test.mjs": {
+      "count": 6,
+      "namesSha256": "20b7f8da065dee6da7a0618f6b6fc8b7cd29566706e28ca6e9fab1b8fc30a2a2"
+    },
+    "test/javascript/operation_test.mjs": {
+      "count": 28,
+      "namesSha256": "cf2728557c28ce32fe7d7bd3df03aabcff75ec0b738bb8e5195aecf6bcb1a843"
+    },
+    "test/javascript/performance_timer_test.mjs": {
+      "count": 3,
+      "namesSha256": "ccfd51cd8cba0ce34a83ed394888de8268da45a54669b874b7bb2cedb76af84e"
+    },
+    "test/javascript/renderer_test.mjs": {
+      "count": 215,
+      "namesSha256": "133a4831a3116b2b7065041d225af4681d908870ef125161371912e6d8a67ac8"
+    },
+    "test/javascript/sequence_test.mjs": {
+      "count": 2,
+      "namesSha256": "3a3e14375cbae3ad22069b7ce86670446ce31d1c1955ed2aa9834a05c77b8a8a"
+    },
+    "test/javascript/serializer_test.mjs": {
+      "count": 66,
+      "namesSha256": "3f1dfac2622ca9d969127ee9a959c5f112dd563cad8896f2b8f925775941d290"
+    },
+    "test/javascript/sse_test.mjs": {
+      "count": 38,
+      "namesSha256": "6899bdd71e32e97916f931f341aa982d3a473819345785839547e3ba02858648"
+    },
+    "test/javascript/subscription_receipt_registry_test.mjs": {
+      "count": 7,
+      "namesSha256": "3a4fe343ec17f7c8da11b6005237eb1408ffb0a1e5f427d99a4b979fb385cdd0"
+    },
+    "test/javascript/support/helpers_test.mjs": {
+      "count": 7,
+      "namesSha256": "228401ad3abc46347f19f8d4970d90714b95be65821cf10375f5c89ca539f5d4"
+    },
+    "test/javascript/throttler_test.mjs": {
+      "count": 7,
+      "namesSha256": "a7b96056b8693c72395c3671dcd274095b0d033b35348eef9ddbe7bc52e1766f"
+    },
+    "test/javascript/type_test.mjs": {
+      "count": 181,
+      "namesSha256": "5a2431db832381b409f96bdb3017827afb013db3a80c2042a8a0cac857119a06"
+    },
+    "test/javascript/utils_test.mjs": {
+      "count": 21,
+      "namesSha256": "976a807d0581f4d477748069839c822934a149c2749d62a2511435e562a5a995"
+    },
+    "test/javascript/vdom_test.mjs": {
+      "count": 25,
+      "namesSha256": "5b19df501bf435eee09f3066bcc337fc03865cc777f5b012464ecd0c8e768d45"
+    }
+  }
+}

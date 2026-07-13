@@ -1,8 +1,8 @@
 import {assert, defineRuntimeGlobals} from "../../../support/helpers.mjs";
 
-import Elixir_Cldr_Validity_U from "../../../../../assets/js/elixir/cldr/validity/u.mjs";
-import HologramInterpreterError from "../../../../../assets/js/errors/interpreter_error.mjs";
-import Interpreter from "../../../../../assets/js/interpreter.mjs";
+import Elixir_Cldr_Validity_U from "hologram:runtime/elixir/cldr/validity/u";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
+import Interpreter from "hologram:runtime/interpreter";
 
 defineRuntimeGlobals();
 

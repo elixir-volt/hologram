@@ -7,8 +7,8 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Erlang_Elixir_Aliases from "../../../assets/js/erlang/elixir_aliases.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Elixir_Aliases from "hologram:runtime/erlang/elixir_aliases";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

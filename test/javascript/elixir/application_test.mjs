@@ -2,9 +2,9 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import ApplicationEnv from "../../../assets/js/erts/application_env.mjs";
-import Elixir_Application from "../../../assets/js/elixir/application.mjs";
-import Type from "../../../assets/js/type.mjs";
+import ApplicationEnv from "hologram:runtime/erts/application_env";
+import Elixir_Application from "hologram:runtime/elixir/application";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

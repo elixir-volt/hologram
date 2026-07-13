@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "./support/helpers.mjs";
 
-import AssetPathRegistry from "../../assets/js/asset_path_registry.mjs";
-import Type from "../../assets/js/type.mjs";
+import AssetPathRegistry from "hologram:runtime/asset_path_registry";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

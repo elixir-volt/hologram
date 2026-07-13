@@ -4,10 +4,10 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Elixir_Code from "../../../assets/js/elixir/code.mjs";
-import Erlang from "../../../assets/js/erlang/erlang.mjs";
-import Interpreter from "../../../assets/js/interpreter.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Elixir_Code from "hologram:runtime/elixir/code";
+import Erlang from "hologram:runtime/erlang/erlang";
+import Interpreter from "hologram:runtime/interpreter";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

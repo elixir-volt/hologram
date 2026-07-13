@@ -6,10 +6,10 @@ import {
   defineRuntimeGlobals,
 } from "./support/helpers.mjs";
 
-import ERTS from "../../assets/js/erts.mjs";
-import HologramInterpreterError from "../../assets/js/errors/interpreter_error.mjs";
-import NodeTable from "../../assets/js/erts/node_table.mjs";
-import Type from "../../assets/js/type.mjs";
+import ERTS from "hologram:runtime/erts";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
+import NodeTable from "hologram:runtime/erts/node_table";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

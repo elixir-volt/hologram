@@ -2,9 +2,9 @@
 
 import {assert, defineRuntimeGlobals, sinon} from "../support/helpers.mjs";
 
-import MouseEvent from "../../../assets/js/events/mouse_event.mjs";
-import PointerEvent from "../../../assets/js/events/pointer_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import MouseEvent from "hologram:runtime/events/mouse_event";
+import PointerEvent from "hologram:runtime/events/pointer_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

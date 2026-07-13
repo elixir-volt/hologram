@@ -1,9 +1,9 @@
 "use strict";
 
-import {sinon} from "./support/helpers.mjs";
+import {sinon} from "./support/sinon_helpers.mjs";
 
-import EventListenerRegistry from "../../assets/js/event_listener_registry.mjs";
-import EventListeners from "../../assets/js/event_listeners.mjs";
+import EventListenerRegistry from "hologram:runtime/event_listener_registry";
+import EventListeners from "hologram:runtime/event_listeners";
 
 describe("EventListenerRegistry", () => {
   let windowAddSpy;

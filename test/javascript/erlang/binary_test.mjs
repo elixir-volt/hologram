@@ -9,10 +9,10 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Bitstring from "../../../assets/js/bitstring.mjs";
-import Erlang_Binary from "../../../assets/js/erlang/binary.mjs";
-import ERTS from "../../../assets/js/erts.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import Erlang_Binary from "hologram:runtime/erlang/binary";
+import ERTS from "hologram:runtime/erts";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

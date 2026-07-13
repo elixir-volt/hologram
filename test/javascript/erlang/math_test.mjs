@@ -7,8 +7,8 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Erlang_Math from "../../../assets/js/erlang/math.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Math from "hologram:runtime/erlang/math";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

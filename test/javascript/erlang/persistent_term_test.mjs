@@ -2,9 +2,9 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import Erlang_Persistent_Term from "../../../assets/js/erlang/persistent_term.mjs";
-import MemoryStorage from "../../../assets/js/memory_storage.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Persistent_Term from "hologram:runtime/erlang/persistent_term";
+import MemoryStorage from "hologram:runtime/memory_storage";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

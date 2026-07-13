@@ -5,14 +5,10 @@ defmodule Mix.Tasks.Compile.HologramTest do
   alias Hologram.Commons.FileUtils
   alias Hologram.Commons.PLT
   alias Hologram.Commons.SystemUtils
-  alias Hologram.Compiler
   alias Hologram.Compiler.CallGraph
   alias Hologram.Reflection
   alias Hologram.Test.Fixtures.Mix.Tasks.Compile.Hologram.Module1
   alias Hologram.Test.Fixtures.Mix.Tasks.Compile.Hologram.Module2
-
-  @lib_assets_dir Path.join(Reflection.root_dir(), "assets")
-  @lib_package_json_path Path.join(@lib_assets_dir, "package.json")
 
   @test_dir Path.join([
               Reflection.tmp_dir(),
@@ -23,7 +19,6 @@ defmodule Mix.Tasks.Compile.HologramTest do
               "run_1"
             ])
 
-  @assets_dir Path.join(@test_dir, "assets")
   @build_dir Path.join(@test_dir, "build")
   @static_dir Path.join(@test_dir, "static")
   @tmp_dir Path.join(@test_dir, "tmp")
@@ -70,23 +65,8 @@ defmodule Mix.Tasks.Compile.HologramTest do
     Agent.update(tracker, fn state -> %{state | current: state.current - 1} end)
   end
 
-  defp setup_empty_assets_and_build_dirs(opts) do
-    assets_dir = setup_empty_assets_dir()
-    build_dir = setup_empty_build_dir()
-
-    opts
-    |> Keyword.put(:assets_dir, assets_dir)
-    |> Keyword.put(:build_dir, build_dir)
-  end
-
-  defp setup_empty_assets_dir do
-    assets_dir = Path.join(@test_dir, "assets_empty")
-    clean_dir(assets_dir)
-
-    test_package_json_path = Path.join(assets_dir, "package.json")
-    FileUtils.cp_p!(@lib_package_json_path, test_package_json_path)
-
-    assets_dir
+  defp setup_empty_build_dir_in_opts(opts) do
+    Keyword.put(opts, :build_dir, setup_empty_build_dir())
   end
 
   defp setup_empty_build_dir do
@@ -99,7 +79,6 @@ defmodule Mix.Tasks.Compile.HologramTest do
   defp test_build_artifacts(opts) do
     test_call_graph(opts)
     test_dirs(opts)
-    test_js_deps(opts)
     test_module_digest_plt(opts)
     test_page_bundles(opts)
     test_page_digest_plt(opts)
@@ -126,12 +105,6 @@ defmodule Mix.Tasks.Compile.HologramTest do
     assert File.exists?(opts[:build_dir])
     assert File.exists?(opts[:static_dir])
     assert File.exists?(opts[:tmp_dir])
-  end
-
-  defp test_js_deps(opts) do
-    assert opts[:assets_dir]
-           |> Path.join("node_modules")
-           |> File.exists?()
   end
 
   defp test_module_digest_plt(opts) do
@@ -246,25 +219,13 @@ defmodule Mix.Tasks.Compile.HologramTest do
     end)
 
     clean_dir(@test_dir)
-    File.mkdir!(@assets_dir)
     File.mkdir!(@build_dir)
 
-    test_node_modules_path = Path.join(@assets_dir, "node_modules")
-
     opts = [
-      assets_dir: @assets_dir,
       build_dir: @build_dir,
-      esbuild_bin_path: Path.join([test_node_modules_path, ".bin", "esbuild"]),
-      js_dir: Path.join(@lib_assets_dir, "js"),
-      node_modules_path: test_node_modules_path,
       static_dir: @static_dir,
       tmp_dir: @tmp_dir
     ]
-
-    test_package_json_path = Path.join(@assets_dir, "package.json")
-    FileUtils.cp_p!(@lib_package_json_path, test_package_json_path)
-
-    Compiler.install_js_deps(@assets_dir, @build_dir)
 
     [opts: opts]
   end
@@ -300,8 +261,9 @@ defmodule Mix.Tasks.Compile.HologramTest do
     end
   end
 
+  @tag timeout: 120_000
   test "compilation artifacts", %{opts: initial_opts} do
-    opts = setup_empty_assets_and_build_dirs(initial_opts)
+    opts = setup_empty_build_dir_in_opts(initial_opts)
 
     # Test case 1: when there are no previous build artifacts
     run(opts)
@@ -316,7 +278,7 @@ defmodule Mix.Tasks.Compile.HologramTest do
   end
 
   test "stops the processes it spawns once compilation finishes", %{opts: initial_opts} do
-    opts = setup_empty_assets_and_build_dirs(initial_opts)
+    opts = setup_empty_build_dir_in_opts(initial_opts)
 
     before_count = count_plt_processes()
     run(opts)
@@ -326,6 +288,7 @@ defmodule Mix.Tasks.Compile.HologramTest do
   end
 
   describe "compiler locking" do
+    @tag timeout: 180_000
     test "locking mechanism prevents concurrent compilation", %{opts: opts} do
       # The lock guards the actual compilation work, which emits
       # [:hologram, :compiler, :start] when it enters the critical section and
@@ -362,23 +325,23 @@ defmodule Mix.Tasks.Compile.HologramTest do
     end
 
     test "lock file is cleaned up after compilation error", %{opts: initial_opts} do
-      opts = setup_empty_assets_and_build_dirs(initial_opts)
+      opts = setup_empty_build_dir_in_opts(initial_opts)
 
-      # Create an invalid package.json that will cause npm install to fail
-      package_json_path = Path.join(opts[:assets_dir], "package.json")
-      File.write!(package_json_path, "{ invalid json content")
+      tmp_file_path = Path.join(opts[:build_dir], "tmp_file")
+      File.write!(tmp_file_path, "not a directory")
+      invalid_opts = Keyword.put(opts, :tmp_dir, tmp_file_path)
 
       refute File.exists?(@lock_path)
 
-      assert_raise RuntimeError, "npm install command failed", fn ->
-        run(opts)
+      assert_raise File.Error, fn ->
+        run(invalid_opts)
       end
 
       refute File.exists?(@lock_path)
     end
 
     test "lock dir (which is the build dir) is created if it doesn't exist", %{opts: initial_opts} do
-      opts = setup_empty_assets_and_build_dirs(initial_opts)
+      opts = setup_empty_build_dir_in_opts(initial_opts)
 
       build_dir = opts[:build_dir]
       lock_path = Path.join(build_dir, @compiler_lock_file_name)

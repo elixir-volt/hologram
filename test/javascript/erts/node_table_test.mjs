@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import NodeTable from "../../../assets/js/erts/node_table.mjs";
+import NodeTable from "hologram:runtime/erts/node_table";
 
 defineRuntimeGlobals();
 

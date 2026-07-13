@@ -44,11 +44,11 @@ build_module_digest_plt!/0          4.11      243.05 ms     ±3.98%      244.90 
 ```
 
 
-### ✅ compiler » build_page_js_6
+### ✅ compiler » build_page_js_5
 
 ```
 Name                      ips        average  deviation         median         99th %
-build_page_js/6         70.82       14.12 ms    ±14.38%       14.67 ms       17.32 ms
+build_page_js/5         70.82       14.12 ms    ±14.38%       14.67 ms       17.32 ms
 ```
 
 

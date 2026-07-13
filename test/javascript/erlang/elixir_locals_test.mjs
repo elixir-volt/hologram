@@ -8,8 +8,8 @@ import {
   freeze,
 } from "../support/helpers.mjs";
 
-import Erlang_Elixir_Locals from "../../../assets/js/erlang/elixir_locals.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Elixir_Locals from "hologram:runtime/erlang/elixir_locals";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

@@ -7,10 +7,10 @@ import {
   sinon,
 } from "../support/helpers.mjs";
 
-import CallStack from "../../../assets/js/erts/call_stack.mjs";
-import HologramBoxedError from "../../../assets/js/errors/boxed_error.mjs";
-import Interpreter from "../../../assets/js/interpreter.mjs";
-import Type from "../../../assets/js/type.mjs";
+import CallStack from "hologram:runtime/erts/call_stack";
+import HologramBoxedError from "hologram:runtime/errors/boxed_error";
+import Interpreter from "hologram:runtime/interpreter";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

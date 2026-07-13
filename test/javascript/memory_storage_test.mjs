@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "./support/helpers.mjs";
 
-import MemoryStorage from "../../assets/js/memory_storage.mjs";
+import MemoryStorage from "hologram:runtime/memory_storage";
 
 defineRuntimeGlobals();
 

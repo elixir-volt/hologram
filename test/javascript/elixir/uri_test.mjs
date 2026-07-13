@@ -7,8 +7,8 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Elixir_URI from "../../../assets/js/elixir/uri.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Elixir_URI from "hologram:runtime/elixir/uri";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

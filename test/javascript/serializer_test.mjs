@@ -6,10 +6,10 @@ import {
   defineRuntimeGlobals,
 } from "./support/helpers.mjs";
 
-import ERTS from "../../assets/js/erts.mjs";
-import HologramRuntimeError from "../../assets/js/errors/runtime_error.mjs";
-import Serializer from "../../assets/js/serializer.mjs";
-import Type from "../../assets/js/type.mjs";
+import ERTS from "hologram:runtime/erts";
+import HologramRuntimeError from "hologram:runtime/errors/runtime_error";
+import Serializer from "hologram:runtime/serializer";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

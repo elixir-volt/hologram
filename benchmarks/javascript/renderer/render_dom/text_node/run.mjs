@@ -1,7 +1,7 @@
 "use strict";
 
-import Renderer from "../../../../../assets/js/renderer.mjs";
-import Type from "../../../../../assets/js/type.mjs";
+import Renderer from "hologram:runtime/renderer";
+import Type from "hologram:runtime/type";
 
 import {benchmark} from "../../../support/helpers.mjs";
 import {defineRuntimeGlobals} from "../../../../../test/javascript/support/helpers.mjs";

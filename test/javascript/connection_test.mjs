@@ -7,11 +7,11 @@ import {
   sinon,
 } from "./support/helpers.mjs";
 
-import Connection from "../../assets/js/connection.mjs";
-import GlobalRegistry from "../../assets/js/global_registry.mjs";
-import LiveReload from "../../assets/js/live_reload.mjs";
-import Serializer from "../../assets/js/serializer.mjs";
-import Type from "../../assets/js/type.mjs";
+import Connection from "hologram:runtime/connection";
+import GlobalRegistry from "hologram:runtime/global_registry";
+import LiveReload from "hologram:runtime/live_reload";
+import Serializer from "hologram:runtime/serializer";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 registerWebApis();

@@ -6,9 +6,9 @@ import {
   defineRuntimeGlobals,
 } from "../../../support/helpers.mjs";
 
-import AssetPathRegistry from "../../../../../assets/js/asset_path_registry.mjs";
-import Elixir_Hologram_Router_Helpers from "../../../../../assets/js/elixir/hologram/router/helpers.mjs";
-import Type from "../../../../../assets/js/type.mjs";
+import AssetPathRegistry from "hologram:runtime/asset_path_registry";
+import Elixir_Hologram_Router_Helpers from "hologram:runtime/elixir/hologram/router/helpers";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

@@ -2,11 +2,11 @@
 
 import {assert, defineRuntimeGlobals, sinon} from "./support/helpers.mjs";
 
-import ERTS from "../../assets/js/erts.mjs";
-import ErrorOverlay from "../../assets/js/error_overlay.mjs";
-import HologramBoxedError from "../../assets/js/errors/boxed_error.mjs";
-import Type from "../../assets/js/type.mjs";
-import UncaughtErrorOverlay from "../../assets/js/uncaught_error_overlay.mjs";
+import ERTS from "hologram:runtime/erts";
+import ErrorOverlay from "hologram:runtime/error_overlay";
+import HologramBoxedError from "hologram:runtime/errors/boxed_error";
+import Type from "hologram:runtime/type";
+import UncaughtErrorOverlay from "hologram:runtime/uncaught_error_overlay";
 
 defineRuntimeGlobals();
 

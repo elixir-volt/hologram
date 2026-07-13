@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "../../support/helpers.mjs";
 
-import {caseVariants} from "../../../../assets/js/erts/regex/regex_case_folding.mjs";
+import {caseVariants} from "hologram:runtime/erts/regex/regex_case_folding";
 
 defineRuntimeGlobals();
 

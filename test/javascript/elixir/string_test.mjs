@@ -6,9 +6,9 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Elixir_String from "../../../assets/js/elixir/string.mjs";
-import Type from "../../../assets/js/type.mjs";
-import HologramInterpreterError from "../../../assets/js/errors/interpreter_error.mjs";
+import Elixir_String from "hologram:runtime/elixir/string";
+import Type from "hologram:runtime/type";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
 
 defineRuntimeGlobals();
 

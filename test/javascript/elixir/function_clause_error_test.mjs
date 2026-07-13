@@ -2,9 +2,9 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import Bitstring from "../../../assets/js/bitstring.mjs";
-import Elixir_FunctionClauseError from "../../../assets/js/elixir/function_clause_error.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import Elixir_FunctionClauseError from "hologram:runtime/elixir/function_clause_error";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

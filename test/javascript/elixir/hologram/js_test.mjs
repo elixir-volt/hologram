@@ -9,13 +9,13 @@ import {
 import Elixir_Hologram_JS, {
   resolveBinding,
   unbox,
-} from "../../../../assets/js/elixir/hologram/js.mjs";
+} from "hologram:runtime/elixir/hologram/js";
 
-import {box} from "../../../../assets/js/js_interop.mjs";
+import {box} from "hologram:runtime/js_interop";
 
-import ERTS from "../../../../assets/js/erts.mjs";
-import Interpreter from "../../../../assets/js/interpreter.mjs";
-import Type from "../../../../assets/js/type.mjs";
+import ERTS from "hologram:runtime/erts";
+import Interpreter from "hologram:runtime/interpreter";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 registerWebApis();

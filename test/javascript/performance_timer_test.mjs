@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals, sinon} from "./support/helpers.mjs";
 
-import PerformanceTimer from "../../assets/js/performance_timer.mjs";
+import PerformanceTimer from "hologram:runtime/performance_timer";
 
 defineRuntimeGlobals();
 

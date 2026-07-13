@@ -2,9 +2,9 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import ERTS from "../../../assets/js/erts.mjs";
-import RegexPatternRegistry from "../../../assets/js/erts/regex_pattern_registry.mjs";
-import Type from "../../../assets/js/type.mjs";
+import ERTS from "hologram:runtime/erts";
+import RegexPatternRegistry from "hologram:runtime/erts/regex_pattern_registry";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

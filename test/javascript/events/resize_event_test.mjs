@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import ResizeEvent from "../../../assets/js/events/resize_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import ResizeEvent from "hologram:runtime/events/resize_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

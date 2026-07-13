@@ -6,11 +6,11 @@ import {
   defineRuntimeGlobals,
 } from "../support/helpers.mjs";
 
-import Bitstring from "../../../assets/js/bitstring.mjs";
-import Interpreter from "../../../assets/js/interpreter.mjs";
-import ERTS from "../../../assets/js/erts.mjs";
-import Elixir_Exception from "../../../assets/js/elixir/exception.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Bitstring from "hologram:runtime/bitstring";
+import Interpreter from "hologram:runtime/interpreter";
+import ERTS from "hologram:runtime/erts";
+import Elixir_Exception from "hologram:runtime/elixir/exception";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

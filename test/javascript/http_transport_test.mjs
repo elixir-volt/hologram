@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals, sinon} from "./support/helpers.mjs";
 
-import HttpTransport from "../../assets/js/http_transport.mjs";
+import HttpTransport from "hologram:runtime/http_transport";
 
 defineRuntimeGlobals();
 

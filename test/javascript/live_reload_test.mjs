@@ -2,8 +2,8 @@
 
 import {defineRuntimeGlobals, sinon} from "./support/helpers.mjs";
 
-import ErrorOverlay from "../../assets/js/error_overlay.mjs";
-import LiveReload from "../../assets/js/live_reload.mjs";
+import ErrorOverlay from "hologram:runtime/error_overlay";
+import LiveReload from "hologram:runtime/live_reload";
 
 defineRuntimeGlobals();
 

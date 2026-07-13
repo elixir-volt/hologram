@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import Sequence from "../../../assets/js/common/sequence.mjs";
+import Sequence from "hologram:runtime/common/sequence";
 
 defineRuntimeGlobals();
 

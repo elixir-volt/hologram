@@ -5,20 +5,20 @@ import {
   componentRegistryEntryFixture,
   defineRuntimeGlobals,
   encodedSubscriptionReceiptKey,
-  registerWebApis,
-  sinon,
   waitForEventLoop,
 } from "./support/helpers.mjs";
+import {registerWebApis} from "hologram:test/browser-helpers";
+import {sinon} from "./support/sinon_helpers.mjs";
 
-import App from "../../assets/js/app.mjs";
-import Client from "../../assets/js/client.mjs";
-import ComponentRegistry from "../../assets/js/component_registry.mjs";
-import Connection from "../../assets/js/connection.mjs";
-import Hologram from "../../assets/js/hologram.mjs";
-import HologramRuntimeError from "../../assets/js/errors/runtime_error.mjs";
-import HttpTransport from "../../assets/js/http_transport.mjs";
-import Serializer from "../../assets/js/serializer.mjs";
-import Type from "../../assets/js/type.mjs";
+import App from "hologram:runtime/app";
+import Client from "hologram:runtime/client";
+import ComponentRegistry from "hologram:runtime/component_registry";
+import Connection from "hologram:runtime/connection";
+import Hologram from "hologram:runtime/hologram";
+import HologramRuntimeError from "hologram:runtime/errors/runtime_error";
+import HttpTransport from "hologram:runtime/http_transport";
+import Serializer from "hologram:runtime/serializer";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 registerWebApis();

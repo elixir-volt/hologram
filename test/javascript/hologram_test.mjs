@@ -9,22 +9,22 @@ import {
   UUID_REGEX,
 } from "./support/helpers.mjs";
 
-import CallStack from "../../assets/js/erts/call_stack.mjs";
-import Client from "../../assets/js/client.mjs";
-import ComponentRegistry from "../../assets/js/component_registry.mjs";
-import Config from "../../assets/js/config.mjs";
-import EventListenerRegistry from "../../assets/js/event_listener_registry.mjs";
-import EventListeners from "../../assets/js/event_listeners.mjs";
-import GlobalRegistry from "../../assets/js/global_registry.mjs";
-import Hologram from "../../assets/js/hologram.mjs";
-import HologramBoxedError from "../../assets/js/errors/boxed_error.mjs";
-import HologramRuntimeError from "../../assets/js/errors/runtime_error.mjs";
-import InitActionQueue from "../../assets/js/init_action_queue.mjs";
-import Interpreter from "../../assets/js/interpreter.mjs";
-import Renderer from "../../assets/js/renderer.mjs";
-import Type from "../../assets/js/type.mjs";
-import UncaughtErrorOverlay from "../../assets/js/uncaught_error_overlay.mjs";
-import Vdom from "../../assets/js/vdom.mjs";
+import CallStack from "hologram:runtime/erts/call_stack";
+import Client from "hologram:runtime/client";
+import ComponentRegistry from "hologram:runtime/component_registry";
+import Config from "hologram:runtime/config";
+import EventListenerRegistry from "hologram:runtime/event_listener_registry";
+import EventListeners from "hologram:runtime/event_listeners";
+import GlobalRegistry from "hologram:runtime/global_registry";
+import Hologram from "hologram:runtime/hologram";
+import HologramBoxedError from "hologram:runtime/errors/boxed_error";
+import HologramRuntimeError from "hologram:runtime/errors/runtime_error";
+import InitActionQueue from "hologram:runtime/init_action_queue";
+import Interpreter from "hologram:runtime/interpreter";
+import Renderer from "hologram:runtime/renderer";
+import Type from "hologram:runtime/type";
+import UncaughtErrorOverlay from "hologram:runtime/uncaught_error_overlay";
+import Vdom from "hologram:runtime/vdom";
 
 import {defineModule7Fixture} from "./support/fixtures/hologram/module_7.mjs";
 

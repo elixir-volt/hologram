@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import TransitionEvent from "../../../assets/js/events/transition_event.mjs";
-import Type from "../../../assets/js/type.mjs";
+import TransitionEvent from "hologram:runtime/events/transition_event";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

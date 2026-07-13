@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import HologramInterpreterError from "../../../assets/js/errors/interpreter_error.mjs";
+import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
 
 defineRuntimeGlobals();
 

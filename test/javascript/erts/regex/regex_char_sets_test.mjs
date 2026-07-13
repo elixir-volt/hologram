@@ -2,7 +2,7 @@
 
 import {assert, defineRuntimeGlobals} from "../../support/helpers.mjs";
 
-import {codePointInRanges} from "../../../../assets/js/erts/regex/regex_char_sets.mjs";
+import {codePointInRanges} from "hologram:runtime/erts/regex/regex_char_sets";
 
 defineRuntimeGlobals();
 

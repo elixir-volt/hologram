@@ -2,8 +2,8 @@
 
 import {assert, defineRuntimeGlobals} from "../support/helpers.mjs";
 
-import Erlang_Init from "../../../assets/js/erlang/init.mjs";
-import Type from "../../../assets/js/type.mjs";
+import Erlang_Init from "hologram:runtime/erlang/init";
+import Type from "hologram:runtime/type";
 
 defineRuntimeGlobals();
 

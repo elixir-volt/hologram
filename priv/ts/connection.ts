@@ -206,9 +206,7 @@ export default class Connection {
       $.MAX_RECONNECT_DELAY,
     );
 
-    console.log(
-      `Hologram: reconnecting in ${delay} ms (attempt ${$.reconnectAttempts})`,
-    );
+    console.log(`Hologram: reconnecting in ${delay} ms (attempt ${$.reconnectAttempts})`);
 
     $.reconnectTimer = setTimeout(() => {
       $.connect();
@@ -226,12 +224,7 @@ export default class Connection {
       } catch {}
     }
 
-    console.error(
-      "Hologram: failed to send message to server",
-      type,
-      payload,
-      correlationId,
-    );
+    console.error("Hologram: failed to send message to server", type, payload, correlationId);
 
     return false;
   }

@@ -27,9 +27,7 @@ const Erlang_Elixir_Utils = {
           const [atom, value] = result.data;
 
           if (Type.isAtom(atom) && atom.value === "error") {
-            Interpreter.raiseArgumentError(
-              `argument error: ${Interpreter.inspect(value)}`,
-            );
+            Interpreter.raiseArgumentError(`argument error: ${Interpreter.inspect(value)}`);
           }
         }
 
@@ -40,9 +38,7 @@ const Erlang_Elixir_Utils = {
           // cp/1 may return a multi-element improper tail, e.g. [codepoint | [rest | tail]];
           // reconstruct it rather than dropping everything past the second element.
           current =
-            result.data.length === 2
-              ? result.data[1]
-              : Type.improperList(result.data.slice(1));
+            result.data.length === 2 ? result.data[1] : Type.improperList(result.data.slice(1));
 
           if (Type.isBitstring(current) && Bitstring.isEmpty(current)) {
             break;
@@ -117,10 +113,7 @@ const Erlang_Elixir_Utils = {
     }
 
     const similarity =
-      (matchCount / len1 +
-        matchCount / len2 +
-        (matchCount - transpositions / 2) / matchCount) /
-      3;
+      (matchCount / len1 + matchCount / len2 + (matchCount - transpositions / 2) / matchCount) / 3;
 
     return Type.float(similarity);
   },

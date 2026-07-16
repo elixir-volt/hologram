@@ -5,9 +5,7 @@ export default class MemoryStorage {
   static data = {};
 
   static get(key) {
-    return typeof MemoryStorage.data[key] !== "undefined"
-      ? MemoryStorage.data[key]
-      : null;
+    return typeof MemoryStorage.data[key] !== "undefined" ? MemoryStorage.data[key] : null;
   }
 
   static put(key, value) {

@@ -18,9 +18,7 @@ export default class JsInterop {
         return Type.boolean(value);
 
       case "number":
-        return Number.isInteger(value)
-          ? Type.integer(value)
-          : Type.float(value);
+        return Number.isInteger(value) ? Type.integer(value) : Type.float(value);
 
       case "string":
         return Type.bitstring(value);
@@ -41,10 +39,7 @@ export default class JsInterop {
 
     if (proto === Object.prototype || proto === null) {
       return Type.map(
-        Object.entries(value).map(([key, value]) => [
-          Type.bitstring(key),
-          $.box(value),
-        ]),
+        Object.entries(value).map(([key, value]) => [Type.bitstring(key), $.box(value)]),
       );
     }
 
@@ -63,10 +58,7 @@ export default class JsInterop {
 
       if (proto === Object.prototype || proto === null) {
         return Type.map(
-          Object.entries(value).map(([key, value]) => [
-            Type.atom(key),
-            $.boxActionParam(value),
-          ]),
+          Object.entries(value).map(([key, value]) => [Type.atom(key), $.boxActionParam(value)]),
         );
       }
     }

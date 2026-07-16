@@ -12,6 +12,11 @@ defmodule Hologram.ApplicationTest do
 
   setup :set_mox_global
 
+  setup_all do
+    :ok = Application.stop(:hologram)
+    on_exit(fn -> Application.ensure_all_started(:hologram) end)
+  end
+
   setup do
     original_hologram_start_flag = System.get_env("HOLOGRAM_START")
 

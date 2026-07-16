@@ -47,7 +47,7 @@ The obsolete `assets/js` mirror, Mocha runner, and jsdom dependencies have been 
 
 ## Compatibility impact
 
-Hologram now depends on the published `volt ~> 0.17.2` package instead of a development path dependency. Because Volt 0.17 requires Elixir 1.17 or later, Hologram's Elixir requirement and CI compatibility floor have moved from Elixir 1.15 to 1.17. Applications upgrading to this version must use Elixir 1.17 or newer.
+Hologram depends on Volt as a compile-time-only package rather than a runtime application. Because Volt 0.17.3 requires Elixir 1.18 and Erlang/OTP 27 or later, Hologram's compatibility floor has moved accordingly. Applications upgrading to this version must use Elixir 1.18 and Erlang/OTP 27 or newer.
 
 ## Completion criteria
 

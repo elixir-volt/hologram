@@ -24,13 +24,9 @@ export default class ChangeEvent {
       value = Type.boolean(target.checked);
     } else if (tagName === "SELECT") {
       if (target.multiple) {
-        const selectedOptions = Array.from(target.selectedOptions).map(
-          (option) => option.value,
-        );
+        const selectedOptions = Array.from(target.selectedOptions).map((option) => option.value);
 
-        value = Type.list(
-          selectedOptions.map((optionValue) => Type.bitstring(optionValue)),
-        );
+        value = Type.list(selectedOptions.map((optionValue) => Type.bitstring(optionValue)));
       } else {
         value = Type.bitstring(target.value);
       }

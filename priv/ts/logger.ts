@@ -12,10 +12,7 @@ export default class Logger {
   }
 
   static #log(level, message) {
-    sessionStorage.setItem(
-      $.key,
-      `${$.getLogs() || ""}[${level}] ${message}\n`,
-    );
+    sessionStorage.setItem($.key, `${$.getLogs() || ""}[${level}] ${message}\n`);
   }
 }
 

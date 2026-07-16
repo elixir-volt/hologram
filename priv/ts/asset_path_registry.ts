@@ -7,11 +7,7 @@ export default class AssetPathRegistry {
 
   // Deps: [:maps.get/3]
   static lookup(staticPath) {
-    return Erlang_Maps["get/3"](
-      staticPath,
-      AssetPathRegistry.entries,
-      Type.nil(),
-    );
+    return Erlang_Maps["get/3"](staticPath, AssetPathRegistry.entries, Type.nil());
   }
 
   // Deps: [:maps.put/3]
@@ -22,11 +18,7 @@ export default class AssetPathRegistry {
       const key = Type.bitstring(staticPath);
       const value = Type.bitstring(assetPath);
 
-      AssetPathRegistry.entries = Erlang_Maps["put/3"](
-        key,
-        value,
-        AssetPathRegistry.entries,
-      );
+      AssetPathRegistry.entries = Erlang_Maps["put/3"](key, value, AssetPathRegistry.entries);
     }
   }
 }

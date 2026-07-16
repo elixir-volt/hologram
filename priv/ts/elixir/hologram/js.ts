@@ -80,8 +80,7 @@ function unbox(term, callerModule) {
         const obj = {};
 
         for (const [_encodedKey, [key, value]] of Object.entries(term.data)) {
-          const jsKey =
-            key.type === "atom" ? key.value : unbox(key, callerModule);
+          const jsKey = key.type === "atom" ? key.value : unbox(key, callerModule);
 
           Object.defineProperty(obj, jsKey, {
             value: unbox(value, callerModule),
@@ -156,11 +155,7 @@ const Elixir_Hologram_JS = {
   },
 
   "eval/1": (expression) => {
-    return box(
-      Interpreter.evaluateJavaScriptCode(
-        "return (" + Bitstring.toText(expression) + ")",
-      ),
-    );
+    return box(Interpreter.evaluateJavaScriptCode("return (" + Bitstring.toText(expression) + ")"));
   },
 
   "exec/1": (code) => {

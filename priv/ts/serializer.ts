@@ -76,9 +76,7 @@ export default class Serializer {
           return `u${value}`;
       }
 
-      throw new HologramRuntimeError(
-        `type "${valueType}" is not supported by the serializer`,
-      );
+      throw new HologramRuntimeError(`type "${valueType}" is not supported by the serializer`);
     });
 
     return `[${$.CURRENT_VERSION},${serialized}]`;
@@ -90,9 +88,7 @@ export default class Serializer {
     }
 
     if (term.capturedModule === null) {
-      throw new HologramRuntimeError(
-        "cannot serialize function: not a named function capture",
-      );
+      throw new HologramRuntimeError("cannot serialize function: not a named function capture");
     }
 
     return `c${term.capturedModule}${$.DELIMITER}${term.capturedFunction}${$.DELIMITER}${term.arity}`;
@@ -110,10 +106,7 @@ export default class Serializer {
 
   static #serializeJsString(value, key) {
     // Don't add prefix for the type marker in serialized boxed collection types
-    if (
-      key === "t" &&
-      (value === "l" || value === "m" || value === "r" || value === "t")
-    ) {
+    if (key === "t" && (value === "l" || value === "m" || value === "r" || value === "t")) {
       return value;
     }
 

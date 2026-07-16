@@ -57,17 +57,11 @@ export default class Operation {
     if (Operation.#isExpressionLonghandSyntax(specDom)) {
       const specKeywordList = specDom.data[0].data[1].data[0];
 
-      const actionName = Interpreter.accessKeywordListElement(
-        specKeywordList,
-        Type.atom("action"),
-      );
+      const actionName = Interpreter.accessKeywordListElement(specKeywordList, Type.atom("action"));
 
       const name = actionName
         ? actionName
-        : Interpreter.accessKeywordListElement(
-            specKeywordList,
-            Type.atom("command"),
-          );
+        : Interpreter.accessKeywordListElement(specKeywordList, Type.atom("command"));
 
       return name === null || Type.isNil(name);
     }
@@ -91,26 +85,16 @@ export default class Operation {
   #constructFromExpressionLonghandSyntaxSpec(specDom) {
     const specKeywordList = specDom.data[0].data[1].data[0];
 
-    const actionName = Interpreter.accessKeywordListElement(
-      specKeywordList,
-      Type.atom("action"),
-    );
+    const actionName = Interpreter.accessKeywordListElement(specKeywordList, Type.atom("action"));
 
     const name = actionName
       ? actionName
-      : Interpreter.accessKeywordListElement(
-          specKeywordList,
-          Type.atom("command"),
-        );
+      : Interpreter.accessKeywordListElement(specKeywordList, Type.atom("command"));
 
     const params = Erlang_Maps["put/3"](
       Type.atom("event"),
       this.#eventParam,
-      Interpreter.accessKeywordListElement(
-        specKeywordList,
-        Type.atom("params"),
-        Type.map(),
-      ),
+      Interpreter.accessKeywordListElement(specKeywordList, Type.atom("params"), Type.map()),
     );
 
     const target = Interpreter.accessKeywordListElement(
@@ -134,9 +118,7 @@ export default class Operation {
       });
     } else {
       if (!Interpreter.isStrictlyEqual(delay, Type.integer(0))) {
-        throw new HologramInterpreterError(
-          "Command delay is not yet implemented in Hologram",
-        );
+        throw new HologramInterpreterError("Command delay is not yet implemented in Hologram");
       }
 
       return Type.commandStruct({name: name, params: params, target: target});
@@ -151,8 +133,7 @@ export default class Operation {
     this.target = this.#defaultTarget;
     this.delay = Type.integer(0);
 
-    const paramsKeywordList =
-      this.#specDom.data[0].data[1].data[1] || Type.keywordList();
+    const paramsKeywordList = this.#specDom.data[0].data[1].data[1] || Type.keywordList();
 
     this.#buildParamsMap(paramsKeywordList);
   }
@@ -207,8 +188,6 @@ export default class Operation {
   // Example: $click="my_action"
   // Spec DOM: [text: "my_action"], which is equivalent to [{:text, "my_action"}]
   static #isTextSyntax(specDom) {
-    return (
-      specDom.data.length === 1 && specDom.data[0].data[0].value === "text"
-    );
+    return specDom.data.length === 1 && specDom.data[0].data[0].value === "text";
   }
 }

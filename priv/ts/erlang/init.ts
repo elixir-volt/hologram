@@ -21,24 +21,15 @@ const Erlang_Init = {
     const flagValue = flag.value;
 
     if (flagValue === "home") {
-      return Type.tuple([
-        Type.atom("ok"),
-        Type.list([Type.list([Type.charlist("/")])]),
-      ]);
+      return Type.tuple([Type.atom("ok"), Type.list([Type.list([Type.charlist("/")])])]);
     }
 
     if (flagValue === "progname") {
-      return Type.tuple([
-        Type.atom("ok"),
-        Type.list([Type.list([Type.charlist("hologram")])]),
-      ]);
+      return Type.tuple([Type.atom("ok"), Type.list([Type.list([Type.charlist("hologram")])])]);
     }
 
     if (flagValue === "root") {
-      return Type.tuple([
-        Type.atom("ok"),
-        Type.list([Type.list([Type.charlist("/")])]),
-      ]);
+      return Type.tuple([Type.atom("ok"), Type.list([Type.list([Type.charlist("/")])])]);
     }
 
     return Type.atom("error");

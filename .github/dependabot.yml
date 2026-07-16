@@ -17,7 +17,6 @@ updates:
     ignore:
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
-      - dependency-name: "jsdom"
     groups:
       lib-javascript:
         patterns:
@@ -27,8 +26,6 @@ updates:
     directory: "/test/features"
     schedule:
       interval: "weekly"
-    ignore:
-      - dependency-name: "hologram"
     groups:
       feature-tests:
         patterns:

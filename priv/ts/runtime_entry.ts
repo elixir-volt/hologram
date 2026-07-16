@@ -1,3 +1,4 @@
+/* oxlint-disable no-unused-expressions, no-unused-vars -- generated placeholders and injected definitions */
 "use strict";
 
 import Bitstring from "hologram:runtime/bitstring";
@@ -21,7 +22,4 @@ if (globalThis.Hologram.pageScriptLoaded) {
   document.dispatchEvent(new CustomEvent("hologram:pageScriptLoaded"));
 }
 
-console.debug(
-  "Hologram: runtime script executed in",
-  PerformanceTimer.diff(startTime),
-);
+console.debug("Hologram: runtime script executed in", PerformanceTimer.diff(startTime));

@@ -90,9 +90,7 @@ export default class Type {
   }
 
   static charlist(string) {
-    return Type.list(
-      Array.from(string, (char) => Type.integer(char.codePointAt(0))),
-    );
+    return Type.list(Array.from(string, (char) => Type.integer(char.codePointAt(0))));
   }
 
   static cloneMap(map) {
@@ -195,13 +193,7 @@ export default class Type {
     return {type: "float", value: value};
   }
 
-  static functionCapture(
-    capturedModule,
-    capturedFunction,
-    arity,
-    clauses,
-    context,
-  ) {
+  static functionCapture(capturedModule, capturedFunction, arity, clauses, context) {
     return {
       type: "anonymous_function",
       arity: arity,
@@ -259,9 +251,7 @@ export default class Type {
   }
 
   static isBoolean(term) {
-    return (
-      term.type === "atom" && (term.value === "false" || term.value === "true")
-    );
+    return term.type === "atom" && (term.value === "false" || term.value === "true");
   }
 
   static isCharlist(term) {
@@ -284,9 +274,7 @@ export default class Type {
     const algo = data[0];
 
     return (
-      Type.isAtom(algo) &&
-      (algo.value === "bm" || algo.value === "ac") &&
-      Type.isReference(data[1])
+      Type.isAtom(algo) && (algo.value === "bm" || algo.value === "ac") && Type.isReference(data[1])
     );
   }
 
@@ -320,10 +308,7 @@ export default class Type {
     }
 
     return term.data.every(
-      (item) =>
-        Type.isTuple(item) &&
-        item.data.length === 2 &&
-        Type.isAtom(item.data[0]),
+      (item) => Type.isTuple(item) && item.data.length === 2 && Type.isAtom(item.data[0]),
     );
   }
 
@@ -387,9 +372,7 @@ export default class Type {
     if (!Type.isMap(term)) return false;
 
     if (module === null) {
-      return Type.isTrue(
-        Erlang_Maps["is_key/2"](Type.atom("__struct__"), term),
-      );
+      return Type.isTrue(Erlang_Maps["is_key/2"](Type.atom("__struct__"), term));
     }
 
     return Interpreter.isEqual(
@@ -440,8 +423,7 @@ export default class Type {
   }
 
   static maybeNormalizeNumberTerms(term1, term2) {
-    const type =
-      Type.isFloat(term1) || Type.isFloat(term2) ? "float" : "integer";
+    const type = Type.isFloat(term1) || Type.isFloat(term2) ? "float" : "integer";
 
     let value1, value2;
 
@@ -548,10 +530,7 @@ export default class Type {
   }
 
   static #encodeReferenceTypeMapKey(term) {
-    const localIncarnationId = ERTS.nodeTable.getLocalIncarnationId(
-      term.node,
-      term.creation,
-    );
+    const localIncarnationId = ERTS.nodeTable.getLocalIncarnationId(term.node, term.creation);
 
     return `r${localIncarnationId}.${term.idWords.toReversed().join(".")}`;
   }

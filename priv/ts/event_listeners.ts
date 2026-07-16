@@ -83,9 +83,7 @@ export default class EventListeners {
         let observed = new Set();
 
         const scrollSize = () =>
-          edge === "top" || edge === "bottom"
-            ? element.scrollHeight
-            : element.scrollWidth;
+          edge === "top" || edge === "bottom" ? element.scrollHeight : element.scrollWidth;
 
         const check = () => {
           frame = null;

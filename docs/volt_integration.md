@@ -15,9 +15,11 @@ The compiler calls `Volt.Priv` directly for OTP path handling and AST-backed sta
 
 ## Dependencies and output
 
-Runtime npm packages are exact-pinned by `Hologram.Assets.NPMDeps` and installed through Volt's npm_ex-backed cache. Application builds do not depend on `assets/node_modules`; that directory contains only repository tooling such as ESLint, Prettier, and Playwright.
+Runtime npm packages are exact-pinned by `Hologram.Assets.NPMDeps` and installed through Volt's npm_ex-backed cache. Importer-scoped package roots keep those framework-owned versions isolated from packages with the same names in an application. Application builds do not depend on `assets/node_modules`; that directory contains only repository tooling such as ESLint, Prettier, and Playwright.
 
-`Hologram.Compiler.bundle/4` uses `Volt.Builder.build/1`, then preserves Hologram's existing bundle digest, source-map naming, size-limit, and static manifest contracts. The former esbuild shell integration and `assets/js` runtime mirror have been removed.
+`Hologram.Compiler.bundle/4` uses the in-memory `Volt.Builder.bundle/1` API, then writes Hologram's digest-named JavaScript and source-map artifacts while preserving its existing size-limit and static manifest contracts. CSS and asset outputs are rejected explicitly until Hologram can publish and reference them correctly. The former esbuild shell integration and `assets/js` runtime mirror have been removed.
+
+The canonical runtime under `priv/ts` is formatted and linted through Volt/OXC without a Node.js process. ESLint and Prettier remain only for repository JavaScript, JSON, and YAML outside the packaged runtime.
 
 ## Testing
 
@@ -27,6 +29,6 @@ Browser helper aliases, Sinon compatibility, and npm test dependencies live unde
 
 ## Future work
 
-- Evaluate Volt.Formatter and Oxlint as replacements for repository-only Prettier and ESLint usage.
+- Replace the remaining repository-only Prettier and ESLint usage where Volt/OXC supports the same file types and rules.
 - Integrate Hologram live reload with Volt HMR where that improves development feedback.
 - Add TypeScript types incrementally without coupling runtime migration to a wholesale rewrite.

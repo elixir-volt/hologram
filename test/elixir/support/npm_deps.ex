@@ -2,7 +2,6 @@ defmodule Hologram.Test.NPMDeps do
   @moduledoc false
 
   alias Hologram.Assets.NPMDeps
-  alias Volt.JS.Runtime.Installer
 
   @test_packages %{
     "chai" => "6.2.2",
@@ -12,7 +11,7 @@ defmodule Hologram.Test.NPMDeps do
   @spec node_modules!() :: String.t()
   def node_modules! do
     packages = Map.merge(NPMDeps.packages(), @test_packages)
-    %{node_modules: node_modules} = Installer.install!(packages)
+    %{node_modules: node_modules} = Volt.NPM.install!(packages)
     node_modules
   end
 end

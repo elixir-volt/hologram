@@ -1,8 +1,6 @@
 defmodule Hologram.Assets.NPMDeps do
   @moduledoc false
 
-  alias Volt.JS.Runtime.Installer
-
   @runtime_packages %{
     "@formatjs/intl-getcanonicallocales" => "3.2.11",
     "@formatjs/intl-locale" => "5.3.10",
@@ -21,7 +19,7 @@ defmodule Hologram.Assets.NPMDeps do
   def node_modules!, do: install!(@runtime_packages)
 
   defp install!(packages) do
-    %{node_modules: node_modules} = Installer.install!(packages)
+    %{node_modules: node_modules} = Volt.NPM.install!(packages)
     node_modules
   end
 end

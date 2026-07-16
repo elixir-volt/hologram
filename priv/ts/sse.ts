@@ -40,8 +40,7 @@ export default class Sse {
   // don't hammer the handshake endpoint.
   static computeReconnectDelay(attempts) {
     const baseDelay = Math.min(
-      $.BASE_RECONNECT_DELAY *
-        Math.pow($.RECONNECT_BACKOFF_FACTOR, attempts - 1),
+      $.BASE_RECONNECT_DELAY * Math.pow($.RECONNECT_BACKOFF_FACTOR, attempts - 1),
       $.MAX_RECONNECT_DELAY,
     );
 
@@ -51,9 +50,9 @@ export default class Sse {
   }
 
   static buildHandshakePayload() {
-    const receipts = Array.from(
-      App.subscriptionReceiptRegistry.entries.values(),
-    ).map((triple) => triple.data[2]);
+    const receipts = Array.from(App.subscriptionReceiptRegistry.entries.values()).map(
+      (triple) => triple.data[2],
+    );
 
     return Type.map([
       [Type.atom("instance_id"), Type.bitstring(App.instanceId)],
@@ -63,8 +62,7 @@ export default class Sse {
 
   static async connect() {
     try {
-      const preHandshakeReceiptCount =
-        App.subscriptionReceiptRegistry.entries.size;
+      const preHandshakeReceiptCount = App.subscriptionReceiptRegistry.entries.size;
 
       const response = await fetch($.HANDSHAKE_PATH, {
         method: "POST",
@@ -78,11 +76,9 @@ export default class Sse {
         return;
       }
 
-      const {handshakeId, refreshedReceipts: encodedRefreshed} =
-        await response.json();
+      const {handshakeId, refreshedReceipts: encodedRefreshed} = await response.json();
 
-      const refreshed =
-        Interpreter.evaluateJavaScriptExpression(encodedRefreshed);
+      const refreshed = Interpreter.evaluateJavaScriptExpression(encodedRefreshed);
 
       if (preHandshakeReceiptCount > 0 && refreshed.data.length === 0) {
         window.location.reload();

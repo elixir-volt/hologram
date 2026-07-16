@@ -39,13 +39,7 @@ export default class Deserializer {
     const parts = serialized.split(Serializer.DELIMITER);
     const context = Interpreter.buildContext();
 
-    return Type.functionCapture(
-      parts[0],
-      parts[1],
-      parseInt(parts[2]),
-      [],
-      context,
-    );
+    return Type.functionCapture(parts[0], parts[1], parseInt(parts[2]), [], context);
   }
 
   static #deserializeBoxedIdentifier(identifierType, serialized) {

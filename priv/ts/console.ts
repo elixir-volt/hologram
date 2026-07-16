@@ -5,8 +5,7 @@ import Interpreter from "./interpreter.ts";
 // TODO: write unit tests
 export default class Console {
   static isDarkMode =
-    window.matchMedia &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches;
+    window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   static endGroup(groupName) {
     console.groupEnd(groupName);

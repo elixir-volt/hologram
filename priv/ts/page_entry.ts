@@ -1,3 +1,4 @@
+/* oxlint-disable no-unused-expressions, no-unused-vars -- generated placeholders and injected definitions */
 "use strict";
 
 import PerformanceTimer from "hologram:runtime/performance_timer";
@@ -24,7 +25,4 @@ globalThis.Hologram.pageReachableFunctionDefs = (deps) => {
 globalThis.Hologram.pageScriptLoaded = true;
 document.dispatchEvent(new CustomEvent("hologram:pageScriptLoaded"));
 
-console.debug(
-  "Hologram: page script executed in",
-  PerformanceTimer.diff(startTime),
-);
+console.debug("Hologram: page script executed in", PerformanceTimer.diff(startTime));

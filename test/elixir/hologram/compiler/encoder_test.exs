@@ -1935,10 +1935,7 @@ defmodule Hologram.Compiler.EncoderTest do
               Interpreter.raiseBifError("badarith", "erlang", "+", [left, right]);
             }
 
-            const [type, leftValue, rightValue] = Type.maybeNormalizeNumberTerms(
-              left,
-              right,
-            );
+            const [type, leftValue, rightValue] = Type.maybeNormalizeNumberTerms(left, right);
 
             const result = leftValue.value + rightValue.value;
 

@@ -26,10 +26,7 @@ const Elixir_IO = {
       ]);
     }
 
-    if (
-      Type.isPid(device) ||
-      (device.value !== "stdio" && device.value !== "stderr")
-    ) {
+    if (Type.isPid(device) || (device.value !== "stdio" && device.value !== "stderr")) {
       const inspectedDevice = Interpreter.inspect(device);
 
       throw new HologramInterpreterError(
@@ -64,10 +61,7 @@ const Elixir_IO = {
   // Simplified temporary implementation - evaluates the message function and delegates to warn/2.
   // Deps: [IO.warn/2]
   "warn_once/3": (_key, messageFun, _stacktraceDropLevels) => {
-    return Elixir_IO["warn/2"](
-      Interpreter.callAnonymousFunction(messageFun, []),
-      Type.list(),
-    );
+    return Elixir_IO["warn/2"](Interpreter.callAnonymousFunction(messageFun, []), Type.list());
   },
 };
 

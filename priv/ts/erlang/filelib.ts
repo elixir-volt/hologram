@@ -139,9 +139,7 @@ const Erlang_Filelib = {
     }, []);
 
     // Build result based on input type
-    return isBinaryInput
-      ? buildBinaryResult(joinedBytes)
-      : buildCharlistResult(joinedBytes);
+    return isBinaryInput ? buildBinaryResult(joinedBytes) : buildCharlistResult(joinedBytes);
   },
   // End safe_relative_path/2
   // Deps: [:filename.join/1, :filename.split/1]

@@ -8,6 +8,7 @@ opts = [enabled: true, env: %{"MIX_ENV" => "test"}]
     {:dialyzer, opts},
     {:doctor, opts},
     {:eslint, "mix eslint", opts},
+    {:volt_js, "mix volt.js.check", opts},
     {:ex_doc, enabled: false},
     {:ex_formatter, "mix format", opts},
     {:ex_test_file_names, "mix holo.test.check_file_names test/elixir/hologram", opts},
@@ -19,7 +20,6 @@ opts = [enabled: true, env: %{"MIX_ENV" => "test"}]
     {:gettext, enabled: false},
     {:hex_audit, "mix hex.audit", opts},
     {:js_formatter, "mix format.js.check", opts},
-    {:js_tests, "mix test.js", opts},
     {:mix_audit, opts},
     # custom :js_tests used instead of :npm_test
     {:npm_test, enabled: false},

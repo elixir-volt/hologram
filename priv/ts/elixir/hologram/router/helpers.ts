@@ -10,9 +10,7 @@ const Elixir_Hologram_Router_Helpers = {
     const assetPath = AssetPathRegistry.lookup(staticPath);
 
     if (Type.isNil(assetPath)) {
-      const message = `there is no such asset: "${Bitstring.toText(
-        staticPath,
-      )}"`;
+      const message = `there is no such asset: "${Bitstring.toText(staticPath)}"`;
 
       Interpreter.raiseError("Hologram.AssetNotFoundError", message);
     }

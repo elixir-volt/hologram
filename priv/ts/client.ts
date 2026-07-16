@@ -43,9 +43,7 @@ export default class Client {
 
   static buildPageQueryString(params) {
     if (Type.isList(params)) {
-      params = Type.map(
-        params.data.map((param) => [param.data[0], param.data[1]]),
-      );
+      params = Type.map(params.data.map((param) => [param.data[0], param.data[1]]));
     }
 
     let queryParts = [];
@@ -74,9 +72,7 @@ export default class Client {
 
       const encodedKey = encodeURIComponent(key.value);
 
-      const rawValue = Type.isBitstring(value)
-        ? Bitstring.toText(value)
-        : value.value.toString();
+      const rawValue = Type.isBitstring(value) ? Bitstring.toText(value) : value.value.toString();
 
       const encodedValue = encodeURIComponent(rawValue);
 
@@ -87,9 +83,9 @@ export default class Client {
   }
 
   static buildPageRequestPayload() {
-    const clientClaimedSubKeys = Array.from(
-      App.subscriptionReceiptRegistry.entries.values(),
-    ).map((triple) => Type.tuple([triple.data[0], triple.data[1]]));
+    const clientClaimedSubKeys = Array.from(App.subscriptionReceiptRegistry.entries.values()).map(
+      (triple) => Type.tuple([triple.data[0], triple.data[1]]),
+    );
 
     return Type.map([
       [Type.atom("client_claimed_sub_keys"), Type.list(clientClaimedSubKeys)],
@@ -194,13 +190,9 @@ export default class Client {
         $.#failCommand(action);
       }
 
-      const subReceiptAdds = Interpreter.evaluateJavaScriptExpression(
-        encodedSubReceiptAdds,
-      );
+      const subReceiptAdds = Interpreter.evaluateJavaScriptExpression(encodedSubReceiptAdds);
 
-      const subReceiptDrops = Interpreter.evaluateJavaScriptExpression(
-        encodedSubReceiptDrops,
-      );
+      const subReceiptDrops = Interpreter.evaluateJavaScriptExpression(encodedSubReceiptDrops);
 
       App.subscriptionReceiptRegistry.merge(subReceiptAdds, subReceiptDrops);
 
@@ -210,8 +202,7 @@ export default class Client {
         Hologram.scheduleAction(nextAction);
       }
 
-      const selfEchoes =
-        Interpreter.evaluateJavaScriptExpression(encodedSelfEchoes);
+      const selfEchoes = Interpreter.evaluateJavaScriptExpression(encodedSelfEchoes);
 
       for (const action of selfEchoes.data) {
         Hologram.scheduleAction(action);

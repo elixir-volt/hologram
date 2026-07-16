@@ -31,9 +31,7 @@ export default class ComponentRegistry {
   static getComponentModule(cid) {
     const entry = ComponentRegistry.getEntry(cid);
 
-    return entry
-      ? Erlang_Maps["get/3"](Type.atom("module"), entry, null)
-      : null;
+    return entry ? Erlang_Maps["get/3"](Type.atom("module"), entry, null) : null;
   }
 
   // null instead of boxed nil is returned by default on purpose, because the function is not used by transpiled code.
@@ -41,9 +39,7 @@ export default class ComponentRegistry {
   static getComponentState(cid) {
     const componentStruct = ComponentRegistry.getComponentStruct(cid);
 
-    return componentStruct
-      ? Erlang_Maps["get/2"](Type.atom("state"), componentStruct)
-      : null;
+    return componentStruct ? Erlang_Maps["get/2"](Type.atom("state"), componentStruct) : null;
   }
 
   // null instead of boxed nil is returned by default on purpose, because the function is not used by transpiled code.
@@ -51,9 +47,7 @@ export default class ComponentRegistry {
   static getComponentStruct(cid) {
     const entry = ComponentRegistry.getEntry(cid);
 
-    return entry
-      ? Erlang_Maps["get/3"](Type.atom("struct"), entry, null)
-      : null;
+    return entry ? Erlang_Maps["get/3"](Type.atom("struct"), entry, null) : null;
   }
 
   // null instead of boxed nil is returned by default on purpose, because the function is not used by transpiled code.
@@ -73,9 +67,8 @@ export default class ComponentRegistry {
 
   // Optimized (mutates entries/struct field in-place)
   static putComponentStruct(cid, componentStruct) {
-    ComponentRegistry.entries.data[Type.encodeMapKey(cid)][1].data[
-      "atom(struct)"
-    ][1] = componentStruct;
+    ComponentRegistry.entries.data[Type.encodeMapKey(cid)][1].data["atom(struct)"][1] =
+      componentStruct;
   }
 
   // Optimized (mutates entries field in-place)

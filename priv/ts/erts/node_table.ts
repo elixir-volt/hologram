@@ -8,9 +8,7 @@ export default class NodeTable {
 
   // Reverse lookup: localIncarnationId -> {node, creation}
   // Made public to make tests easier
-  static reverseData = new Map([
-    [0, {node: NodeTable.CLIENT_NODE, creation: 0}],
-  ]);
+  static reverseData = new Map([[0, {node: NodeTable.CLIENT_NODE, creation: 0}]]);
 
   // Made public to make tests easier
   static sequence = 0;

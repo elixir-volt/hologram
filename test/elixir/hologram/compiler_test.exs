@@ -772,6 +772,68 @@ defmodule Hologram.CompilerTest do
       assert File.read!(expected_static_source_map_path) == expected_source_map_js
     end
 
+    test "isolates framework npm packages from application packages with the same name" do
+      tmp_dir =
+        Path.join([Reflection.tmp_dir(), "tests", "compiler", "bundle_4_package_scopes"])
+
+      node_modules = Path.join(tmp_dir, "node_modules")
+      package_dir = Path.join([node_modules, "@formatjs", "intl-pluralrules"])
+      static_dir = Path.join(tmp_dir, "static")
+      clean_dir(tmp_dir)
+      File.mkdir_p!(package_dir)
+      File.mkdir!(static_dir)
+
+      package_dir
+      |> Path.join("package.json")
+      |> File.write!(
+        Jason.encode!(%{"name" => "@formatjs/intl-pluralrules", "module" => "index.js"})
+      )
+
+      package_dir
+      |> Path.join("index.js")
+      |> File.write!("export default 'application plural rules';\n")
+
+      entry_file_path = Path.join(tmp_dir, "MyPage.entry.js")
+
+      File.write!(entry_file_path, """
+      import appPluralRules from "@formatjs/intl-pluralrules";
+      import "hologram:runtime/intl-pluralrules-polyfill";
+      console.log(appPluralRules);
+      """)
+
+      result =
+        bundle(MyPage, entry_file_path, "my_bundle_name",
+          resolve_dirs: [node_modules],
+          static_dir: static_dir,
+          tmp_dir: tmp_dir
+        )
+
+      assert File.read!(result.static_bundle_path) =~ "application plural rules"
+    end
+
+    test "rejects CSS and asset outputs that Hologram cannot publish" do
+      tmp_dir = Path.join([Reflection.tmp_dir(), "tests", "compiler", "bundle_4_css_output"])
+      static_dir = Path.join(tmp_dir, "static")
+      clean_dir(tmp_dir)
+      File.mkdir_p!(static_dir)
+
+      tmp_dir
+      |> Path.join("style.css")
+      |> File.write!("body { color: red; }")
+
+      entry_file_path = Path.join(tmp_dir, "MyPage.entry.js")
+      File.write!(entry_file_path, ~s(import "./style.css";))
+
+      assert_raise RuntimeError, ~r/emitted unsupported CSS or asset output/, fn ->
+        bundle(MyPage, entry_file_path, "my_bundle_name",
+          static_dir: static_dir,
+          tmp_dir: tmp_dir
+        )
+      end
+
+      assert File.ls!(static_dir) == []
+    end
+
     test "invalid entry file" do
       node_modules_path = Path.join([@root_dir, "assets", "node_modules"])
 
@@ -936,10 +998,7 @@ defmodule Hologram.CompilerTest do
               Interpreter.raiseBifError("badarith", "erlang", "+", [left, right]);
             }
 
-            const [type, leftValue, rightValue] = Type.maybeNormalizeNumberTerms(
-              left,
-              right,
-            );
+            const [type, leftValue, rightValue] = Type.maybeNormalizeNumberTerms(left, right);
 
             const result = leftValue.value + rightValue.value;
 

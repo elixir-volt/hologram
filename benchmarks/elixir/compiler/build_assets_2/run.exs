@@ -5,12 +5,12 @@ alias Hologram.Reflection
 
 Benchee.run(
   %{
-    "bundle/2" => fn {entry_files_info, opts} ->
-      Compiler.bundle(entry_files_info, opts)
+    "build_assets/2" => fn {entry_files, opts} ->
+      Compiler.build_assets(entry_files, opts)
     end
   },
   before_scenario: fn _input ->
-    tmp_dir = Path.join([Reflection.tmp_dir(), "benchmarks", "compiler", "bundle_2"])
+    tmp_dir = Path.join([Reflection.tmp_dir(), "benchmarks", "compiler", "build_assets_2"])
 
     opts = [
       tmp_dir: tmp_dir,
@@ -40,21 +40,23 @@ Benchee.run(
     runtime_entry_file_path =
       Compiler.create_runtime_entry_file(runtime_mfas, ir_plt, async_mfas, app_versions, opts)
 
-    page_entry_files_info =
-      Reflection.list_pages()
-      |> Compiler.create_page_entry_files(call_graph_for_pages, ir_plt, async_mfas, opts)
-      |> Enum.map(fn {entry_name, entry_file_path} ->
-        {entry_name, entry_file_path, "page"}
-      end)
+    page_entry_files =
+      Compiler.create_page_entry_files(
+        Reflection.list_pages(),
+        call_graph_for_pages,
+        ir_plt,
+        async_mfas,
+        opts
+      )
 
-    entry_files_info = [{"runtime", runtime_entry_file_path, "runtime"} | page_entry_files_info]
+    entry_files = [runtime_entry_file_path | Enum.map(page_entry_files, &elem(&1, 1))]
 
-    {entry_files_info, opts}
+    {entry_files, opts}
   end,
   formatters: [
     Benchee.Formatters.Console,
     {Benchee.Formatters.Markdown,
-     description: "Hologram.Compiler.bundle/2", file: Path.join(__DIR__, "README.md")}
+     description: "Hologram.Compiler.build_assets/2", file: Path.join(__DIR__, "README.md")}
   ],
   time: 10
 )

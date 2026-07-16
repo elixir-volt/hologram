@@ -2,7 +2,7 @@
 "use strict";
 
 import PerformanceTimer from "hologram:runtime/performance_timer";
-$import_statements;
+$imports;
 
 const startTime = performance.now();
 
@@ -17,9 +17,7 @@ globalThis.Hologram.pageReachableFunctionDefs = (deps) => {
     Type,
     Utils,
   } = deps;
-  $js_bindings_registration_call;
-  $erlang_function_defs;
-  $elixir_function_defs;
+  $function_definitions;
 };
 
 globalThis.Hologram.pageScriptLoaded = true;

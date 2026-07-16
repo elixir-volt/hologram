@@ -5,7 +5,6 @@ defmodule Hologram.Template.RendererTest do
   import Hologram.Test.Stubs
   import Mox
 
-  alias Hologram.Assets.PathRegistry, as: AssetPathRegistry
   alias Hologram.Commons.ETS
   alias Hologram.Component
   alias Hologram.Runtime.Cookie
@@ -96,7 +95,7 @@ defmodule Hologram.Template.RendererTest do
 
   use_module_stub :asset_manifest_cache
   use_module_stub :asset_path_registry
-  use_module_stub :page_digest_registry
+  use_module_stub :bundle_manifest
 
   setup :set_mox_global
 
@@ -1590,15 +1589,14 @@ defmodule Hologram.Template.RendererTest do
   describe "context" do
     setup do
       setup_asset_path_registry(AssetPathRegistryStub)
-      AssetPathRegistry.register("hologram/runtime.js", "/hologram/runtime-1234567890abcdef.js")
 
       setup_asset_manifest_cache(AssetManifestCacheStub)
 
-      setup_page_digest_registry(PageDigestRegistryStub)
+      setup_bundle_manifest(BundleManifestStub)
     end
 
     test "emitted in page, accessed in component nested in page" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module39, :dummy_module_39_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module39, :dummy_module_39_digest)
 
       assert render_page_without_tree(Module39, @params, @server, @opts) ==
                {"prop_aaa = 123",
@@ -1616,8 +1614,9 @@ defmodule Hologram.Template.RendererTest do
                         {Hologram.Runtime, :csrf_token} => @csrf_token,
                         {Hologram.Runtime, :initial_page?} => false,
                         {Hologram.Runtime, :instance_id} => @instance_id,
-                        {Hologram.Runtime, :page_digest} => :dummy_module_39_digest,
+                        {Hologram.Runtime, :page_bundle_path} => :dummy_module_39_digest,
                         {Hologram.Runtime, :page_mounted?} => true,
+                        {Hologram.Runtime, :runtime_bundle_path} => "/hologram/runtime.entry.js",
                         {:my_scope, :my_key} => 123
                       }
                     }
@@ -1626,7 +1625,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "emitted in page, accessed in component nested in layout" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module46, :dummy_module_46_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module46, :dummy_module_46_digest)
 
       assert render_page_without_tree(Module46, @params, @server, @opts) ==
                {"prop_aaa = 123",
@@ -1644,8 +1643,9 @@ defmodule Hologram.Template.RendererTest do
                         {Hologram.Runtime, :csrf_token} => @csrf_token,
                         {Hologram.Runtime, :initial_page?} => false,
                         {Hologram.Runtime, :instance_id} => @instance_id,
-                        {Hologram.Runtime, :page_digest} => :dummy_module_46_digest,
+                        {Hologram.Runtime, :page_bundle_path} => :dummy_module_46_digest,
                         {Hologram.Runtime, :page_mounted?} => true,
+                        {Hologram.Runtime, :runtime_bundle_path} => "/hologram/runtime.entry.js",
                         {:my_scope, :my_key} => 123
                       }
                     }
@@ -1654,7 +1654,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "emitted in page, accessed in layout" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module40, :dummy_module_40_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module40, :dummy_module_40_digest)
 
       assert render_page_without_tree(Module40, @params, @server, @opts) ==
                {"prop_aaa = 123",
@@ -1672,8 +1672,9 @@ defmodule Hologram.Template.RendererTest do
                         {Hologram.Runtime, :csrf_token} => @csrf_token,
                         {Hologram.Runtime, :initial_page?} => false,
                         {Hologram.Runtime, :instance_id} => @instance_id,
-                        {Hologram.Runtime, :page_digest} => :dummy_module_40_digest,
+                        {Hologram.Runtime, :page_bundle_path} => :dummy_module_40_digest,
                         {Hologram.Runtime, :page_mounted?} => true,
+                        {Hologram.Runtime, :runtime_bundle_path} => "/hologram/runtime.entry.js",
                         {:my_scope, :my_key} => 123
                       }
                     }
@@ -1682,7 +1683,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "emmited in layout, accessed in component nested in page" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module43, :dummy_module_43_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module43, :dummy_module_43_digest)
 
       assert render_page_without_tree(Module43, @params, @server, @opts) ==
                {"prop_aaa = 123",
@@ -1700,8 +1701,9 @@ defmodule Hologram.Template.RendererTest do
                         {Hologram.Runtime, :csrf_token} => @csrf_token,
                         {Hologram.Runtime, :initial_page?} => false,
                         {Hologram.Runtime, :instance_id} => @instance_id,
-                        {Hologram.Runtime, :page_digest} => :dummy_module_43_digest,
-                        {Hologram.Runtime, :page_mounted?} => true
+                        {Hologram.Runtime, :page_bundle_path} => :dummy_module_43_digest,
+                        {Hologram.Runtime, :page_mounted?} => true,
+                        {Hologram.Runtime, :runtime_bundle_path} => "/hologram/runtime.entry.js"
                       }
                     }
                   }
@@ -1709,7 +1711,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "emitted in layout, accessed in component nested in layout" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module45, :dummy_module_45_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module45, :dummy_module_45_digest)
 
       assert render_page_without_tree(Module45, @params, @server, @opts) ==
                {"prop_aaa = 123",
@@ -1727,8 +1729,9 @@ defmodule Hologram.Template.RendererTest do
                         {Hologram.Runtime, :csrf_token} => @csrf_token,
                         {Hologram.Runtime, :initial_page?} => false,
                         {Hologram.Runtime, :instance_id} => @instance_id,
-                        {Hologram.Runtime, :page_digest} => :dummy_module_45_digest,
-                        {Hologram.Runtime, :page_mounted?} => true
+                        {Hologram.Runtime, :page_bundle_path} => :dummy_module_45_digest,
+                        {Hologram.Runtime, :page_mounted?} => true,
+                        {Hologram.Runtime, :runtime_bundle_path} => "/hologram/runtime.entry.js"
                       }
                     }
                   }
@@ -1756,15 +1759,14 @@ defmodule Hologram.Template.RendererTest do
   describe "page" do
     setup do
       setup_asset_path_registry(AssetPathRegistryStub)
-      AssetPathRegistry.register("hologram/runtime.js", "/hologram/runtime-1234567890abcdef.js")
 
       setup_asset_manifest_cache(AssetManifestCacheStub)
 
-      setup_page_digest_registry(PageDigestRegistryStub)
+      setup_bundle_manifest(BundleManifestStub)
     end
 
     test "inside layout slot" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module14, :dummy_module_14_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module14, :dummy_module_14_digest)
 
       assert {"layout template start, page template, layout template end", _component_registry,
               _server_struct} =
@@ -1772,7 +1774,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "cast page param values to correct type" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module19, :dummy_module_19_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module19, :dummy_module_19_digest)
 
       params = %{param_1: "abc", param_3: 123}
 
@@ -1782,7 +1784,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "cast layout explicit static props" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module25, :dummy_module_25_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module25, :dummy_module_25_digest)
 
       assert {~s'layout vars = %{cid: &quot;layout&quot;, prop_1: &quot;prop_value_1&quot;, prop_3: &quot;prop_value_3&quot;}',
               _component_registry, _server_struct} =
@@ -1790,7 +1792,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "cast layout props passed implicitely from page state" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module27, :dummy_module_27_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module27, :dummy_module_27_digest)
 
       assert {~s'layout vars = %{cid: &quot;layout&quot;, prop_1: &quot;prop_value_1&quot;, prop_3: &quot;prop_value_3&quot;}',
               _component_registry, _server_struct} =
@@ -1798,7 +1800,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "aggregate page vars, giving state vars priority over param vars when there are name conflicts" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module21, :dummy_module_21_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module21, :dummy_module_21_digest)
 
       params = %{key_1: "param_value_1", key_2: "param_value_2"}
 
@@ -1808,7 +1810,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "aggregate layout vars, giving state vars priority over prop vars when there are name conflicts" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module24, :dummy_module_24_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module24, :dummy_module_24_digest)
 
       assert {~s'layout vars = %{cid: &quot;layout&quot;, key_1: &quot;prop_value_1&quot;, key_2: &quot;state_value_2&quot;, key_3: &quot;state_value_3&quot;}',
               _component_registry, _server_struct} =
@@ -1816,7 +1818,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "merge the page component struct into the result" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       assert render_page_without_tree(Module28, @params, @server, @opts) ==
                {"",
@@ -1829,8 +1831,9 @@ defmodule Hologram.Template.RendererTest do
                         {Hologram.Runtime, :csrf_token} => @csrf_token,
                         {Hologram.Runtime, :initial_page?} => false,
                         {Hologram.Runtime, :instance_id} => @instance_id,
-                        {Hologram.Runtime, :page_digest} => :dummy_module_28_digest,
-                        {Hologram.Runtime, :page_mounted?} => true
+                        {Hologram.Runtime, :page_bundle_path} => :dummy_module_28_digest,
+                        {Hologram.Runtime, :page_mounted?} => true,
+                        {Hologram.Runtime, :runtime_bundle_path} => "/hologram/runtime.entry.js"
                       },
                       state: %{state_1: "value_1", state_2: "value_2"}
                     }
@@ -1839,7 +1842,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "merge the layout component struct into the result" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module29, :dummy_module_29_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module29, :dummy_module_29_digest)
 
       assert render_page_without_tree(Module29, @params, @server, @opts) ==
                {"",
@@ -1857,8 +1860,9 @@ defmodule Hologram.Template.RendererTest do
                         {Hologram.Runtime, :csrf_token} => @csrf_token,
                         {Hologram.Runtime, :initial_page?} => false,
                         {Hologram.Runtime, :instance_id} => @instance_id,
-                        {Hologram.Runtime, :page_digest} => :dummy_module_29_digest,
-                        {Hologram.Runtime, :page_mounted?} => true
+                        {Hologram.Runtime, :page_bundle_path} => :dummy_module_29_digest,
+                        {Hologram.Runtime, :page_mounted?} => true,
+                        {Hologram.Runtime, :runtime_bundle_path} => "/hologram/runtime.entry.js"
                       }
                     }
                   }
@@ -1866,7 +1870,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "passes server struct to layout and nested components and aggregates mutations" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module70, :dummy_module_70_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module70, :dummy_module_70_digest)
 
       {_html, _component_registry, server_struct} =
         render_page_without_tree(Module70, @params, @server, @opts)
@@ -1896,7 +1900,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "accumulates broadcasts queued during init across the full page + layout + component tree" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module84, :dummy_module_84_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module84, :dummy_module_84_digest)
 
       server = %{@server | cid: "page", instance_id: "test-instance-id"}
 
@@ -1930,19 +1934,21 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "injects (interpolated) asset manifest when the initial_page? opt is set to true" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module53, :dummy_module_53_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module53, :dummy_module_53_digest)
 
       opts = [csrf_token: @csrf_token, initial_page?: true, instance_id: @instance_id]
 
       assert {html, _component_registry, _server_struct} =
                render_page_without_tree(Module53, @params, @server, opts)
 
-      assert normalize_newlines(html) =~
-               ~r'globalThis.Hologram.assetManifest = \{\n"hologram/runtime\.js": "/hologram/runtime\-1234567890abcdef\.js"[^\}]+\n\};'
+      html = normalize_newlines(html)
+      assert html =~ "globalThis.Hologram.assetManifest = {"
+      assert html =~ "test_dir_1/test_dir_2/test_file_1.css"
+      refute html =~ ~s'"hologram/'
     end
 
     test "doesn't inject asset manifest when the initial_page? opt is set to false" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module53, :dummy_module_53_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module53, :dummy_module_53_digest)
 
       opts = [csrf_token: @csrf_token, initial_page?: false]
 
@@ -1954,7 +1960,7 @@ defmodule Hologram.Template.RendererTest do
 
     test "interpolate component structs JS" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module48,
         "102790adb6c3b1956db310be523a7693"
       )
@@ -1963,14 +1969,14 @@ defmodule Hologram.Template.RendererTest do
                render_page_without_tree(Module48, @params, @server, @opts)
 
       expected =
-        ~s/componentRegistry: Type.map([[Type.bitstring("layout"), Type.map([[Type.atom("module"), Type.atom("Elixir.Hologram.Test.Fixtures.Template.Renderer.Module49")], [Type.atom("struct"), Type.map([[Type.atom("__struct__"), Type.atom("Elixir.Hologram.Component")], [Type.atom("emitted_context"), Type.map([])], [Type.atom("next_action"), Type.atom("nil")], [Type.atom("next_command"), Type.atom("nil")], [Type.atom("next_page"), Type.atom("nil")], [Type.atom("state"), Type.map([])]])]])], [Type.bitstring("page"), Type.map([[Type.atom("module"), Type.atom("Elixir.Hologram.Test.Fixtures.Template.Renderer.Module48")], [Type.atom("struct"), Type.map([[Type.atom("__struct__"), Type.atom("Elixir.Hologram.Component")], [Type.atom("emitted_context"), Type.map([[Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("csrf_token")]), Type.bitstring("#{@csrf_token}")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("initial_page?")]), Type.atom("false")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("instance_id")]), Type.bitstring("#{@instance_id}")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("page_digest")]), Type.bitstring("102790adb6c3b1956db310be523a7693")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("page_mounted?")]), Type.atom("true")]])], [Type.atom("next_action"), Type.atom("nil")], [Type.atom("next_command"), Type.atom("nil")], [Type.atom("next_page"), Type.atom("nil")], [Type.atom("state"), Type.map([])]])]])]])/
+        ~s/componentRegistry: Type.map([[Type.bitstring("layout"), Type.map([[Type.atom("module"), Type.atom("Elixir.Hologram.Test.Fixtures.Template.Renderer.Module49")], [Type.atom("struct"), Type.map([[Type.atom("__struct__"), Type.atom("Elixir.Hologram.Component")], [Type.atom("emitted_context"), Type.map([])], [Type.atom("next_action"), Type.atom("nil")], [Type.atom("next_command"), Type.atom("nil")], [Type.atom("next_page"), Type.atom("nil")], [Type.atom("state"), Type.map([])]])]])], [Type.bitstring("page"), Type.map([[Type.atom("module"), Type.atom("Elixir.Hologram.Test.Fixtures.Template.Renderer.Module48")], [Type.atom("struct"), Type.map([[Type.atom("__struct__"), Type.atom("Elixir.Hologram.Component")], [Type.atom("emitted_context"), Type.map([[Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("csrf_token")]), Type.bitstring("#{@csrf_token}")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("initial_page?")]), Type.atom("false")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("instance_id")]), Type.bitstring("#{@instance_id}")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("page_bundle_path")]), Type.bitstring("102790adb6c3b1956db310be523a7693")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("page_mounted?")]), Type.atom("true")], [Type.tuple([Type.atom("Elixir.Hologram.Runtime"), Type.atom("runtime_bundle_path")]), Type.bitstring("\/hologram\/runtime.entry.js")]])], [Type.atom("next_action"), Type.atom("nil")], [Type.atom("next_command"), Type.atom("nil")], [Type.atom("next_page"), Type.atom("nil")], [Type.atom("state"), Type.map([])]])]])]])/
 
       assert String.contains?(html, expected)
     end
 
     test "interpolate page module JS" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module48,
         "102790adb6c3b1956db310be523a7693"
       )
@@ -1986,7 +1992,7 @@ defmodule Hologram.Template.RendererTest do
 
     test "interpolate page params JS" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module50,
         "102790adb6c3b1956db310be523a7693"
       )
@@ -2004,7 +2010,7 @@ defmodule Hologram.Template.RendererTest do
 
     test "does not interpolate self_echoes JS" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module48,
         "102790adb6c3b1956db310be523a7693"
       )
@@ -2017,7 +2023,7 @@ defmodule Hologram.Template.RendererTest do
 
     test "does not interpolate sub_receipt_adds JS" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module48,
         "102790adb6c3b1956db310be523a7693"
       )
@@ -2030,7 +2036,7 @@ defmodule Hologram.Template.RendererTest do
 
     test "does not interpolate sub_receipt_drops JS" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module48,
         "102790adb6c3b1956db310be523a7693"
       )
@@ -2043,7 +2049,7 @@ defmodule Hologram.Template.RendererTest do
 
     test "with DOCTYPE" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module62,
         "102790adb6c3b1956db310be523a7693"
       )
@@ -2064,7 +2070,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "CSRF token is put into page emitted context for initial page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [csrf_token: @csrf_token, initial_page?: true, instance_id: @instance_id]
 
@@ -2077,7 +2083,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "CSRF token is not put into page emitted context for subsequent page requests even when provided" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [csrf_token: @csrf_token, initial_page?: false]
 
@@ -2090,7 +2096,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "raises ArgumentError when CSRF token is not provided for initial page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [initial_page?: true, instance_id: @instance_id]
 
@@ -2100,7 +2106,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "raises ArgumentError when CSRF token is nil for initial page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [csrf_token: nil, initial_page?: true, instance_id: @instance_id]
 
@@ -2110,7 +2116,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "CSRF token is not required for subsequent page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [initial_page?: false]
 
@@ -2123,7 +2129,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "instance_id is put into page emitted context for initial page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [csrf_token: @csrf_token, initial_page?: true, instance_id: @instance_id]
 
@@ -2136,7 +2142,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "instance_id is not put into page emitted context for subsequent page requests even when provided" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [initial_page?: false, instance_id: @instance_id]
 
@@ -2149,7 +2155,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "raises ArgumentError when instance_id is not provided for initial page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [csrf_token: @csrf_token, initial_page?: true]
 
@@ -2159,7 +2165,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "raises ArgumentError when instance_id is nil for initial page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [csrf_token: @csrf_token, initial_page?: true, instance_id: nil]
 
@@ -2169,7 +2175,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "instance_id is not required for subsequent page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module28, :dummy_module_28_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module28, :dummy_module_28_digest)
 
       opts = [initial_page?: false]
 
@@ -2182,7 +2188,7 @@ defmodule Hologram.Template.RendererTest do
     end
 
     test "framework sets server.cid to \"layout\" during layout init/3" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module80, :dummy_module_80_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module80, :dummy_module_80_digest)
 
       {_html, registry, _server} = render_page_without_tree(Module80, @params, @server, @opts)
 

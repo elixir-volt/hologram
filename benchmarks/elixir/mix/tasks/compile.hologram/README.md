@@ -9,16 +9,16 @@ Benchmark suite executing on the following system:
 <table style="width: 1%">
   <tr>
     <th style="width: 1%; white-space: nowrap">Operating System</th>
-    <td>macOS</td>
+    <td>Linux</td>
   </tr><tr>
     <th style="white-space: nowrap">CPU Information</th>
-    <td style="white-space: nowrap">Apple M1 Pro</td>
+    <td style="white-space: nowrap">AMD Ryzen 9 9950X 16-Core Processor</td>
   </tr><tr>
     <th style="white-space: nowrap">Number of Available Cores</th>
-    <td style="white-space: nowrap">10</td>
+    <td style="white-space: nowrap">32</td>
   </tr><tr>
     <th style="white-space: nowrap">Available Memory</th>
-    <td style="white-space: nowrap">16 GB</td>
+    <td style="white-space: nowrap">121.18 GB</td>
   </tr><tr>
     <th style="white-space: nowrap">Elixir Version</th>
     <td style="white-space: nowrap">1.20.0</td>
@@ -63,20 +63,20 @@ Run Time
 
   <tr>
     <td style="white-space: nowrap">has cache</td>
-    <td style="white-space: nowrap; text-align: right">0.48</td>
-    <td style="white-space: nowrap; text-align: right">2.09 s</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;1.36%</td>
-    <td style="white-space: nowrap; text-align: right">2.10 s</td>
-    <td style="white-space: nowrap; text-align: right">2.12 s</td>
+    <td style="white-space: nowrap; text-align: right">0.0661</td>
+    <td style="white-space: nowrap; text-align: right">15.14 s</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;0.00%</td>
+    <td style="white-space: nowrap; text-align: right">15.14 s</td>
+    <td style="white-space: nowrap; text-align: right">15.14 s</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">no cache</td>
-    <td style="white-space: nowrap; text-align: right">0.21</td>
-    <td style="white-space: nowrap; text-align: right">4.77 s</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;4.05%</td>
-    <td style="white-space: nowrap; text-align: right">4.77 s</td>
-    <td style="white-space: nowrap; text-align: right">4.90 s</td>
+    <td style="white-space: nowrap; text-align: right">0.0634</td>
+    <td style="white-space: nowrap; text-align: right">15.77 s</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;0.00%</td>
+    <td style="white-space: nowrap; text-align: right">15.77 s</td>
+    <td style="white-space: nowrap; text-align: right">15.77 s</td>
   </tr>
 
 </table>
@@ -91,14 +91,14 @@ Run Time Comparison
     <th style="text-align: right">Slower</th>
   <tr>
     <td style="white-space: nowrap">has cache</td>
-    <td style="white-space: nowrap;text-align: right">0.48</td>
+    <td style="white-space: nowrap;text-align: right">0.0661</td>
     <td>&nbsp;</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">no cache</td>
-    <td style="white-space: nowrap; text-align: right">0.21</td>
-    <td style="white-space: nowrap; text-align: right">2.28x</td>
+    <td style="white-space: nowrap; text-align: right">0.0634</td>
+    <td style="white-space: nowrap; text-align: right">1.04x</td>
   </tr>
 
 </table>

@@ -77,10 +77,12 @@ defmodule Hologram.MixProject do
       {:mox, "~> 1.0", only: :test},
       {:phoenix, "~> 1.7"},
       {:phoenix_pubsub, "~> 2.0"},
+      {:playwright_ex, "~> 0.5", only: :test},
       {:plug_crypto, "~> 2.0"},
       {:recode, "~> 0.7", only: :dev, runtime: false},
       {:sobelow, "~> 0.12", only: [:dev, :test], runtime: false},
       {:telemetry, "~> 1.0"},
+      {:volt, "~> 0.17.10", runtime: false},
       {:uuid, "~> 1.0"},
       {:wallaby, "~> 0.30", only: [:dev, :test], runtime: false},
       {:websock_adapter, "~> 0.5"}

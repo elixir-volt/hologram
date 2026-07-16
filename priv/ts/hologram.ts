@@ -858,9 +858,8 @@ export default class Hologram {
   // memory but absent from the document would run it a second time.
   //
   // The document is the one just built from the tree, so it is edited in place.
-  static #dropPageBundleScript(virtualDocument, pageDigest) {
-    // Mirrors Hologram.Router.Helpers.page_bundle_path/1
-    const key = `__hologramScript__:${$.#pageBundlePath(pageDigest)}`;
+  static #dropPageBundleScript(virtualDocument, pageBundlePath) {
+    const key = `__hologramScript__:${pageBundlePath}`;
 
     const headVnode = virtualDocument.children.find(
       (childVnode) => childVnode?.sel === "head",
@@ -1172,6 +1171,7 @@ export default class Hologram {
   static #loadPageBundle(src, epoch = Math.max($.domEpoch, $.registryEpoch)) {
     const script = document.createElement("script");
 
+    script.type = "module";
     script.src = src;
     script.fetchpriority = "high";
 
@@ -1273,11 +1273,6 @@ export default class Hologram {
     }
   }
 
-  // Mirrors Hologram.Router.Helpers.page_bundle_path/1
-  static #pageBundlePath(pageDigest) {
-    return `/hologram/page-${pageDigest}.js`;
-  }
-
   static #pageSnapshotKey(historyId) {
     return `${$.#PAGE_SNAPSHOT_KEY_PREFIX}${historyId}`;
   }
@@ -1352,13 +1347,13 @@ export default class Hologram {
     // until this frame's work ends.
     if (!isPageModuleRegistered) {
       globalThis.Hologram.pageScriptLoaded = false;
-      $.#loadPageBundle($.#pageBundlePath(payload.pageDigest));
+      $.#loadPageBundle(payload.pageBundlePath);
     }
 
     const tree = Interpreter.evaluateJavaScriptExpression(payload.tree);
     const newVirtualDocument = Renderer.renderTree(tree);
 
-    $.#dropPageBundleScript(newVirtualDocument, payload.pageDigest);
+    $.#dropPageBundleScript(newVirtualDocument, payload.pageBundlePath);
 
     Hologram.virtualDocument = Vdom.patchVirtualDocument(
       Hologram.virtualDocument,

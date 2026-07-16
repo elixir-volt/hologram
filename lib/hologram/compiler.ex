@@ -1,9 +1,9 @@
 defmodule Hologram.Compiler do
   @moduledoc false
 
+  alias Hologram.Assets.NPMDeps
   alias Hologram.Commons.CryptographicUtils
   alias Hologram.Commons.MapUtils
-  alias Hologram.Commons.PathUtils
   alias Hologram.Commons.PLT
   alias Hologram.Commons.SystemUtils
   alias Hologram.Commons.TaskUtils
@@ -13,6 +13,9 @@ defmodule Hologram.Compiler do
   alias Hologram.Compiler.Encoder
   alias Hologram.Compiler.IR
   alias Hologram.Reflection
+  alias Volt.Builder.ManifestEntry
+
+  @runtime_source {:hologram, "ts"}
 
   @doc """
   Aggregates JS imports from all Elixir modules referenced by the given MFAs.
@@ -179,24 +182,44 @@ defmodule Hologram.Compiler do
   end
 
   @doc """
-  Builds page digest PLT, where the keys represent page modules,
-  and the values are hex digests of their corresponding JavaScript bundles.
+  Builds all generated JavaScript entries through Volt's production pipeline.
   """
-  @spec build_page_digest_plt(list(map), T.opts()) :: {PLT.t(), T.file_path()}
-  def build_page_digest_plt(bundle_info, opts) do
-    page_digest_plt_items =
-      bundle_info
-      |> Enum.reject(fn %{entry_name: entry_name} -> entry_name == "runtime" end)
-      |> Enum.reduce([], fn %{entry_name: page_module, digest: digest}, acc ->
-        [{page_module, digest} | acc]
-      end)
+  @spec build_assets([T.file_path()], T.opts()) :: Volt.Builder.Result.t()
+  def build_assets(entry_files, opts) do
+    static_dir = opts[:static_dir]
+    project_node_modules = Path.join([Reflection.root_dir(), "assets", "node_modules"])
+    hologram_node_modules = opts[:hologram_node_modules] || NPMDeps.node_modules!()
+    plugins = [Hologram.Volt.Plugin | List.wrap(opts[:plugins])]
 
-    page_digest_plt = PLT.start(items: page_digest_plt_items, supervisor: opts[:supervisor])
+    File.rm_rf!(static_dir)
+    File.mkdir_p!(static_dir)
 
-    page_digest_plt_dump_path =
-      Path.join([opts[:build_dir], Reflection.page_digest_plt_dump_file_name()])
+    case Volt.Builder.build(
+           entry: entry_files,
+           outdir: static_dir,
+           target: :es2021,
+           minify: true,
+           sourcemap: true,
+           format: :esm,
+           code_splitting: true,
+           hash: true,
+           asset_url_prefix: "/hologram",
+           node_modules: project_node_modules,
+           package_scopes: [
+             {Volt.Priv.path(@runtime_source, "."), hologram_node_modules}
+             | List.wrap(opts[:package_scopes])
+           ],
+           plugins: plugins,
+           resolve_dirs: List.wrap(opts[:resolve_dirs])
+         ) do
+      {:ok, result} ->
+        ensure_no_css!(result.manifest)
+        maybe_ensure_build_within_size_limit!(result.manifest, static_dir)
+        result
 
-    {page_digest_plt, page_digest_plt_dump_path}
+      {:error, reason} ->
+        raise RuntimeError, message: "Volt build failed: #{inspect(reason)}"
+    end
   end
 
   @doc """
@@ -254,31 +277,15 @@ defmodule Hologram.Compiler do
       |> render_module_metadata_registration()
       |> render_block()
 
-    """
-    "use strict";
+    function_definitions =
+      module_metadata_registration <>
+        js_bindings_registration_call <>
+        erlang_function_defs <>
+        elixir_function_defs
 
-    import PerformanceTimer from "#{js_dir}/performance_timer.mjs";#{import_statements}
-
-    const startTime = performance.now();
-
-    globalThis.Hologram.pageReachableFunctionDefs = (deps) => {
-      const {
-        Bitstring,
-        ERTS,
-        HologramBoxedError,
-        HologramInterpreterError,
-        Interpreter,
-        MemoryStorage,
-        Type,
-        Utils,
-      } = deps;#{module_metadata_registration}#{js_bindings_registration_call}#{erlang_function_defs}#{elixir_function_defs}
-    }
-
-    globalThis.Hologram.pageScriptLoaded = true;
-    document.dispatchEvent(new CustomEvent("hologram:pageScriptLoaded"));
-
-    console.debug("Hologram: page script executed in", PerformanceTimer.diff(startTime));\
-    """
+    Volt.Priv.render!(@runtime_source, "page_entry.ts", [],
+      splices: [imports: import_statements, function_definitions: function_definitions]
+    )
   end
 
   @doc """
@@ -307,133 +314,17 @@ defmodule Hologram.Compiler do
       |> render_manually_ported_clause_heads()
       |> render_block()
 
-    """
-    "use strict";
+    function_definitions =
+      "globalThis.Hologram.config = #{render_client_config()};\n" <>
+        "ERTS.appVersions = #{render_app_versions(app_versions)};\n" <>
+        module_metadata_registration <>
+        erlang_function_defs <>
+        elixir_function_defs <>
+        manually_ported_clause_heads
 
-    import Bitstring from "#{js_dir}/bitstring.mjs";
-    import ERTS from "#{js_dir}/erts.mjs";
-    import Hologram from "#{js_dir}/hologram.mjs";
-    import HologramBoxedError from "#{js_dir}/errors/boxed_error.mjs";
-    import HologramInterpreterError from "#{js_dir}/errors/interpreter_error.mjs";
-    import Interpreter from "#{js_dir}/interpreter.mjs";
-    import MemoryStorage from "#{js_dir}/memory_storage.mjs";
-    import PerformanceTimer from "#{js_dir}/performance_timer.mjs";
-    import Type from "#{js_dir}/type.mjs";
-    import Utils from "#{js_dir}/utils.mjs";
-
-    const startTime = PerformanceTimer.start();
-
-    globalThis.Hologram.config = #{render_client_config()};
-
-    ERTS.appVersions = #{render_app_versions(app_versions)};#{module_metadata_registration}#{erlang_function_defs}#{elixir_function_defs}#{manually_ported_clause_heads}
-
-    document.addEventListener("hologram:pageScriptLoaded", () => Hologram.run());
-
-    if (globalThis.Hologram.pageScriptLoaded) {
-      document.dispatchEvent(new CustomEvent("hologram:pageScriptLoaded"));
-    }
-
-    console.debug("Hologram: runtime script executed in", PerformanceTimer.diff(startTime));\
-    """
-  end
-
-  @doc """
-  Bundles multiple entry files.
-  Includes the source maps of the output files.
-  The output files' and source maps' file names contain hex digest.
-
-  Benchmark: https://github.com/bartblast/hologram/blob/master/benchmarks/compiler/bundle_2/README.md
-  """
-  @spec bundle(list({term, T.file_path(), String.t()}), T.opts()) :: list(map)
-  def bundle(entry_files_info, opts) do
-    entry_files_info
-    |> TaskUtils.async_many(fn {entry_name, entry_file_path, bundle_name} ->
-      bundle(entry_name, entry_file_path, bundle_name, opts)
-    end)
-    |> Task.await_many(:infinity)
-  end
-
-  @doc """
-  Bundles the given entry file.
-  Includes the source map of the output file.
-  The output file and source map file names contain hex digest.
-  """
-  @spec bundle(term, T.file_path(), String.t(), T.opts()) :: map
-  # sobelow_skip ["CI.System"]
-  def bundle(entry_name, entry_file_path, bundle_name, opts) do
-    output_bundle_path = Path.join(opts[:tmp_dir], "#{entry_name}.output.js")
-
-    esbuild_cmd = [
-      entry_file_path,
-      "--bundle",
-      "--log-level=warning",
-      "--minify",
-      "--outfile=#{output_bundle_path}",
-      "--sourcemap",
-      "--sources-content=true",
-      "--target=es2021"
-    ]
-
-    # Both the workspace root's and the OTP app's assets/node_modules go on
-    # NODE_PATH (identical in single-app projects, hence deduplicated).
-    # Non-existent dirs are silently ignored by Node.
-    workspace_and_otp_app_node_modules_paths =
-      [Reflection.root_dir(), Reflection.otp_app_dir()]
-      |> Enum.uniq()
-      |> Enum.map(&Path.join([&1, "assets", "node_modules"]))
-
-    node_path =
-      Enum.join(
-        [opts[:node_modules_path] | workspace_and_otp_app_node_modules_paths],
-        PathUtils.env_path_separator()
-      )
-
-    esbuild_opts = [
-      env: [{"NODE_PATH", node_path}],
-      parallelism: true
-    ]
-
-    {_exit_msg, exit_status} =
-      SystemUtils.cmd_cross_platform(opts[:esbuild_bin_path], esbuild_cmd, esbuild_opts)
-
-    if exit_status != 0 do
-      raise RuntimeError,
-        message:
-          "esbuild bundler failed for entry file: #{entry_file_path} (probably there were JavaScript syntax errors)"
-    end
-
-    maybe_ensure_bundle_within_size_limit!(entry_name, output_bundle_path)
-
-    digest =
-      output_bundle_path
-      |> File.read!()
-      |> CryptographicUtils.digest(:md5, :hex)
-
-    static_bundle_path_with_digest = Path.join(opts[:static_dir], "#{bundle_name}-#{digest}.js")
-
-    output_source_map_path = output_bundle_path <> ".map"
-    static_source_map_path_with_digest = static_bundle_path_with_digest <> ".map"
-
-    File.rename!(output_bundle_path, static_bundle_path_with_digest)
-    File.rename!(output_source_map_path, static_source_map_path_with_digest)
-
-    js_with_replaced_source_map_url =
-      static_bundle_path_with_digest
-      |> File.read!()
-      |> String.replace(
-        "//# sourceMappingURL=#{entry_name}.output.js.map",
-        "//# sourceMappingURL=#{bundle_name}-#{digest}.js.map"
-      )
-
-    File.write!(static_bundle_path_with_digest, js_with_replaced_source_map_url)
-
-    %{
-      bundle_name: bundle_name,
-      digest: digest,
-      entry_name: entry_name,
-      static_bundle_path: static_bundle_path_with_digest,
-      static_source_map_path: static_source_map_path_with_digest
-    }
+    Volt.Priv.render!(@runtime_source, "runtime_entry.ts", [],
+      splices: [function_definitions: function_definitions]
+    )
   end
 
   @doc """
@@ -919,12 +810,35 @@ defmodule Hologram.Compiler do
 
   defp keep_protocol_dispatcher_function_def?(_function_def, _protocol, _included_impls), do: true
 
-  defp maybe_ensure_bundle_within_size_limit!(entry_name, bundle_path) do
+  defp ensure_no_css!(manifest) do
+    Enum.each(manifest, fn
+      {entry_name, %ManifestEntry{css: [_first | _rest]}} ->
+        raise RuntimeError,
+          message:
+            "Volt emitted CSS for #{entry_name}, but Hologram does not load CSS entries yet"
+
+      {_entry_name, %ManifestEntry{}} ->
+        :ok
+    end)
+  end
+
+  defp maybe_ensure_build_within_size_limit!(manifest, static_dir) do
+    Enum.each(manifest, fn
+      {entry_name, %ManifestEntry{file: file, isEntry: true}} when is_binary(file) ->
+        file
+        |> then(&Path.join(static_dir, &1))
+        |> File.stat!()
+        |> then(&maybe_ensure_bundle_within_size_limit!(entry_name, &1.size))
+
+      {_entry_name, %ManifestEntry{}} ->
+        :ok
+    end)
+  end
+
+  defp maybe_ensure_bundle_within_size_limit!(entry_name, bundle_size) do
     max_bundle_size = Application.get_env(:hologram, :max_bundle_size)
 
     if max_bundle_size do
-      bundle_size = File.stat!(bundle_path).size
-
       if bundle_size > max_bundle_size do
         raise RuntimeError,
           message: """

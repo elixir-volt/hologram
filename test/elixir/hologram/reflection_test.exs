@@ -652,10 +652,6 @@ defmodule Hologram.ReflectionTest do
     end
   end
 
-  test "page_digest_plt_dump_file_name/0" do
-    assert page_digest_plt_dump_file_name() == "page_digest.plt"
-  end
-
   describe "phoenix_endpoint/0" do
     test "there is a config entry for the given Phoenix endpoint module" do
       put_env_with_cleanup(:hologram, Module7, [])

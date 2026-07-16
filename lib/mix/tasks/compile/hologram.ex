@@ -170,35 +170,20 @@ defmodule Mix.Tasks.Compile.Hologram do
 
       call_graph_for_pages = CallGraph.remove_runtime_mfas!(call_graph_for_runtime, runtime_mfas)
 
-      page_entry_files_info =
-        page_modules
-        |> Compiler.create_page_entry_files(call_graph_for_pages, ir_plt, async_mfas, opts)
-        |> Enum.map(fn {entry_name, entry_file_path} ->
-          {entry_name, entry_file_path, "page"}
-        end)
+      page_entry_files =
+        Compiler.create_page_entry_files(
+          page_modules,
+          call_graph_for_pages,
+          ir_plt,
+          async_mfas,
+          opts
+        )
 
-      entry_files_info = [{"runtime", runtime_entry_file_path, "runtime"} | page_entry_files_info]
+      entry_files = [runtime_entry_file_path | Enum.map(page_entry_files, &elem(&1, 1))]
+      Compiler.build_assets(entry_files, opts)
 
-      old_build_static_artifacts =
-        opts[:static_dir]
-        |> File.ls!()
-        |> Enum.map(fn file_name -> Path.join(opts[:static_dir], file_name) end)
-
-      bundles_info = Compiler.bundle(entry_files_info, opts)
-
-      new_build_static_artifacts =
-        Enum.reduce(bundles_info, [], fn bundle_info, acc ->
-          [bundle_info.static_bundle_path, bundle_info.static_source_map_path | acc]
-        end)
-
-      {page_digest_plt, page_digest_plt_dump_path} =
-        Compiler.build_page_digest_plt(bundles_info, Keyword.put(opts, :supervisor, sup))
-
-      PLT.dump(page_digest_plt, page_digest_plt_dump_path)
       CallGraph.dump(call_graph, call_graph_dump_path)
       PLT.dump(new_module_digest_plt, module_digest_plt_dump_path)
-
-      Enum.each(old_build_static_artifacts -- new_build_static_artifacts, &File.rm!/1)
 
       Logger.info("Hologram: compiler finished")
 

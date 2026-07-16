@@ -1,12 +1,11 @@
 defmodule Hologram.UI.Runtime do
   use Hologram.Component
-  alias Hologram.Router.Helpers, as: RouterHelpers
-
   prop :csrf_token, :string, from_context: {Hologram.Runtime, :csrf_token}
   prop :initial_page?, :boolean, from_context: {Hologram.Runtime, :initial_page?}
   prop :instance_id, :string, from_context: {Hologram.Runtime, :instance_id}
-  prop :page_digest, :string, from_context: {Hologram.Runtime, :page_digest}
+  prop :page_bundle_path, :string, from_context: {Hologram.Runtime, :page_bundle_path}
   prop :page_mounted?, :boolean, from_context: {Hologram.Runtime, :page_mounted?}
+  prop :runtime_bundle_path, :string, from_context: {Hologram.Runtime, :runtime_bundle_path}
 
   @impl Component
   def template do
@@ -45,11 +44,11 @@ defmodule Hologram.UI.Runtime do
     {/if}
 
     {%if @initial_page? && !@page_mounted?}
-      <script async src={asset_path("hologram/runtime.js")}></script>
+      <script type="module" async src={@runtime_bundle_path}></script>
     {/if}
 
     {%if !@page_mounted?}
-      <script async src={RouterHelpers.page_bundle_path(@page_digest)}></script>
+      <script type="module" async src={@page_bundle_path}></script>
     {/if}
     """
   end

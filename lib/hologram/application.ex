@@ -35,7 +35,7 @@ defmodule Hologram.Application do
       Hologram.Router.PageModuleResolver,
       Hologram.Assets.PathRegistry,
       Hologram.Assets.ManifestCache,
-      Hologram.Assets.PageDigestRegistry,
+      Hologram.Assets.BundleManifest,
       Hologram.Realtime.Handshake,
       Hologram.Realtime.SubscriptionRegistry,
       Hologram.Realtime.Tombstone

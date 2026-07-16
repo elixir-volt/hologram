@@ -1,27 +1,17 @@
 defmodule Hologram.UI.RuntimeTest do
   use Hologram.Test.BasicCase, async: false
 
-  import Hologram.Test.Stubs
-  import Mox
-
-  alias Hologram.Assets.PathRegistry, as: AssetPathRegistry
   alias Hologram.UI.Runtime
 
-  use_module_stub :asset_path_registry
-
-  setup :set_mox_global
-
   setup do
-    setup_asset_path_registry(AssetPathRegistryStub)
-    AssetPathRegistry.register("hologram/runtime.js", "/hologram/runtime-1234567890abcdef.js")
-
     [
       context: %{
         {Hologram.Runtime, :csrf_token} => "test-csrf-token-12345",
         {Hologram.Runtime, :initial_page?} => false,
         {Hologram.Runtime, :instance_id} => "test-instance-id-abcde",
-        {Hologram.Runtime, :page_digest} => "102790adb6c3b1956db310be523a7693",
-        {Hologram.Runtime, :page_mounted?} => false
+        {Hologram.Runtime, :page_bundle_path} => "/hologram/my-page-123.js",
+        {Hologram.Runtime, :page_mounted?} => false,
+        {Hologram.Runtime, :runtime_bundle_path} => "/hologram/runtime-456.js"
       }
     ]
   end
@@ -55,7 +45,7 @@ defmodule Hologram.UI.RuntimeTest do
     assert String.contains?(markup, "globalThis.Hologram.instanceId")
     assert String.contains?(markup, "globalThis.Hologram.pageMountData")
     assert String.contains?(markup, "hologram/runtime")
-    assert String.contains?(markup, "hologram/page")
+    assert String.contains?(markup, "/hologram/my-page-123.js")
   end
 
   test "not initial page, page mounted", %{context: initial_context} do
@@ -92,7 +82,7 @@ defmodule Hologram.UI.RuntimeTest do
     refute String.contains?(markup, "globalThis.Hologram.instanceId")
     assert String.contains?(markup, "globalThis.Hologram.pageMountData")
     refute String.contains?(markup, "hologram/runtime")
-    assert String.contains?(markup, "hologram/page")
+    assert String.contains?(markup, "/hologram/my-page-123.js")
   end
 
   test "csrf_token prop", %{context: initial_context} do
@@ -112,12 +102,12 @@ defmodule Hologram.UI.RuntimeTest do
            )
   end
 
-  test "page_digest prop", %{context: context} do
+  test "page_bundle_path prop", %{context: context} do
     markup = render_component(Runtime, %{}, context)
 
     assert String.contains?(
              markup,
-             ~s'<script async src="/hologram/page-102790adb6c3b1956db310be523a7693.js">'
+             ~s'<script type="module" async src="/hologram/my-page-123.js">'
            )
   end
 end

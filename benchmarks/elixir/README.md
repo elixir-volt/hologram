@@ -52,11 +52,11 @@ build_page_js/5         70.82       14.12 ms    ±14.38%       14.67 ms       17
 ```
 
 
-### ✅ compiler » bundle_2
+### ✅ compiler » build_assets_2
 
 ```
-Name               ips        average  deviation         median         99th %
-bundle/2          4.59      218.01 ms     ±1.91%      217.77 ms      233.56 ms
+Name                     ips        average  deviation         median         99th %
+build_assets/2          0.22         4.51 s     ±0.94%         4.51 s         4.55 s
 ```
 
 
@@ -194,7 +194,7 @@ all templatables        3.53 K - 1.21x slower +48.96 μs
 
 ```
 Name                                ips        average  deviation         median         99th %
-create_page_entry_files/5          1.05      949.73 ms     ±2.89%      941.21 ms     1014.11 ms
+create_page_entry_files/5         0.108         9.26 s     ±0.53%         9.26 s         9.29 s
 ```
 
 
@@ -290,12 +290,12 @@ validate_page_modules/1      120.03 K        8.33 μs    ±76.52%        8.25 μ
 
 ```
 Name                ips        average  deviation         median         99th %
-has cache       40.40 K       24.76 μs    ±59.81%       20.25 μs       87.83 μs
-no cache        29.13 K       34.33 μs    ±28.31%       31.63 μs       60.15 μs
+has cache        0.0661        15.14 s     ±0.00%        15.14 s        15.14 s
+no cache         0.0634        15.77 s     ±0.00%        15.77 s        15.77 s
 
 Comparison: 
-has cache       40.40 K
-no cache        29.13 K - 1.39x slower +9.58 μs
+has cache        0.0661
+no cache         0.0634 - 1.04x slower +0.63 s
 ```
 
 

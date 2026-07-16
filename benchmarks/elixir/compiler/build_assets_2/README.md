@@ -1,6 +1,6 @@
 Benchmark
 
-Hologram.Compiler.bundle/2
+Hologram.Compiler.build_assets/2
 
 ## System
 
@@ -9,16 +9,16 @@ Benchmark suite executing on the following system:
 <table style="width: 1%">
   <tr>
     <th style="width: 1%; white-space: nowrap">Operating System</th>
-    <td>macOS</td>
+    <td>Linux</td>
   </tr><tr>
     <th style="white-space: nowrap">CPU Information</th>
-    <td style="white-space: nowrap">Apple M1 Pro</td>
+    <td style="white-space: nowrap">AMD Ryzen 9 9950X 16-Core Processor</td>
   </tr><tr>
     <th style="white-space: nowrap">Number of Available Cores</th>
-    <td style="white-space: nowrap">10</td>
+    <td style="white-space: nowrap">32</td>
   </tr><tr>
     <th style="white-space: nowrap">Available Memory</th>
-    <td style="white-space: nowrap">16 GB</td>
+    <td style="white-space: nowrap">121.18 GB</td>
   </tr><tr>
     <th style="white-space: nowrap">Elixir Version</th>
     <td style="white-space: nowrap">1.20.0</td>
@@ -62,12 +62,12 @@ Run Time
   </tr>
 
   <tr>
-    <td style="white-space: nowrap">bundle/2</td>
-    <td style="white-space: nowrap; text-align: right">4.59</td>
-    <td style="white-space: nowrap; text-align: right">218.01 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;1.91%</td>
-    <td style="white-space: nowrap; text-align: right">217.77 ms</td>
-    <td style="white-space: nowrap; text-align: right">233.56 ms</td>
+    <td style="white-space: nowrap">build_assets/2</td>
+    <td style="white-space: nowrap; text-align: right">0.22</td>
+    <td style="white-space: nowrap; text-align: right">4.51 s</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;0.94%</td>
+    <td style="white-space: nowrap; text-align: right">4.51 s</td>
+    <td style="white-space: nowrap; text-align: right">4.55 s</td>
   </tr>
 
 </table>

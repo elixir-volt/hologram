@@ -8,7 +8,7 @@ defmodule Hologram.Runtime.ConnectionTest do
   alias Hologram.Commons.ETS
   alias Hologram.Test.Fixtures.Runtime.Connection.Module2
 
-  use_module_stub :page_digest_registry
+  use_module_stub :bundle_manifest
 
   setup :set_mox_global
 
@@ -94,16 +94,12 @@ defmodule Hologram.Runtime.ConnectionTest do
 
   describe "handle_in/2" do
     test "handles page_bundle_path message" do
-      setup_page_digest_registry(PageDigestRegistryStub)
+      setup_bundle_manifest(BundleManifestStub)
 
-      test_digest = "12345678901234567890123456789012"
+      page_bundle_path = "/hologram/page-module-123.js"
       correlation_id = "test-correlation-123"
 
-      ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
-        Module2,
-        test_digest
-      )
+      ETS.put(BundleManifestStub.ets_table_name(), Module2, page_bundle_path)
 
       # Message format: ["page_bundle_path", payload, correlation_id]
       # Payload format: [serialization_protocol_version, serialized_data]
@@ -113,8 +109,7 @@ defmodule Hologram.Runtime.ConnectionTest do
       encoded_message = Jason.encode!(message)
 
       # Expected response format: ["reply", page_bundle_path, correlation_id]
-      expected_page_bundle_path = "/hologram/page-#{test_digest}.js"
-      expected_response_data = ["reply", expected_page_bundle_path, correlation_id]
+      expected_response_data = ["reply", page_bundle_path, correlation_id]
       expected_response = Jason.encode!(expected_response_data)
 
       assert handle_in({encoded_message, [opcode: :text]}, @state) ==

@@ -3,8 +3,8 @@ defmodule Hologram.LiveReload do
 
   use GenServer
 
+  alias Hologram.Assets.BundleManifest
   alias Hologram.Assets.ManifestCache
-  alias Hologram.Assets.PageDigestRegistry
   alias Hologram.Assets.PathRegistry
   alias Hologram.LiveReload.Diagnostic
   alias Hologram.Reflection
@@ -194,7 +194,7 @@ defmodule Hologram.LiveReload do
     PageModuleResolver.reload()
     PathRegistry.reload()
     ManifestCache.reload()
-    PageDigestRegistry.reload()
+    BundleManifest.reload()
   end
 
   # Determines whether to process a file event and returns the target file to reload

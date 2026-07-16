@@ -80,9 +80,7 @@ defmodule Mix.Tasks.Compile.HologramTest do
     test_call_graph(opts)
     test_dirs(opts)
     test_module_digest_plt(opts)
-    test_page_bundles(opts)
-    test_page_digest_plt(opts)
-    test_runtime_bundle(opts)
+    test_volt_manifest(opts)
   end
 
   defp test_call_graph(opts) do
@@ -132,55 +130,28 @@ defmodule Mix.Tasks.Compile.HologramTest do
            |> File.exists?()
   end
 
-  defp test_page_bundles(opts) do
-    num_page_bundles =
-      opts[:static_dir]
-      |> Path.join("page-????????????????????????????????.js")
-      |> Path.wildcard()
-      |> Enum.count()
+  defp test_volt_manifest(opts) do
+    manifest_path = Path.join(opts[:static_dir], "manifest.json")
+    assert File.regular?(manifest_path)
 
-    assert num_page_bundles == @num_pages
+    manifest =
+      manifest_path
+      |> File.read!()
+      |> Jason.decode!()
 
-    num_page_source_maps =
-      opts[:static_dir]
-      |> Path.join("page-????????????????????????????????.js.map")
-      |> Path.wildcard()
-      |> Enum.count()
+    entry_keys = ["runtime.entry.js" | Enum.map(Reflection.list_pages(), &entry_key/1)]
 
-    assert num_page_source_maps == @num_pages
+    assert Enum.count(manifest, fn {_key, entry} -> entry["isEntry"] end) == @num_pages + 1
+
+    Enum.each(entry_keys, fn entry_key ->
+      assert %{"file" => file, "isEntry" => true} = manifest[entry_key]
+      assert File.regular?(Path.join(opts[:static_dir], file))
+      assert File.regular?(Path.join(opts[:static_dir], file <> ".map"))
+    end)
   end
 
-  defp test_page_digest_plt(opts) do
-    page_digest_plt_dump_path =
-      Path.join(opts[:build_dir], Reflection.page_digest_plt_dump_file_name())
-
-    assert File.exists?(page_digest_plt_dump_path)
-
-    page_digest_plt = PLT.start()
-    PLT.load(page_digest_plt, page_digest_plt_dump_path)
-    page_digest_items = PLT.get_all(page_digest_plt)
-
-    assert map_size(page_digest_items) == @num_pages
-
-    assert page_digest_items[Module1] =~ ~r/^[0-9a-f]{32}$/
-  end
-
-  defp test_runtime_bundle(opts) do
-    num_runtime_bundles =
-      opts[:static_dir]
-      |> Path.join("runtime-????????????????????????????????.js")
-      |> Path.wildcard()
-      |> Enum.count()
-
-    assert num_runtime_bundles == 1
-
-    num_runtime_source_maps =
-      opts[:static_dir]
-      |> Path.join("runtime-????????????????????????????????.js.map")
-      |> Path.wildcard()
-      |> Enum.count()
-
-    assert num_runtime_source_maps == 1
+  defp entry_key(page_module) do
+    Reflection.module_name(page_module) <> ".entry.js"
   end
 
   # Helper function to wait for lock file to appear and return its content

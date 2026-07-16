@@ -3,12 +3,11 @@ defmodule Hologram.Test.Stubs do
   import Hologram.Test.Helpers, only: [random_atom: 0, random_module: 0, random_string: 0]
   import Mox, only: [stub_with: 2]
 
+  alias Hologram.Assets.BundleManifest
   alias Hologram.Assets.ManifestCache, as: AssetManifestCache
-  alias Hologram.Assets.PageDigestRegistry
   alias Hologram.Assets.PathRegistry, as: AssetPathRegistry
   alias Hologram.Commons.ETS
   alias Hologram.Commons.FileUtils
-  alias Hologram.Commons.PLT
   alias Hologram.Commons.ProcessUtils
   alias Hologram.Reflection
   alias Hologram.Router.PageModuleResolver
@@ -51,10 +50,10 @@ defmodule Hologram.Test.Stubs do
     mapping
   end
 
-  def setup_page_digest_registry(stub, start_link \\ true) do
-    stub_with(PageDigestRegistryMock, stub)
+  def setup_bundle_manifest(stub, start_link \\ true) do
+    stub_with(BundleManifestMock, stub)
 
-    setup_page_digest_registry_dump(stub)
+    setup_bundle_manifest_file(stub)
 
     ets_table_name = stub.ets_table_name()
 
@@ -63,7 +62,7 @@ defmodule Hologram.Test.Stubs do
     end
 
     if start_link do
-      PageDigestRegistry.start_link([])
+      BundleManifest.start_link([])
     end
 
     :ok
@@ -127,28 +126,28 @@ defmodule Hologram.Test.Stubs do
     end
   end
 
-  defmacro use_module_stub(:page_digest_registry) do
+  defmacro use_module_stub(:bundle_manifest) do
     random_module = random_module()
 
     quote do
-      defmodule alias!(unquote(random_module).PageDigestRegistryStub) do
-        @behaviour PageDigestRegistry
+      defmodule alias!(unquote(random_module).BundleManifestStub) do
+        @behaviour BundleManifest
 
-        def dump_path do
+        def manifest_path do
           Path.join([
             Reflection.tmp_dir(),
             "tests",
             "stubs",
-            "page_digest_registry",
-            "dump_path_0",
-            "#{unquote(random_string())}.plt"
+            "bundle_manifest",
+            "manifest_path_0",
+            "#{unquote(random_string())}.json"
           ])
         end
 
         def ets_table_name, do: unquote(random_atom())
       end
 
-      alias alias!(unquote(random_module).PageDigestRegistryStub)
+      alias alias!(unquote(random_module).BundleManifestStub)
     end
   end
 
@@ -231,24 +230,23 @@ defmodule Hologram.Test.Stubs do
         "test_dir_3/test_file_5.css" =>
           "/test_dir_3/test_file_5-55555555555555555555555555555555.css",
         "test_dir_3/test_file_10.css" => "/test_dir_3/test_file_10.css",
-        "test_dir_3/page.js" => "/test_dir_3/page-66666666666666666666666666666666.js",
-        "hologram/runtime.js" => "/hologram/runtime-00000000000000000000000000000000.js",
-        "hologram/test_file_9.css" => "/hologram/test_file_9-99999999999999999999999999999999.css"
+        "test_dir_3/page.js" => "/test_dir_3/page-66666666666666666666666666666666.js"
       }
     ]
   end
 
-  defp setup_page_digest_registry_dump(stub) do
-    dump_path = stub.dump_path()
+  defp setup_bundle_manifest_file(stub) do
+    manifest =
+      Reflection.list_pages()
+      |> Map.new(fn page_module ->
+        entry = Reflection.module_name(page_module) <> ".entry.js"
+        {entry, %{"file" => entry, "isEntry" => true}}
+      end)
+      |> Map.put("runtime.entry.js", %{
+        "file" => "runtime.entry.js",
+        "isEntry" => true
+      })
 
-    File.rm(dump_path)
-
-    PLT.start()
-    |> PLT.put(:module_a, :module_a_digest)
-    |> PLT.put(:module_b, :module_b_digest)
-    |> PLT.put(:module_c, :module_c_digest)
-    |> PLT.dump(dump_path)
-
-    :ok
+    FileUtils.write_p!(stub.manifest_path(), Jason.encode!(manifest))
   end
 end

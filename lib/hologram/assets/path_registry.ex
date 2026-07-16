@@ -111,7 +111,10 @@ defmodule Hologram.Assets.PathRegistry do
   end
 
   defp find_assets(static_dir) do
-    static_files = FileUtils.list_files_recursively(static_dir)
+    static_files =
+      static_dir
+      |> FileUtils.list_files_recursively()
+      |> Enum.reject(&String.starts_with?(&1, Path.join(static_dir, "hologram") <> "/"))
 
     assets_with_digest_suffix = find_assets_with_digest_suffix(static_dir, static_files)
 
@@ -132,7 +135,6 @@ defmodule Hologram.Assets.PathRegistry do
     |> Stream.map(&Regex.run(regex, &1))
     |> Stream.filter(& &1)
     |> Stream.map(&List.to_tuple/1)
-    |> stream_reject_page_bundles()
     |> stream_reject_source_maps()
     |> stream_build_asset_entries()
     |> Enum.to_list()
@@ -166,12 +168,6 @@ defmodule Hologram.Assets.PathRegistry do
   defp stream_build_asset_entries(file_infos) do
     Stream.map(file_infos, fn {_file_path, prefix, digest, suffix} ->
       {prefix <> suffix, "/#{prefix}-#{digest}#{suffix}"}
-    end)
-  end
-
-  defp stream_reject_page_bundles(file_infos) do
-    Stream.reject(file_infos, fn {_file_path, prefix, _digest, _suffix} ->
-      prefix == "hologram/page"
     end)
   end
 

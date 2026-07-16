@@ -11,8 +11,6 @@ defmodule Hologram.Reflection do
 
   @module_digest_plt_dump_file_name "module_digest.plt"
 
-  @page_digest_plt_dump_file_name "page_digest.plt"
-
   @doc """
   Determines whether the given term is an alias.
 
@@ -549,14 +547,6 @@ defmodule Hologram.Reflection do
   @spec page?(term) :: boolean
   def page?(term) do
     elixir_module?(term) && has_function?(term, :__is_hologram_page__, 0)
-  end
-
-  @doc """
-  Returns the page digest PLT dump file name.
-  """
-  @spec page_digest_plt_dump_file_name() :: String.t()
-  def page_digest_plt_dump_file_name do
-    @page_digest_plt_dump_file_name
   end
 
   @doc """

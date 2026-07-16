@@ -1,8 +1,8 @@
 defmodule Hologram.Template.Renderer do
   @moduledoc false
 
+  alias Hologram.Assets.BundleManifest
   alias Hologram.Assets.ManifestCache, as: AssetManifestCache
-  alias Hologram.Assets.PageDigestRegistry
   alias Hologram.Commons.StringUtils
   alias Hologram.Commons.Types, as: T
   alias Hologram.Compiler.Encoder
@@ -192,12 +192,14 @@ defmodule Hologram.Template.Renderer do
     {page_component_struct, page_server_struct} =
       init_component(page_module, params, server_struct)
 
-    page_digest = PageDigestRegistry.lookup(page_module)
+    page_bundle_path = BundleManifest.page_path(page_module)
+    runtime_bundle_path = BundleManifest.runtime_path()
 
     page_component_struct_with_emitted_context_before_rendering =
       page_component_struct
       |> put_initial_page_flag_context(initial_page?)
-      |> put_page_digest_context(page_digest)
+      |> put_page_bundle_path_context(page_bundle_path)
+      |> maybe_put_runtime_bundle_path_context(runtime_bundle_path, initial_page?)
       |> put_page_mounted_flag_context(false)
       |> maybe_put_csrf_token_context(opts, initial_page?)
       |> maybe_put_instance_id_context(opts, initial_page?)
@@ -784,12 +786,28 @@ defmodule Hologram.Template.Renderer do
     )
   end
 
-  defp put_page_digest_context(page_component_struct, page_digest) do
+  defp put_page_bundle_path_context(page_component_struct, page_bundle_path) do
     Component.put_context(
       page_component_struct,
-      {Hologram.Runtime, :page_digest},
-      page_digest
+      {Hologram.Runtime, :page_bundle_path},
+      page_bundle_path
     )
+  end
+
+  defp maybe_put_runtime_bundle_path_context(
+         page_component_struct,
+         runtime_bundle_path,
+         initial_page?
+       ) do
+    if initial_page? do
+      Component.put_context(
+        page_component_struct,
+        {Hologram.Runtime, :runtime_bundle_path},
+        runtime_bundle_path
+      )
+    else
+      page_component_struct
+    end
   end
 
   defp put_page_mounted_flag_context(page_component_struct, page_mounted?) do

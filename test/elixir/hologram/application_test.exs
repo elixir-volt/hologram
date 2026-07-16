@@ -7,7 +7,7 @@ defmodule Hologram.ApplicationTest do
 
   use_module_stub :asset_manifest_cache
   use_module_stub :asset_path_registry
-  use_module_stub :page_digest_registry
+  use_module_stub :bundle_manifest
   use_module_stub :page_module_resolver
 
   setup :set_mox_global
@@ -23,7 +23,7 @@ defmodule Hologram.ApplicationTest do
     setup_asset_path_registry(AssetPathRegistryStub, false)
     setup_asset_manifest_cache(AssetManifestCacheStub, false)
 
-    setup_page_digest_registry(PageDigestRegistryStub, false)
+    setup_bundle_manifest(BundleManifestStub, false)
 
     setup_page_module_resolver(PageModuleResolverStub, false)
 
@@ -46,7 +46,7 @@ defmodule Hologram.ApplicationTest do
       children = Supervisor.which_children(pid)
       child_modules = Enum.map(children, fn {module, _pid, _type, _modules} -> module end)
 
-      assert Hologram.Assets.PageDigestRegistry in child_modules
+      assert Hologram.Assets.BundleManifest in child_modules
       assert Hologram.Assets.PathRegistry in child_modules
       assert Hologram.Assets.ManifestCache in child_modules
       assert Hologram.Realtime.SubscriptionRegistry in child_modules

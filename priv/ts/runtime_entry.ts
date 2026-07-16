@@ -13,8 +13,7 @@ import Type from "hologram:runtime/type";
 import Utils from "hologram:runtime/utils";
 
 const startTime = PerformanceTimer.start();
-$erlang_function_defs;
-$elixir_function_defs;
+$function_definitions;
 
 document.addEventListener("hologram:pageScriptLoaded", () => Hologram.run());
 

@@ -3,7 +3,7 @@ defmodule Hologram.Controller do
 
   require Logger
 
-  alias Hologram.Assets.PageDigestRegistry
+  alias Hologram.Assets.BundleManifest
   alias Hologram.Compiler.Encoder
   alias Hologram.Component.Action
   alias Hologram.Page
@@ -130,12 +130,12 @@ defmodule Hologram.Controller do
   end
 
   def build_page_data_payload(%{
-        page_digest: page_digest,
+        page_bundle_path: page_bundle_path,
         page_module: page_module,
         tree: tree
       }) do
     %{
-      pageDigest: page_digest,
+      pageBundlePath: page_bundle_path,
       pageModule: Encoder.encode_term!(page_module),
       tree: Encoder.encode_term!(tree),
       type: "page"
@@ -569,7 +569,7 @@ defmodule Hologram.Controller do
 
         payload =
           build_page_data_payload(%{
-            page_digest: PageDigestRegistry.lookup(page_module),
+            page_bundle_path: BundleManifest.page_path(page_module),
             page_module: page_module,
             tree: tree
           })

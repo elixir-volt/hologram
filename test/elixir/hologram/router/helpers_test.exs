@@ -32,10 +32,6 @@ defmodule Hologram.Router.HelpersTest do
     end
   end
 
-  test "page_bundle_path/1" do
-    assert page_bundle_path("abc") == "/hologram/page-abc.js"
-  end
-
   describe "page_path/1" do
     test "module arg" do
       assert page_path(Module1) == "/hologram-test-fixtures-router-helpers-module1"

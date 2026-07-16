@@ -4,9 +4,9 @@ Last run: 2026-07-05 11:29:48 UTC
 
 ## Summary
 
-Total benchmarks: 34
+Total benchmarks: 33
 
-Successful: 34\
+Successful: 33\
 Warnings: 0\
 Failed: 0
 
@@ -236,19 +236,6 @@ no module changes                         1.70 K - 2.58x slower +359.76 μs
 1 module added                            1.62 K - 2.71x slower +390.14 μs
 1 module edited                           1.60 K - 2.74x slower +397.28 μs
 1 module removed                          1.59 K - 2.75x slower +398.82 μs
-```
-
-
-### ✅ compiler » maybe_install_js_deps_2
-
-```
-Name                 ips        average  deviation         median         99th %
-no install        8.11 K      0.00012 s    ±22.19%      0.00013 s      0.00021 s
-do install     0.00011 K         9.40 s    ±12.37%         9.40 s        10.22 s
-
-Comparison: 
-no install        8.11 K
-do install     0.00011 K - 76151.71x slower +9.40 s
 ```
 
 

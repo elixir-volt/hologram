@@ -23,7 +23,7 @@ The previous handwritten `test/javascript_volt` and `test/javascript_volt_browse
 
 The bridge discovers and executes all 87 canonical files without changing their test bodies or names. Currently 82 execute in QuickBEAM and five DOM-dependent files execute in Chromium through Volt's browser runner. A focused Volt regression suite also verifies English cardinal and ordinal plural rules for decimals, negatives, and the 11/12/13 exceptions.
 
-`test/javascript_volt/canonical_manifest.json` records the baseline count and test-name hash for every canonical file (4,797 tests total). Every Volt result must match its file's count and name set. Regenerate the manifest intentionally with `mix holo.test.update_volt_manifest` after canonical test additions, removals, or renames. CI now runs the canonical suite through Volt instead of redundantly executing the same files through Mocha.
+`test/javascript_volt/canonical_manifest.json` records the baseline count and test-name hash for every canonical file (4,799 tests total). Every Volt result must match its file's count and name set. Regenerate the manifest intentionally with `mix holo.test.update_volt_manifest` after canonical test additions, removals, or renames. CI now runs the canonical suite through Volt instead of redundantly executing the same files through Mocha.
 
 The runtime blockers addressed centrally so far include:
 
@@ -47,7 +47,7 @@ The obsolete `assets/js` mirror, Mocha runner, and jsdom dependencies have been 
 
 ## Compatibility impact
 
-Hologram depends on Volt as a compile-time-only package rather than a runtime application. Because Volt 0.17.3 requires Elixir 1.18 and Erlang/OTP 27 or later, Hologram's compatibility floor has moved accordingly. Applications upgrading to this version must use Elixir 1.18 and Erlang/OTP 27 or newer.
+Hologram depends on Volt as a compile-time-only package rather than a runtime application. Because Volt 0.17 requires Elixir 1.18 and Erlang/OTP 27 or later, Hologram's compatibility floor has moved accordingly. Applications upgrading to this version must use Elixir 1.18 and Erlang/OTP 27 or newer.
 
 ## Completion criteria
 

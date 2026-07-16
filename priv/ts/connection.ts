@@ -220,7 +220,7 @@ export default class Connection {
       try {
         $.websocket.send(encodedMessage);
         return true;
-        // eslint-disable-next-line no-empty
+        // oxlint-disable-next-line no-empty
       } catch {}
     }
 

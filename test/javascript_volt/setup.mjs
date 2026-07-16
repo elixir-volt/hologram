@@ -14,11 +14,9 @@ if (typeof globalThis.self === "undefined") {
 
 if (typeof globalThis.addEventListener === "undefined") {
   const windowEvents = new EventTarget();
-  globalThis.addEventListener =
-    windowEvents.addEventListener.bind(windowEvents);
+  globalThis.addEventListener = windowEvents.addEventListener.bind(windowEvents);
   globalThis.dispatchEvent = windowEvents.dispatchEvent.bind(windowEvents);
-  globalThis.removeEventListener =
-    windowEvents.removeEventListener.bind(windowEvents);
+  globalThis.removeEventListener = windowEvents.removeEventListener.bind(windowEvents);
 }
 
 if (typeof globalThis.sessionStorage === "undefined") {

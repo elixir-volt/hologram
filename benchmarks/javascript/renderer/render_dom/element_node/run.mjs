@@ -12,12 +12,7 @@ const context = Type.map();
 const defaultTarget = Type.bitstring("my_default_target");
 const slots = Type.keywordList();
 
-const node = Type.tuple([
-  Type.atom("element"),
-  Type.bitstring("div"),
-  Type.list(),
-  Type.list(),
-]);
+const node = Type.tuple([Type.atom("element"), Type.bitstring("div"), Type.list(), Type.list()]);
 
 benchmark(() => {
   Renderer.renderDom(node, context, slots, defaultTarget);

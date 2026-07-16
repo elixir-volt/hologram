@@ -2,13 +2,7 @@ defmodule HologramFeatureTests.MixProject do
   use Mix.Project
 
   defp aliases do
-    [
-      f: ["format", "format.js"],
-      "format.js":
-        "cmd ../../assets/node_modules/.bin/prettier 'assets/js/**' --config '../../assets/.prettierrc.json' --write",
-      "format.js.check":
-        "cmd ../../assets/node_modules/.bin/prettier 'assets/js/**' --check --config '../../assets/.prettierrc.json' --no-error-on-unmatched-pattern"
-    ]
+    [f: ["format", "volt.js.format"]]
   end
 
   def application do

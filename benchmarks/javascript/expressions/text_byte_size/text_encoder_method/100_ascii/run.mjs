@@ -8,5 +8,5 @@ const text =
 const encoder = new TextEncoder("utf-8");
 
 benchmark(() => {
-  encoder.encode(text).length;
+  void encoder.encode(text).length;
 });

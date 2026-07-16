@@ -16,4 +16,19 @@ config :phoenix,
   json_library: Jason,
   plug_init_mode: :runtime
 
+config :volt,
+  root: ".",
+  sources: ["assets/js/**/*.{js,mjs,ts,jsx,tsx}"],
+  ignore: []
+
+config :volt, :format, bracket_spacing: false
+
+config :volt, :lint,
+  env: [:browser, :node],
+  rules: %{
+    "correctness" => :deny,
+    "no-unused-expressions" => :deny,
+    "no-unused-vars" => :deny
+  }
+
 import_config "#{config_env()}.exs"

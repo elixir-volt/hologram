@@ -6,5 +6,5 @@ const text =
   "abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghij";
 
 benchmark(() => {
-  new Blob([text]).size;
+  void new Blob([text]).size;
 });

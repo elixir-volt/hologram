@@ -14,9 +14,7 @@ const outputFile = __dirname + "/mapping_javascript.txt";
 // Generate mapping for all Unicode codepoints (0 to 0x10FFFF = 1,114,111)
 const maxCodepoint = 0x10ffff;
 
-console.log(
-  `Generating uppercase mapping for codepoints 0 to ${maxCodepoint}...`,
-);
+console.log(`Generating uppercase mapping for codepoints 0 to ${maxCodepoint}...`);
 
 const mapping = [];
 

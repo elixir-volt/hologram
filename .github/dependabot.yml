@@ -14,9 +14,6 @@ updates:
     directory: "/assets"
     schedule:
       interval: "weekly"
-    ignore:
-      - dependency-name: "eslint"
-        update-types: ["version-update:semver-major"]
     groups:
       lib-javascript:
         patterns:

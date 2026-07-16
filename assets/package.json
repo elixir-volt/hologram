@@ -1,20 +1,6 @@
 {
-  "dependencies": {
-    "esbuild": "^0.28",
-    "lodash": "^4",
-    "snabbdom-to-html": "^7"
-  },
   "devDependencies": {
-    "chai": "^6",
-    "eslint": "^9",
-    "jsdom": "27.0.0",
-    "jsdom-global": "^3",
-    "mocha": "^11",
-    "prettier": "^3",
-    "sinon": "^22"
-  },
-  "scripts": {
-    "test": "mocha ../test/javascript/*.mjs ../test/javascript/*/*.mjs ../test/javascript/*/*/*.mjs ../test/javascript/*/*/*/*.mjs --color --require jsdom-global/register",
-    "test-file": "mocha --color --require jsdom-global/register"
+    "playwright": "1.61.1",
+    "prettier": "^3"
   }
 }

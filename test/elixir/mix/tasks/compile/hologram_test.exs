@@ -148,6 +148,25 @@ defmodule Mix.Tasks.Compile.HologramTest do
       assert File.regular?(Path.join(opts[:static_dir], file))
       assert File.regular?(Path.join(opts[:static_dir], file <> ".map"))
     end)
+
+    runtime_entry = manifest["runtime.entry.js"]
+
+    assert [polyfill_chunk] =
+             Enum.filter(
+               runtime_entry["dynamicImports"],
+               &String.starts_with?(&1, "intl-pluralrules-polyfill-")
+             )
+
+    assert %{"file" => ^polyfill_chunk, "isEntry" => false} = manifest[polyfill_chunk]
+
+    assert opts[:static_dir]
+           |> Path.join(polyfill_chunk)
+           |> File.regular?()
+
+    assert opts[:static_dir]
+           |> Path.join(runtime_entry["file"])
+           |> File.stat!()
+           |> Map.fetch!(:size) < 500_000
   end
 
   defp entry_key(page_module) do

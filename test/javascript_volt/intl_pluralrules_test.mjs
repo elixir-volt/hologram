@@ -1,7 +1,23 @@
 import {describe, expect, test} from "volt:test";
+import {needsIntlPluralRulesPolyfill} from "hologram:runtime/intl-pluralrules";
 import Utils from "hologram:runtime/utils";
 
 describe("Intl.PluralRules compatibility", () => {
+  test("recognizes the installed implementation", () => {
+    expect(needsIntlPluralRulesPolyfill()).toBe(false);
+  });
+
+  test("detects a missing implementation", () => {
+    const originalPluralRules = Intl.PluralRules;
+
+    try {
+      Intl.PluralRules = undefined;
+      expect(needsIntlPluralRulesPolyfill()).toBe(true);
+    } finally {
+      Intl.PluralRules = originalPluralRules;
+    }
+  });
+
   test("applies English cardinal rules to integers, decimals, and negatives", () => {
     expect(Utils.naiveNounPlural("car", 1)).toBe("car");
     expect(Utils.naiveNounPlural("car", 1.2)).toBe("cars");

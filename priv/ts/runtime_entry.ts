@@ -7,18 +7,29 @@ import Hologram from "hologram:runtime/hologram";
 import HologramBoxedError from "hologram:runtime/errors/boxed_error";
 import HologramInterpreterError from "hologram:runtime/errors/interpreter_error";
 import Interpreter from "hologram:runtime/interpreter";
+import {loadIntlPluralRulesPolyfill} from "hologram:runtime/intl-pluralrules";
 import MemoryStorage from "hologram:runtime/memory_storage";
 import PerformanceTimer from "hologram:runtime/performance_timer";
 import Type from "hologram:runtime/type";
 import Utils from "hologram:runtime/utils";
 
-const startTime = PerformanceTimer.start();
-$function_definitions;
+function initializeRuntime() {
+  const startTime = PerformanceTimer.start();
+  $function_definitions;
 
-document.addEventListener("hologram:pageScriptLoaded", () => Hologram.run());
+  document.addEventListener("hologram:pageScriptLoaded", () => Hologram.run());
 
-if (globalThis.Hologram.pageScriptLoaded) {
-  document.dispatchEvent(new CustomEvent("hologram:pageScriptLoaded"));
+  if (globalThis.Hologram.pageScriptLoaded) {
+    document.dispatchEvent(new CustomEvent("hologram:pageScriptLoaded"));
+  }
+
+  console.debug("Hologram: runtime script executed in", PerformanceTimer.diff(startTime));
 }
 
-console.debug("Hologram: runtime script executed in", PerformanceTimer.diff(startTime));
+const pluralRulesPolyfill = loadIntlPluralRulesPolyfill();
+
+if (pluralRulesPolyfill) {
+  pluralRulesPolyfill.then(initializeRuntime);
+} else {
+  initializeRuntime();
+}

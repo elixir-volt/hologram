@@ -1,7 +1,5 @@
 "use strict";
 
-import "./intl-pluralrules-polyfill";
-
 export default class Utils {
   static capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);

@@ -11,15 +11,15 @@ The files under `test/javascript` run directly through Volt. Runtime and compati
 1. Run the existing `*_test.mjs` files directly with Volt's Mocha-compatible globals (`describe`, `it`, `beforeEach`, and `afterEach`).
 2. Resolve namespaced `hologram:runtime/*` imports directly to canonical `priv/ts/*.ts` runtime sources.
 3. Keep the existing Chai assertions initially rather than rewriting thousands of assertions.
-4. Register one ExUnit test per JavaScript file with `Hologram.Test.JavaScriptSuite`. Volt then executes all tests in that file in one runtime invocation. Registering one ExUnit test per JavaScript test repeatedly bundles and starts a runtime and is too slow for this suite.
-5. Use Volt `setup_files` for shared QuickBEAM compatibility initialization instead of rewriting every test module through a loader hook.
+4. Use `Volt.Test.ExUnit.install/1` with `granularity: :file`. Volt executes all tests in each file in one runtime invocation; repeatedly bundling and starting a runtime for every JavaScript test is too slow for this suite.
+5. Use separate Volt setups for shared globals and QuickBEAM-only compatibility. Browser files use native `Intl.PluralRules` and do not bundle the FormatJS fallback.
 6. Separate environment-specific helpers (browser APIs and Sinon) from the common helper module so pure files do not eagerly load incompatible dependencies.
 7. Classify whole files by required runtime capability and run them unchanged in QuickBEAM or a browser. Do not replace browser tests with approximations.
 8. Remove the redundant Mocha runner after every existing JavaScript test file passes through Volt.
 
 ## Implementation status
 
-The bridge discovers and executes all 87 original files without changing their test bodies or names. Currently 82 execute in QuickBEAM and five DOM-dependent files execute in Chromium through Volt's browser runner. A focused regression file in the same test tree also verifies English cardinal and ordinal plural rules for decimals, negatives, and the 11/12/13 exceptions. CI runs the JavaScript suite through Volt instead of redundantly executing the same files through Mocha.
+Volt's ExUnit integration discovers and executes all 87 original files without changing their test bodies or names. Currently 82 execute in QuickBEAM and five DOM-dependent files execute in Chromium through Volt's browser runner. A focused regression file in the same test tree also verifies English cardinal and ordinal plural rules for decimals, negatives, and the 11/12/13 exceptions. CI runs the JavaScript suite through Volt instead of redundantly executing the same files through Mocha.
 
 The runtime blockers addressed centrally so far include:
 

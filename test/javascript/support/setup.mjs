@@ -1,7 +1,5 @@
 "use strict";
 
-import "hologram:runtime/intl-pluralrules-polyfill";
-
 if (typeof globalThis.global === "undefined") {
   globalThis.global = globalThis;
 }

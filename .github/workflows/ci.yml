@@ -221,8 +221,6 @@ jobs:
 
       # Step: Execute lib Elixir tests.
       - name: Run lib Elixir tests
-        env:
-          HOLOGRAM_SKIP_JAVASCRIPT_TESTS: "1"
         run: mix test --warnings-as-errors --exclude consistency --exclude js
 
       # Step: Execute JavaScript tests through Volt.

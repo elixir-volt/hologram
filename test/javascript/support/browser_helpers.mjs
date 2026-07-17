@@ -2,7 +2,7 @@
 
 export {h as vnode} from "snabbdom";
 
-// Narrow compatibility facade for canonical tests that previously used jsdom.
+// Narrow compatibility facade for existing tests that previously used jsdom.
 // DOM behavior itself comes from the real Playwright browser.
 export class JSDOM {
   constructor(html = "") {

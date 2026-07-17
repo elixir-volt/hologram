@@ -18,6 +18,7 @@ config :volt, :format,
     "scripts/**/*.{js,mjs,ts,jsx,tsx}",
     "test/javascript/intl_pluralrules_test.mjs",
     "test/javascript/support/browser_helpers.mjs",
+    "test/javascript/support/quickbeam_setup.mjs",
     "test/javascript/support/setup.mjs"
   ],
   ignore: [],

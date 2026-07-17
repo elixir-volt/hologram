@@ -22,18 +22,35 @@ exclude_opts =
 
 ExUnit.start(exclude: exclude_opts)
 
-included_tags = ExUnit.configuration()[:include]
+ex_unit_config = ExUnit.configuration()
+
+tag_configured? = fn filters, tag ->
+  Enum.any?(filters, fn
+    ^tag -> true
+    {^tag, _value} -> true
+    _other -> false
+  end)
+end
+
+included_tags = ex_unit_config[:include]
+excluded_tags = ex_unit_config[:exclude]
 
 javascript_tests_requested? =
-  System.get_env("HOLOGRAM_SKIP_JAVASCRIPT_TESTS") != "1" and
-    (included_tags == [] or :js in included_tags)
+  not tag_configured?.(excluded_tags, :js) and
+    (included_tags == [] or tag_configured?.(included_tags, :js))
 
 if javascript_tests_requested? do
-  "test/javascript/**/*_test.mjs"
-  |> Path.wildcard()
-  |> Hologram.Test.JavaScriptSuite.install(
-    browser_files: Hologram.Test.JavaScriptSuite.browser_files(),
-    setup_files: [Path.expand("test/javascript/support/setup.mjs")],
+  browser_files = ~w[
+    test/javascript/elixir/hologram/js_test.mjs
+    test/javascript/events/change_event_test.mjs
+    test/javascript/events/submit_event_test.mjs
+    test/javascript/live_reload_test.mjs
+    test/javascript/vdom_test.mjs
+  ]
+
+  common_opts = [
+    root: ".",
+    granularity: :file,
     playwright: [executable: Path.expand("assets/node_modules/.bin/playwright")],
     bundle: [
       aliases: %{
@@ -43,7 +60,26 @@ if javascript_tests_requested? do
       plugins: [Hologram.Volt.Plugin],
       node_modules: Hologram.Test.NPMDeps.node_modules!()
     ]
+  ]
+
+  common_opts
+  |> Keyword.merge(
+    include: ["test/javascript/**/*_test.mjs"],
+    exclude: browser_files,
+    setup_files: [
+      Path.expand("test/javascript/support/setup.mjs"),
+      Path.expand("test/javascript/support/quickbeam_setup.mjs")
+    ]
   )
+  |> Volt.Test.ExUnit.install()
+
+  common_opts
+  |> Keyword.merge(
+    include: browser_files,
+    browser: true,
+    setup_files: [Path.expand("test/javascript/support/setup.mjs")]
+  )
+  |> Volt.Test.ExUnit.install()
 end
 
 Mox.defmock(AssetManifestCacheMock, for: AssetManifestCache)

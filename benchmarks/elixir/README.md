@@ -48,7 +48,7 @@ build_module_digest_plt!/0          4.11      243.05 ms     ±3.98%      244.90 
 
 ```
 Name                      ips        average  deviation         median         99th %
-build_page_js/5         70.82       14.12 ms    ±14.38%       14.67 ms       17.32 ms
+build_page_js/5         58.64       17.05 ms    ±15.27%       17.18 ms       22.83 ms
 ```
 
 
@@ -194,7 +194,7 @@ all templatables        3.53 K - 1.21x slower +48.96 μs
 
 ```
 Name                                ips        average  deviation         median         99th %
-create_page_entry_files/5         0.108         9.26 s     ±0.53%         9.26 s         9.29 s
+create_page_entry_files/5          0.71         1.40 s     ±4.23%         1.38 s         1.51 s
 ```
 
 
@@ -290,12 +290,12 @@ validate_page_modules/1      120.03 K        8.33 μs    ±76.52%        8.25 μ
 
 ```
 Name                ips        average  deviation         median         99th %
-has cache        0.0661        15.14 s     ±0.00%        15.14 s        15.14 s
-no cache         0.0634        15.77 s     ±0.00%        15.77 s        15.77 s
+has cache         0.141         7.11 s     ±0.53%         7.11 s         7.14 s
+no cache          0.133         7.51 s     ±1.61%         7.51 s         7.60 s
 
 Comparison: 
-has cache        0.0661
-no cache         0.0634 - 1.04x slower +0.63 s
+has cache         0.141
+no cache          0.133 - 1.06x slower +0.40 s
 ```
 
 

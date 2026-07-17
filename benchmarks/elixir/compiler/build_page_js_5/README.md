@@ -9,16 +9,16 @@ Benchmark suite executing on the following system:
 <table style="width: 1%">
   <tr>
     <th style="width: 1%; white-space: nowrap">Operating System</th>
-    <td>macOS</td>
+    <td>Linux</td>
   </tr><tr>
     <th style="white-space: nowrap">CPU Information</th>
-    <td style="white-space: nowrap">Apple M1 Pro</td>
+    <td style="white-space: nowrap">AMD Ryzen 9 9950X 16-Core Processor</td>
   </tr><tr>
     <th style="white-space: nowrap">Number of Available Cores</th>
-    <td style="white-space: nowrap">10</td>
+    <td style="white-space: nowrap">32</td>
   </tr><tr>
     <th style="white-space: nowrap">Available Memory</th>
-    <td style="white-space: nowrap">16 GB</td>
+    <td style="white-space: nowrap">121.18 GB</td>
   </tr><tr>
     <th style="white-space: nowrap">Elixir Version</th>
     <td style="white-space: nowrap">1.20.0</td>
@@ -63,11 +63,11 @@ Run Time
 
   <tr>
     <td style="white-space: nowrap">build_page_js/5</td>
-    <td style="white-space: nowrap; text-align: right">61.20</td>
-    <td style="white-space: nowrap; text-align: right">16.34 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;17.89%</td>
-    <td style="white-space: nowrap; text-align: right">16.98 ms</td>
-    <td style="white-space: nowrap; text-align: right">28.24 ms</td>
+    <td style="white-space: nowrap; text-align: right">58.64</td>
+    <td style="white-space: nowrap; text-align: right">17.05 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;15.27%</td>
+    <td style="white-space: nowrap; text-align: right">17.18 ms</td>
+    <td style="white-space: nowrap; text-align: right">22.83 ms</td>
   </tr>
 
 </table>

@@ -93,10 +93,10 @@ defmodule Hologram.MixProject do
   def package do
     [
       files: [
-        "assets/js",
-        "assets/package.json",
         "config",
         "lib",
+        "priv/npm.lock",
+        "priv/ts",
         ".formatter.exs",
         "LICENSE",
         "llms.txt",

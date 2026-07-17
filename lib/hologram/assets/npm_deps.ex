@@ -19,7 +19,8 @@ defmodule Hologram.Assets.NPMDeps do
   def node_modules!, do: install!(@runtime_packages)
 
   defp install!(packages) do
-    %{node_modules: node_modules} = Volt.NPM.install!(packages)
+    opts = [lockfile: Volt.Priv.path(:hologram, "npm.lock")]
+    %{node_modules: node_modules} = Volt.NPM.install!(packages, opts)
     node_modules
   end
 end

@@ -15,7 +15,7 @@ The compiler calls `Volt.Priv` directly for OTP path handling and AST-backed sta
 
 ## Dependencies and output
 
-Runtime npm packages are exact-pinned by `Hologram.Assets.NPMDeps` and installed through Volt's npm_ex-backed cache. Importer-scoped package roots keep those framework-owned versions isolated from packages with the same names in an application. Application builds do not depend on `assets/node_modules`; that directory contains only repository tooling such as Prettier and Playwright.
+Runtime npm packages are exact-pinned by `Hologram.Assets.NPMDeps` and installed through Volt's npm_ex-backed cache from the checked-in `priv/npm.lock` graph. Test-only packages use a separate `test/npm.lock`. Fresh installs consume those integrity-checked graphs without resolving transitive ranges. Importer-scoped package roots keep framework-owned versions isolated from packages with the same names in an application. Application builds do not depend on `assets/node_modules`; that directory contains only repository tooling such as Prettier and Playwright.
 
 `Hologram.Compiler.build_assets/2` passes the generated runtime and page entries to the multi-entry `Volt.Builder.build/1` production pipeline. Volt owns code splitting, content hashes, JavaScript output, source maps, and `manifest.json`. CSS entries remain explicitly rejected until Hologram loads their manifest entries. Hologram reads that manifest through `Hologram.Assets.BundleManifest` to resolve runtime and page entry URLs; it no longer computes bundle digests, rewrites source-map comments, or maintains a parallel page-digest PLT. The former esbuild shell integration and `assets/js` runtime mirror have been removed.
 

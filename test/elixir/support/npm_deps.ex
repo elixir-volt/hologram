@@ -3,6 +3,8 @@ defmodule Hologram.Test.NPMDeps do
 
   alias Hologram.Assets.NPMDeps
 
+  @lockfile Path.expand("../../npm.lock", __DIR__)
+
   @test_packages %{
     "chai" => "6.2.2",
     "sinon" => "22.0.0"
@@ -11,7 +13,7 @@ defmodule Hologram.Test.NPMDeps do
   @spec node_modules!() :: String.t()
   def node_modules! do
     packages = Map.merge(NPMDeps.packages(), @test_packages)
-    %{node_modules: node_modules} = Volt.NPM.install!(packages)
+    %{node_modules: node_modules} = Volt.NPM.install!(packages, lockfile: @lockfile)
     node_modules
   end
 end

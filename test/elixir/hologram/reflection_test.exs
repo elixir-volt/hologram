@@ -181,6 +181,10 @@ defmodule Hologram.ReflectionTest do
     assert build_dir() == "#{File.cwd!()}/_build/test/lib/hologram/priv"
   end
 
+  test "asset_build_fingerprint_file_name/0" do
+    assert asset_build_fingerprint_file_name() == "asset_build.fingerprint"
+  end
+
   test "call_graph_dump_file_name/0" do
     assert call_graph_dump_file_name() == "call_graph.bin"
   end

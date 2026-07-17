@@ -1,6 +1,8 @@
 defmodule Hologram.Reflection do
   @moduledoc false
 
+  @asset_build_fingerprint_file_name "asset_build.fingerprint"
+
   @call_graph_dump_file_name "call_graph.bin"
 
   @compiler_lock_file_name "hologram_compiler.lock"
@@ -106,6 +108,12 @@ defmodule Hologram.Reflection do
     :hologram
     |> :code.priv_dir()
     |> to_string()
+  end
+
+  @doc "Returns the asset-build fingerprint file name."
+  @spec asset_build_fingerprint_file_name() :: String.t()
+  def asset_build_fingerprint_file_name do
+    @asset_build_fingerprint_file_name
   end
 
   @doc """

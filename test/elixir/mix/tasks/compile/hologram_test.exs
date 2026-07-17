@@ -77,10 +77,19 @@ defmodule Mix.Tasks.Compile.HologramTest do
   end
 
   defp test_build_artifacts(opts) do
+    test_asset_build_fingerprint(opts)
     test_call_graph(opts)
     test_dirs(opts)
     test_module_digest_plt(opts)
     test_volt_manifest(opts)
+  end
+
+  defp test_asset_build_fingerprint(opts) do
+    fingerprint_path =
+      Path.join(opts[:build_dir], Reflection.asset_build_fingerprint_file_name())
+
+    fingerprint = File.read!(fingerprint_path)
+    assert String.match?(fingerprint, ~r/^[0-9a-f]{64}$/)
   end
 
   defp test_call_graph(opts) do
@@ -262,9 +271,24 @@ defmodule Mix.Tasks.Compile.HologramTest do
     # Test case 2: when there are previous build artifacts
     generate_old_bundle("old_bundle_1", opts)
     generate_old_bundle("old_bundle_2", opts)
-    run(opts)
+    run(Keyword.put(opts, :force?, true))
     test_build_artifacts(opts)
     test_old_build_static_artifacts_cleanup(opts)
+  end
+
+  @tag timeout: 120_000
+  test "skips unchanged asset output and preserves Phoenix digest artifacts", %{
+    opts: initial_opts
+  } do
+    opts = setup_empty_build_dir_in_opts(initial_opts)
+
+    assert run(opts) == :ok
+
+    phoenix_digest_artifact = Path.join(opts[:static_dir], "runtime-phoenix-digest.js.gz")
+    File.write!(phoenix_digest_artifact, "compressed")
+
+    assert run(opts) == :noop
+    assert File.read!(phoenix_digest_artifact) == "compressed"
   end
 
   test "stops the processes it spawns once compilation finishes", %{opts: initial_opts} do

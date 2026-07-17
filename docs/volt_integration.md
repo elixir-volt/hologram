@@ -23,14 +23,20 @@ Volt/OXC formats and lints the packaged runtime and repository-owned JavaScript 
 
 ## Phoenix production assets and releases
 
-The Hologram compiler owns `priv/static/hologram` and replaces that directory on every production compilation. Phoenix's `phx.digest` must therefore run after the final Hologram compilation. When assembling a release after a normal Phoenix `assets.deploy` alias, prevent `mix release` from compiling Hologram again and removing Phoenix's digested and compressed copies:
+The Hologram compiler owns the first-stage Volt output in `priv/static/hologram`. It fingerprints generated entries, compiled modules, packaged runtime sources, application asset sources, package manifests, and directly imported application packages. An unchanged compilation returns `:noop` without replacing that directory, preserving Phoenix's finalized assets.
+
+A normal Phoenix deployment sequence therefore works without special release flags:
 
 ```shell
 MIX_ENV=prod mix assets.deploy
-MIX_ENV=prod mix release --no-compile
+MIX_ENV=prod mix release
 ```
 
-The first command compiles Hologram before running `phx.digest`; the second assembles exactly those finalized assets. A release does not retain `MIX_ENV` at runtime, so `Hologram.env/0` detects the release metadata and enables the production runtime. `HOLOGRAM_ENV` remains available as an explicit runtime override.
+The first command writes Volt's content-hashed output and then runs `phx.digest`, which adds Phoenix's digested and compressed copies. During release assembly, Hologram verifies that its inputs are unchanged and preserves those files. If inputs changed after `assets.deploy`, Hologram rebuilds its first-stage output; run `assets.deploy` again before assembling the release.
+
+`Hologram.Assets.BundleManifest` first resolves entries through Volt's manifest and then through the Phoenix endpoint's `static_path/1`. Production HTML consequently uses Phoenix's final `?vsn=d` URLs and receives immutable cache headers while internal ESM chunk references retain Volt's own content hashes.
+
+A release does not retain `MIX_ENV` at runtime, so `Hologram.env/0` detects the release metadata and enables the production runtime. `HOLOGRAM_ENV` remains available as an explicit runtime override.
 
 ## Testing
 

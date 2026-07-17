@@ -20,6 +20,7 @@ defmodule Mix.Tasks.Compile.Hologram do
 
   require Logger
 
+  alias Hologram.Commons.FileUtils
   alias Hologram.Commons.PLT
   alias Hologram.Commons.SystemUtils
   alias Hologram.Compiler
@@ -180,14 +181,21 @@ defmodule Mix.Tasks.Compile.Hologram do
         )
 
       entry_files = [runtime_entry_file_path | Enum.map(page_entry_files, &elem(&1, 1))]
-      Compiler.build_assets(entry_files, opts)
+      asset_build_fingerprint = asset_build_fingerprint(entry_files, new_module_digest_plt)
 
-      CallGraph.dump(call_graph, call_graph_dump_path)
-      PLT.dump(new_module_digest_plt, module_digest_plt_dump_path)
+      if asset_build_current?(asset_build_fingerprint, opts) do
+        Logger.info("Hologram: compiler finished (assets unchanged)")
+        :noop
+      else
+        Compiler.build_assets(entry_files, opts)
 
-      Logger.info("Hologram: compiler finished")
+        CallGraph.dump(call_graph, call_graph_dump_path)
+        PLT.dump(new_module_digest_plt, module_digest_plt_dump_path)
+        dump_asset_build_fingerprint(asset_build_fingerprint, build_dir)
 
-      :ok
+        Logger.info("Hologram: compiler finished")
+        :ok
+      end
     after
       duration = System.monotonic_time() - start_time
       :telemetry.execute([:hologram, :compiler, :stop], %{duration: duration}, %{})
@@ -201,6 +209,113 @@ defmodule Mix.Tasks.Compile.Hologram do
     with_lock(lock_path, fn ->
       compile(opts)
     end)
+  end
+
+  defp asset_build_fingerprint(entry_files, module_digest_plt) do
+    files =
+      entry_files ++
+        runtime_input_files() ++
+        project_asset_input_files() ++
+        imported_package_input_files()
+
+    module_digests =
+      module_digest_plt
+      |> PLT.get_all()
+      |> Enum.sort()
+
+    file_fingerprints =
+      files
+      |> Enum.uniq()
+      |> Enum.sort()
+      |> Enum.map(&file_fingerprint/1)
+
+    input = {module_digests, file_fingerprints}
+
+    input
+    |> :erlang.term_to_binary()
+    |> then(&:crypto.hash(:sha256, &1))
+    |> Base.encode16(case: :lower)
+  end
+
+  defp asset_build_current?(fingerprint, opts) do
+    fingerprint_path =
+      Path.join(opts[:build_dir], Reflection.asset_build_fingerprint_file_name())
+
+    manifest_path = Path.join(opts[:static_dir], "manifest.json")
+
+    !opts[:force?] and File.regular?(manifest_path) and
+      File.read(fingerprint_path) == {:ok, fingerprint}
+  end
+
+  defp dump_asset_build_fingerprint(fingerprint, build_dir) do
+    build_dir
+    |> Path.join(Reflection.asset_build_fingerprint_file_name())
+    |> File.write!(fingerprint)
+  end
+
+  defp runtime_input_files do
+    [Volt.Priv.path(:hologram, "npm.lock") | list_files(Volt.Priv.path(:hologram, "ts"))]
+  end
+
+  defp project_asset_input_files do
+    assets_dir = Path.join(Reflection.root_dir(), "assets")
+    node_modules_dir = Path.join(assets_dir, "node_modules")
+
+    assets_dir
+    |> list_files()
+    |> Enum.reject(&descendant?(&1, node_modules_dir))
+  end
+
+  defp imported_package_input_files do
+    node_modules_dir = Path.join([Reflection.root_dir(), "assets", "node_modules"])
+
+    Reflection.list_elixir_modules()
+    |> Enum.filter(&Reflection.has_function?(&1, :__js_imports__, 0))
+    |> Enum.flat_map(& &1.__js_imports__())
+    |> Enum.map(& &1.from)
+    |> Enum.map(&package_name/1)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
+    |> Enum.flat_map(&list_files(Path.join(node_modules_dir, &1)))
+  end
+
+  defp package_name("@" <> _rest = specifier) do
+    specifier
+    |> String.split("/", parts: 3)
+    |> Enum.take(2)
+    |> Enum.join("/")
+  end
+
+  defp package_name(specifier) do
+    if String.starts_with?(specifier, [".", "/", "#"]) do
+      nil
+    else
+      specifier
+      |> String.split("/", parts: 2)
+      |> hd()
+    end
+  end
+
+  defp list_files(path) do
+    if File.exists?(path), do: FileUtils.list_files_recursively(path), else: []
+  end
+
+  defp file_fingerprint(path) do
+    digest =
+      path
+      |> File.read!()
+      |> then(&:crypto.hash(:sha256, &1))
+
+    {path, digest}
+  end
+
+  defp descendant?(path, parent) do
+    relative_path = Path.relative_to(path, parent)
+
+    case Path.split(relative_path) do
+      [".." | _rest] -> false
+      _relative_path -> true
+    end
   end
 
   defp compiler_enabled? do

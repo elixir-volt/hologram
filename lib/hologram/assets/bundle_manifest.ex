@@ -6,6 +6,7 @@ defmodule Hologram.Assets.BundleManifest do
   alias Hologram.Commons.ETS
   alias Hologram.Reflection
 
+  @phoenix_endpoint_key :phoenix_endpoint
   @runtime_entry "runtime.entry.js"
   @runtime_key :runtime
   @url_prefix "/hologram/"
@@ -33,13 +34,17 @@ defmodule Hologram.Assets.BundleManifest do
   @doc "Returns the public URL of the entry emitted for the given page module."
   @spec page_path(module) :: String.t()
   def page_path(page_module) do
-    ETS.get!(impl().ets_table_name(), page_module)
+    table_name = impl().ets_table_name()
+    path = ETS.get!(table_name, page_module)
+    phoenix_static_path(path, ETS.get!(table_name, @phoenix_endpoint_key))
   end
 
   @doc "Returns the public URL of the emitted runtime entry."
   @spec runtime_path() :: String.t()
   def runtime_path do
-    ETS.get!(impl().ets_table_name(), @runtime_key)
+    table_name = impl().ets_table_name()
+    path = ETS.get!(table_name, @runtime_key)
+    phoenix_static_path(path, ETS.get!(table_name, @phoenix_endpoint_key))
   end
 
   @doc "Reloads entry URLs from Volt's production manifest."
@@ -68,6 +73,7 @@ defmodule Hologram.Assets.BundleManifest do
       |> File.read!()
       |> Jason.decode!()
 
+    ETS.put(table_name, @phoenix_endpoint_key, Reflection.phoenix_endpoint())
     ETS.put(table_name, @runtime_key, entry_path(manifest, @runtime_entry))
 
     Enum.each(Reflection.list_pages(), fn page_module ->
@@ -85,6 +91,12 @@ defmodule Hologram.Assets.BundleManifest do
   defp page_entry(page_module) do
     Reflection.module_name(page_module) <> ".entry.js"
   end
+
+  @doc false
+  @spec phoenix_static_path(String.t(), module | nil) :: String.t()
+  def phoenix_static_path(path, endpoint)
+  def phoenix_static_path(path, nil), do: path
+  def phoenix_static_path(path, endpoint), do: endpoint.static_path(path)
 
   defp impl do
     Application.get_env(:hologram, :bundle_manifest_impl, __MODULE__)

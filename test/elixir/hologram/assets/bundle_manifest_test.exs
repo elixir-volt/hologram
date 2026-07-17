@@ -11,6 +11,11 @@ defmodule Hologram.Assets.BundleManifestTest do
 
   use_module_stub :bundle_manifest
 
+  defmodule PhoenixEndpointStub do
+    @spec static_path(String.t()) :: String.t()
+    def static_path(path), do: path <> "-phoenix-digest?vsn=d"
+  end
+
   setup :set_mox_global
 
   setup do
@@ -48,6 +53,19 @@ defmodule Hologram.Assets.BundleManifestTest do
 
     test "raises when a page entry doesn't exist" do
       assert_raise KeyError, fn -> page_path(:missing_page) end
+    end
+
+    test "resolves a Volt entry through the Phoenix static manifest" do
+      assert BundleManifest.phoenix_static_path(
+               "/hologram/runtime.entry-volt-hash.js",
+               PhoenixEndpointStub
+             ) ==
+               "/hologram/runtime.entry-volt-hash.js-phoenix-digest?vsn=d"
+    end
+
+    test "keeps the Volt entry path when the application has no Phoenix endpoint" do
+      assert BundleManifest.phoenix_static_path("/hologram/runtime.entry-volt-hash.js", nil) ==
+               "/hologram/runtime.entry-volt-hash.js"
     end
   end
 

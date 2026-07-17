@@ -23,7 +23,7 @@ Volt/OXC formats and lints the packaged runtime and repository-owned JavaScript 
 
 ## Testing
 
-The canonical JavaScript suite under `test/javascript` imports `hologram:runtime/*` and executes through Volt. QuickBEAM handles runtime-only suites, while five explicitly documented DOM suites use Volt's Playwright browser runner. See `docs/volt_js_test_migration.md` for parity and compatibility details.
+The JavaScript suite under `test/javascript` imports `hologram:runtime/*` and executes through Volt. QuickBEAM handles runtime-only files, while five explicitly documented DOM files use Volt's Playwright browser runner. See `docs/volt_js_test_migration.md` for migration and compatibility details.
 
 Browser helper aliases, Sinon compatibility, and npm test dependencies live under `test/`; none are included in the published Hologram package.
 

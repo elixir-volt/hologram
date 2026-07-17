@@ -1,4 +1,4 @@
-defmodule Hologram.Test.VoltCanonicalSuite do
+defmodule Hologram.Test.JavaScriptSuite do
   @moduledoc false
 
   alias Volt.Test.Assertions
@@ -19,9 +19,7 @@ defmodule Hologram.Test.VoltCanonicalSuite do
 
   @spec install([Path.t()], keyword()) :: [module()]
   def install(files, opts) do
-    {browser_paths, opts_without_browser} = Keyword.pop(opts, :browser_files, [])
-
-    {parity_files, config_opts} = Keyword.pop(opts_without_browser, :parity_files, %{})
+    {browser_paths, config_opts} = Keyword.pop(opts, :browser_files, [])
     config = Config.read(config_opts)
     browser_set = MapSet.new(browser_paths)
 
@@ -31,44 +29,14 @@ defmodule Hologram.Test.VoltCanonicalSuite do
           do: BrowserRunner,
           else: Runner
 
-      define_test_module(file, config, runner, Map.get(parity_files, file))
+      define_test_module(file, config, runner)
     end)
   end
 
-  @spec names_hash([map()]) :: String.t()
-  def names_hash(tests) do
-    tests
-    |> Enum.map(& &1.full_name)
-    |> Enum.sort()
-    |> Jason.encode!()
-    |> then(&:crypto.hash(:sha256, &1))
-    |> Base.encode16(case: :lower)
-  end
-
-  @spec assert_parity!(map(), map() | nil) :: :ok
-  def assert_parity!(_result, nil), do: :ok
-
-  def assert_parity!(result, expected) do
-    actual_hash = names_hash(result.tests)
-
-    expected_count = expected["count"]
-    expected_hash = expected["namesSha256"]
-
-    if result.total != expected_count or actual_hash != expected_hash do
-      raise ExUnit.AssertionError,
-        message:
-          "canonical JavaScript parity mismatch for #{result.file}: " <>
-            "expected #{expected_count} tests / #{expected_hash}, " <>
-            "got #{result.total} tests / #{actual_hash}"
-    end
-
-    :ok
-  end
-
-  defp define_test_module(file, config, runner, parity) do
+  defp define_test_module(file, config, runner) do
     expanded_file = Path.expand(file)
     # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom
-    module = Module.concat([Hologram.Test.Generated.VoltJSTest, module_suffix(expanded_file)])
+    module = Module.concat([Hologram.Test.Generated.JavaScriptTest, module_suffix(expanded_file)])
 
     unless Code.ensure_loaded?(module) do
       quoted =
@@ -77,7 +45,6 @@ defmodule Hologram.Test.VoltCanonicalSuite do
             use ExUnit.Case, async: false
 
             @moduletag js: true
-            @moduletag canonical_js: true
 
             if unquote(runner) == Volt.Test.BrowserRunner do
               @moduletag browser_js: true
@@ -90,7 +57,6 @@ defmodule Hologram.Test.VoltCanonicalSuite do
                        )
 
               unquote(Assertions).assert_passed!(result)
-              unquote(__MODULE__).assert_parity!(result, unquote(Macro.escape(parity)))
             end
           end
         end

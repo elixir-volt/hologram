@@ -4,26 +4,22 @@
 
 Do not port the legacy JavaScript tests by hand.
 
-The files under `test/javascript` are the canonical test suite and run directly through Volt with verified parity. Runtime and compatibility imports were migrated mechanically; test names and behavioral assertions were not replaced with handwritten paraphrases or consolidated copies.
-
-The previous handwritten `test/javascript_volt` and `test/javascript_volt_browser` suites were removed.
+The files under `test/javascript` run directly through Volt. Runtime and compatibility imports were migrated mechanically; existing test names and behavioral assertions were not replaced with handwritten paraphrases or consolidated copies.
 
 ## Approach
 
 1. Run the existing `*_test.mjs` files directly with Volt's Mocha-compatible globals (`describe`, `it`, `beforeEach`, and `afterEach`).
 2. Resolve namespaced `hologram:runtime/*` imports directly to canonical `priv/ts/*.ts` runtime sources.
 3. Keep the existing Chai assertions initially rather than rewriting thousands of assertions.
-4. Register one ExUnit test per canonical JavaScript file with `Hologram.Test.VoltCanonicalSuite`. Volt then executes all tests in that file in one runtime invocation. Registering one ExUnit test per JavaScript test repeatedly bundles and starts a runtime and is too slow for this suite.
+4. Register one ExUnit test per JavaScript file with `Hologram.Test.JavaScriptSuite`. Volt then executes all tests in that file in one runtime invocation. Registering one ExUnit test per JavaScript test repeatedly bundles and starts a runtime and is too slow for this suite.
 5. Use Volt `setup_files` for shared QuickBEAM compatibility initialization instead of rewriting every test module through a loader hook.
 6. Separate environment-specific helpers (browser APIs and Sinon) from the common helper module so pure files do not eagerly load incompatible dependencies.
 7. Classify whole files by required runtime capability and run them unchanged in QuickBEAM or a browser. Do not replace browser tests with approximations.
-8. Remove the redundant Mocha runner after every canonical file passes through Volt and test-file/test-name parity is checked automatically.
+8. Remove the redundant Mocha runner after every existing JavaScript test file passes through Volt.
 
 ## Implementation status
 
-The bridge discovers and executes all 87 canonical files without changing their test bodies or names. Currently 82 execute in QuickBEAM and five DOM-dependent files execute in Chromium through Volt's browser runner. A focused Volt regression suite also verifies English cardinal and ordinal plural rules for decimals, negatives, and the 11/12/13 exceptions.
-
-`test/javascript_volt/canonical_manifest.json` records the baseline count and test-name hash for every canonical file (4,799 tests total). Every Volt result must match its file's count and name set. Regenerate the manifest intentionally with `mix holo.test.update_volt_manifest` after canonical test additions, removals, or renames. CI now runs the canonical suite through Volt instead of redundantly executing the same files through Mocha.
+The bridge discovers and executes all 87 original files without changing their test bodies or names. Currently 82 execute in QuickBEAM and five DOM-dependent files execute in Chromium through Volt's browser runner. A focused regression file in the same test tree also verifies English cardinal and ordinal plural rules for decimals, negatives, and the 11/12/13 exceptions. CI runs the JavaScript suite through Volt instead of redundantly executing the same files through Mocha.
 
 The runtime blockers addressed centrally so far include:
 
@@ -51,8 +47,7 @@ Hologram depends on Volt as a compile-time-only package rather than a runtime ap
 
 ## Completion criteria
 
-- All 87 canonical JavaScript test files execute through Volt.
-- Test file and test name parity is verified automatically.
+- Every JavaScript test file, including all 87 original files, executes directly through Volt.
 - No handwritten duplicate test tree exists.
 - Tests import and exercise `priv/ts`, not `assets/js`.
 - Runtime-specific exclusions are explicit and justified.

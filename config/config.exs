@@ -16,7 +16,9 @@ config :volt, :format,
     "benchmarks/javascript/**/*.{js,mjs,ts,jsx,tsx}",
     "priv/ts/**/*.{js,ts,jsx,tsx}",
     "scripts/**/*.{js,mjs,ts,jsx,tsx}",
-    "test/javascript_volt/**/*.{js,mjs,ts,jsx,tsx}"
+    "test/javascript/intl_pluralrules_test.mjs",
+    "test/javascript/support/browser_helpers.mjs",
+    "test/javascript/support/setup.mjs"
   ],
   ignore: [],
   bracket_spacing: false
@@ -28,8 +30,7 @@ config :volt, :lint,
     "benchmarks/javascript/**/*.{js,mjs,ts,jsx,tsx}",
     "priv/ts/**/*.{js,ts,jsx,tsx}",
     "scripts/**/*.{js,mjs,ts,jsx,tsx}",
-    "test/javascript/**/*.{js,mjs,ts,jsx,tsx}",
-    "test/javascript_volt/**/*.{js,mjs,ts,jsx,tsx}"
+    "test/javascript/**/*.{js,mjs,ts,jsx,tsx}"
   ],
   ignore: [],
   env: [:browser, :node, :mocha],

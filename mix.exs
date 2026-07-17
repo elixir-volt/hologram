@@ -49,10 +49,7 @@ defmodule Hologram.MixProject do
 
   def cli do
     [
-      preferred_envs: [
-        t: :test,
-        "test.js": :test
-      ]
+      preferred_envs: [t: :test]
     ]
   end
 

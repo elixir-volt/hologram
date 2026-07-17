@@ -221,7 +221,14 @@ jobs:
 
       # Step: Execute lib Elixir tests.
       - name: Run lib Elixir tests
-        run: mix test --warnings-as-errors --exclude consistency
+        env:
+          HOLOGRAM_SKIP_JAVASCRIPT_TESTS: "1"
+        run: mix test --warnings-as-errors --exclude consistency --exclude js
+
+      # Step: Execute JavaScript tests through Volt.
+      - name: Run lib JavaScript tests
+        if: ${{ env.IS_HIGHEST_MATRIX_COMBINATION == 'true' }}
+        run: mix test --warnings-as-errors --only js
 
       # Step: Execute lib Elixir consistency tests.
       - name: Run lib Elixir consistency tests

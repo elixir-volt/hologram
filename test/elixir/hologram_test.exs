@@ -103,9 +103,47 @@ defmodule HologramTest do
     end
   end
 
-  test "env/0" do
-    assert env() == :test
+  describe "env/0" do
+    setup do
+      hologram_env = System.get_env("HOLOGRAM_ENV")
+      mix_env = System.get_env("MIX_ENV")
+      release_name = System.get_env("RELEASE_NAME")
+
+      on_exit(fn ->
+        restore_env("HOLOGRAM_ENV", hologram_env)
+        restore_env("MIX_ENV", mix_env)
+        restore_env("RELEASE_NAME", release_name)
+      end)
+
+      :ok
+    end
+
+    test "uses the runtime environment when it is available" do
+      System.put_env("HOLOGRAM_ENV", "dev")
+
+      assert env() == :dev
+    end
+
+    test "detects the test environment when runtime variables are absent" do
+      System.delete_env("HOLOGRAM_ENV")
+      System.delete_env("MIX_ENV")
+      System.delete_env("RELEASE_NAME")
+
+      assert env() == :test
+    end
+
+    test "detects a production release when Mix environment variables are absent" do
+      System.delete_env("HOLOGRAM_ENV")
+      System.delete_env("MIX_ENV")
+      System.put_env("RELEASE_NAME", "my_app")
+
+      assert env() == :prod
+      assert enabled?()
+    end
   end
+
+  defp restore_env(name, nil), do: System.delete_env(name)
+  defp restore_env(name, value), do: System.put_env(name, value)
 
   describe "secret_key_base/0" do
     setup do

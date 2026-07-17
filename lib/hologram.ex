@@ -72,6 +72,10 @@ defmodule Hologram do
 
   @doc """
   Returns the current environment.
+
+  Runtime environment variables take precedence. When Mix environment variables
+  are absent, release metadata distinguishes production releases from ordinary
+  development and test VMs.
   """
   @spec env() :: atom
   def env do
@@ -98,17 +102,14 @@ defmodule Hologram do
   end
 
   defp detect_env do
-    if Process.whereis(ExUnit.Server) do
-      :test
-    else
-      :dev
+    cond do
+      System.get_env("RELEASE_NAME") -> :prod
+      Process.whereis(ExUnit.Server) -> :test
+      true -> :dev
     end
   end
 
   defp dev_test_secret_key_base do
-    # NOTE: Hologram.env/0 defaults to :dev when neither HOLOGRAM_ENV nor MIX_ENV
-    # is set (possible in a release). Harmless here: a real prod release either has
-    # SECRET_KEY_BASE set (handled above) or Phoenix's runtime.exs already raised.
     if env() in [:dev, :test] do
       endpoint = Reflection.phoenix_endpoint()
       otp_app = Reflection.otp_app()

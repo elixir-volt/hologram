@@ -20,7 +20,7 @@ opts = [enabled: true, env: %{"MIX_ENV" => "test"}]
     {:hex_audit, "mix hex.audit", opts},
     {:js_formatter, "mix format.js.check", opts},
     {:mix_audit, opts},
-    # custom :js_tests used instead of :npm_test
+    # JavaScript tests run through ExUnit via Volt.Test.ExUnit.
     {:npm_test, enabled: false},
     {:sobelow, "mix sobelow --config", opts},
     {:unused_deps, opts}

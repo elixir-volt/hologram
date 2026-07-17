@@ -10,10 +10,12 @@ defmodule Hologram.Test.NPMDeps do
     "sinon" => "22.0.0"
   }
 
+  @spec packages() :: %{String.t() => String.t()}
+  def packages, do: Map.merge(NPMDeps.packages(), @test_packages)
+
   @spec node_modules!() :: String.t()
   def node_modules! do
-    packages = Map.merge(NPMDeps.packages(), @test_packages)
-    %{node_modules: node_modules} = Volt.NPM.install!(packages, lockfile: @lockfile)
+    %{node_modules: node_modules} = Volt.NPM.install!(packages(), lockfile: @lockfile)
     node_modules
   end
 end

@@ -1,5 +1,8 @@
 import {describe, expect, test} from "volt:test";
-import {needsIntlPluralRulesPolyfill} from "hologram:runtime/intl-pluralrules";
+import {
+  loadIntlPluralRulesPolyfill,
+  needsIntlPluralRulesPolyfill,
+} from "hologram:runtime/intl-pluralrules";
 import Utils from "hologram:runtime/utils";
 
 describe("Intl.PluralRules compatibility", () => {
@@ -15,6 +18,20 @@ describe("Intl.PluralRules compatibility", () => {
       expect(needsIntlPluralRulesPolyfill()).toBe(true);
     } finally {
       Intl.PluralRules = originalPluralRules;
+    }
+  });
+
+  test("loads the maintained fallback when the implementation is missing", async () => {
+    const originalDescriptor = Object.getOwnPropertyDescriptor(Intl, "PluralRules");
+
+    try {
+      Intl.PluralRules = undefined;
+      await loadIntlPluralRulesPolyfill();
+
+      expect(new Intl.PluralRules("en").select(1)).toBe("one");
+      expect(new Intl.PluralRules("en", {type: "ordinal"}).select(22)).toBe("two");
+    } finally {
+      Object.defineProperty(Intl, "PluralRules", originalDescriptor);
     }
   });
 

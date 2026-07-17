@@ -214,10 +214,10 @@ jobs:
         if: ${{ env.IS_HIGHEST_MATRIX_COMBINATION == 'true' }}
         run: mix holo.test.check_file_names test/elixir
 
-      # Step: Run lib JavaScript static code analysis with ESLint.
-      - name: Run lib JavaScript static code analysis with ESLint
+      # Step: Run repository JavaScript and TypeScript checks through Volt/OXC.
+      - name: Run lib TypeScript checks with Volt
         if: ${{ env.IS_HIGHEST_MATRIX_COMBINATION == 'true' }}
-        run: mix eslint
+        run: mix volt.js.check
 
       # Step: Execute lib Elixir tests.
       - name: Run lib Elixir tests

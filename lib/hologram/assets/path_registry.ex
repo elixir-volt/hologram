@@ -114,7 +114,12 @@ defmodule Hologram.Assets.PathRegistry do
     static_files =
       static_dir
       |> FileUtils.list_files_recursively()
-      |> Enum.reject(&String.starts_with?(&1, Path.join(static_dir, "hologram") <> "/"))
+      |> Enum.reject(fn path ->
+        path
+        |> Path.relative_to(static_dir)
+        |> Path.split()
+        |> List.first() == "hologram"
+      end)
 
     assets_with_digest_suffix = find_assets_with_digest_suffix(static_dir, static_files)
 

@@ -4,7 +4,7 @@
 
 Do not port the legacy JavaScript tests by hand.
 
-The files under `test/javascript` run directly through Volt. Runtime and compatibility imports were migrated mechanically; existing test names and behavioral assertions were not replaced with handwritten paraphrases or consolidated copies.
+The files under `test/javascript` run directly through Volt. Runtime and compatibility imports were migrated mechanically, and existing test names were preserved. Formatter-dependent function-source expectations in `serializer_test.mjs` now derive from the runtime's native `Function#toString` output instead of hardcoded source formatting.
 
 ## Approach
 
@@ -14,12 +14,12 @@ The files under `test/javascript` run directly through Volt. Runtime and compati
 4. Use `Volt.Test.ExUnit.install/1` with `granularity: :file`. Volt executes all tests in each file in one runtime invocation; repeatedly bundling and starting a runtime for every JavaScript test is too slow for this suite.
 5. Use separate Volt setups for shared globals and QuickBEAM-only compatibility. Browser files use native `Intl.PluralRules` and do not bundle the FormatJS fallback.
 6. Separate environment-specific helpers (browser APIs and Sinon) from the common helper module so pure files do not eagerly load incompatible dependencies.
-7. Classify whole files by required runtime capability and run them unchanged in QuickBEAM or a browser. Do not replace browser tests with approximations.
+7. Classify and execute whole files by required runtime capability in QuickBEAM or a browser. Do not replace browser tests with approximations.
 8. Remove the redundant Mocha runner after every existing JavaScript test file passes through Volt.
 
 ## Implementation status
 
-Volt's ExUnit integration discovers and executes all 87 original files without changing their test bodies or names. Currently 82 execute in QuickBEAM and five DOM-dependent files execute in Chromium through Volt's browser runner. A focused regression file in the same test tree also verifies English cardinal and ordinal plural rules for decimals, negatives, and the 11/12/13 exceptions. CI runs the JavaScript suite through Volt instead of redundantly executing the same files through Mocha.
+Volt's ExUnit integration discovers and executes all 87 original files with their original test names and behavioral coverage. Aside from mechanical import migration and formatter-neutral serializer expectations, their assertions remain intact. Of the original files, 82 execute in QuickBEAM and five DOM-dependent files execute in Chromium through Volt's browser runner. A focused browser regression file in the same test tree also verifies lazy fallback loading and English cardinal and ordinal plural rules for decimals, negatives, and the 11/12/13 exceptions. CI runs the JavaScript suite through Volt instead of redundantly executing the same files through Mocha.
 
 The runtime blockers addressed centrally so far include:
 
@@ -27,7 +27,7 @@ The runtime blockers addressed centrally so far include:
 - Hologram conditionally installs FormatJS `Intl.PluralRules` compatibility with only English locale data.
 - JSONCodec 0.2.3 and the corresponding Volt update decode generic nested test errors correctly.
 - Hologram falls back to QuickBEAM's granular compression API for compressed Erlang external terms.
-- Test compatibility setup supplies standard global aliases, session storage, and Sinon timer configuration without changing canonical tests.
+- Test compatibility setup supplies standard global aliases, session storage, and Sinon timer configuration without adding adapters to production code.
 - Volt execution is serialized to prevent 87 simultaneous OXC bundle builds from exhausting the test timeout.
 
 The DOM-capability files are routed explicitly to Volt's browser runner:

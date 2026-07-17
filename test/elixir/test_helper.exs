@@ -44,6 +44,7 @@ if javascript_tests_requested? do
     test/javascript/elixir/hologram/js_test.mjs
     test/javascript/events/change_event_test.mjs
     test/javascript/events/submit_event_test.mjs
+    test/javascript/intl_pluralrules_test.mjs
     test/javascript/live_reload_test.mjs
     test/javascript/vdom_test.mjs
   ]

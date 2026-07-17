@@ -191,35 +191,34 @@ defmodule Hologram.Compiler do
     hologram_node_modules = opts[:hologram_node_modules] || NPMDeps.node_modules!()
     plugins = [Hologram.Volt.Plugin | List.wrap(opts[:plugins])]
 
-    File.rm_rf!(static_dir)
-    File.mkdir_p!(static_dir)
+    with_asset_output_rollback(static_dir, fn ->
+      case Volt.Builder.build(
+             entry: entry_files,
+             outdir: static_dir,
+             target: :es2021,
+             minify: true,
+             sourcemap: true,
+             format: :esm,
+             code_splitting: true,
+             hash: true,
+             asset_url_prefix: "/hologram",
+             node_modules: project_node_modules,
+             package_scopes: [
+               {Volt.Priv.path(@runtime_source, "."), hologram_node_modules}
+               | List.wrap(opts[:package_scopes])
+             ],
+             plugins: plugins,
+             resolve_dirs: List.wrap(opts[:resolve_dirs])
+           ) do
+        {:ok, result} ->
+          ensure_no_css!(result.manifest)
+          maybe_ensure_build_within_size_limit!(result.manifest, static_dir)
+          result
 
-    case Volt.Builder.build(
-           entry: entry_files,
-           outdir: static_dir,
-           target: :es2021,
-           minify: true,
-           sourcemap: true,
-           format: :esm,
-           code_splitting: true,
-           hash: true,
-           asset_url_prefix: "/hologram",
-           node_modules: project_node_modules,
-           package_scopes: [
-             {Volt.Priv.path(@runtime_source, "."), hologram_node_modules}
-             | List.wrap(opts[:package_scopes])
-           ],
-           plugins: plugins,
-           resolve_dirs: List.wrap(opts[:resolve_dirs])
-         ) do
-      {:ok, result} ->
-        ensure_no_css!(result.manifest)
-        maybe_ensure_build_within_size_limit!(result.manifest, static_dir)
-        result
-
-      {:error, reason} ->
-        raise RuntimeError, message: "Volt build failed: #{inspect(reason)}"
-    end
+        {:error, reason} ->
+          raise RuntimeError, message: "Volt build failed: #{inspect(reason)}"
+      end
+    end)
   end
 
   @doc """
@@ -810,6 +809,40 @@ defmodule Hologram.Compiler do
 
   defp keep_protocol_dispatcher_function_def?(_function_def, _protocol, _included_impls), do: true
 
+  defp with_asset_output_rollback(static_dir, build) do
+    backup_dir = static_dir <> ".previous"
+    recover_interrupted_asset_build!(static_dir, backup_dir)
+
+    if File.exists?(static_dir), do: File.rename!(static_dir, backup_dir)
+    File.mkdir_p!(static_dir)
+
+    try do
+      result = build.()
+      File.rm_rf!(backup_dir)
+      result
+    catch
+      kind, reason ->
+        File.rm_rf!(static_dir)
+        restore_asset_output!(static_dir, backup_dir)
+        :erlang.raise(kind, reason, __STACKTRACE__)
+    end
+  end
+
+  defp recover_interrupted_asset_build!(static_dir, backup_dir) do
+    if File.exists?(backup_dir) do
+      File.rm_rf!(static_dir)
+      File.rename!(backup_dir, static_dir)
+    end
+  end
+
+  defp restore_asset_output!(static_dir, backup_dir) do
+    if File.exists?(backup_dir) do
+      File.rename!(backup_dir, static_dir)
+    else
+      File.mkdir_p!(static_dir)
+    end
+  end
+
   defp ensure_no_css!(manifest) do
     Enum.each(manifest, fn
       {entry_name, %ManifestEntry{css: [_first | _rest]}} ->
@@ -824,13 +857,15 @@ defmodule Hologram.Compiler do
 
   defp maybe_ensure_build_within_size_limit!(manifest, static_dir) do
     Enum.each(manifest, fn
-      {entry_name, %ManifestEntry{file: file, isEntry: true}} when is_binary(file) ->
-        file
-        |> then(&Path.join(static_dir, &1))
-        |> File.stat!()
-        |> then(&maybe_ensure_bundle_within_size_limit!(entry_name, &1.size))
+      {artifact_name, %ManifestEntry{file: file}} when is_binary(file) ->
+        if Path.extname(file) == ".js" do
+          file
+          |> then(&Path.join(static_dir, &1))
+          |> File.stat!()
+          |> then(&maybe_ensure_bundle_within_size_limit!(artifact_name, &1.size))
+        end
 
-      {_entry_name, %ManifestEntry{}} ->
+      {_artifact_name, %ManifestEntry{}} ->
         :ok
     end)
   end

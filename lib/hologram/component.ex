@@ -86,6 +86,22 @@ defmodule Hologram.Component do
     ]
   end
 
+  @doc false
+  @spec __using_setup__() :: Macro.t()
+  def __using_setup__ do
+    quote do
+      use Hologram.Middleware.Builder
+
+      import Hologram.Router.Helpers, only: [asset_path: 1, page_path: 1, page_path: 2]
+      import Hologram.Server, only: unquote(Hologram.Server.__helper_imports__())
+      import Hologram.Template, only: [sigil_HOLO: 2]
+
+      alias Hologram.Component
+      alias Hologram.Component.Action
+      alias Hologram.Component.Command
+    end
+  end
+
   defmacro __using__(_opts) do
     template_path = colocated_template_path(__CALLER__.file)
 
@@ -93,16 +109,9 @@ defmodule Hologram.Component do
       quote do
         @behaviour Component
 
-        use Hologram.Middleware.Builder
+        unquote(__using_setup__())
 
         import Hologram.Component, only: unquote([prop: 2, prop: 3] ++ __helper_imports__())
-        import Hologram.Router.Helpers, only: [asset_path: 1, page_path: 1, page_path: 2]
-        import Hologram.Server, only: unquote(Hologram.Server.__helper_imports__())
-        import Hologram.Template, only: [sigil_HOLO: 2]
-
-        alias Hologram.Component
-        alias Hologram.Component.Action
-        alias Hologram.Component.Command
 
         @before_compile Component
 

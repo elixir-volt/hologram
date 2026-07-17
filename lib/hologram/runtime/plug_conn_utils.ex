@@ -24,8 +24,7 @@ defmodule Hologram.Runtime.PlugConnUtils do
     conn
     |> Map.fetch!(:cookies)
     |> Map.delete("hologram_session")
-    |> Enum.map(fn {key, value} -> {key, Cookie.decode(value)} end)
-    |> Enum.into(%{})
+    |> Map.new(fn {key, value} -> {key, Cookie.decode(value)} end)
   end
 
   @doc """

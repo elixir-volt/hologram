@@ -492,7 +492,7 @@ defmodule Hologram.Framework do
 
     stdlib_deps
     |> dependents_by_erlang_mfa()
-    |> Enum.map(fn {erlang_mfa, dependents} ->
+    |> Map.new(fn {erlang_mfa, dependents} ->
       unique_dependents = Enum.uniq(dependents)
 
       status =
@@ -510,7 +510,6 @@ defmodule Hologram.Framework do
          dependents_count: length(unique_dependents)
        }}
     end)
-    |> Enum.into(%{})
   end
 
   @doc """

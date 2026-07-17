@@ -665,8 +665,7 @@ defmodule Hologram.Template.Renderer do
       |> Enum.filter(fn {_name, _type, opts} ->
         opts[:from_context] && Map.has_key?(context, opts[:from_context])
       end)
-      |> Enum.map(fn {name, _type, opts} -> {name, context[opts[:from_context]]} end)
-      |> Enum.into(%{})
+      |> Map.new(fn {name, _type, opts} -> {name, context[opts[:from_context]]} end)
 
     Map.merge(props, props_from_context)
   end

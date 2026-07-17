@@ -7,20 +7,19 @@ defmodule Hologram.MixProject do
   # Copied from Hologram.Commons.SystemUtils
   @windows_exec_suffixes [".bat", ".cmd", ".exe"]
 
-  def aliases do
+  defp aliases do
     [
-      eslint:
-        "cmd assets/node_modules/.bin/eslint --color --config assets/eslint.config.mjs assets/js/** benchmarks/javascript/** scripts/** test/javascript/** --no-error-on-unmatched-pattern",
       f: [
         "format",
+        "volt.js.format",
         "format.js",
         "cmd cd test/features && mix format && mix format.js",
         "cmd cd test/umbrella && mix format"
       ],
       "format.js":
-        "cmd assets/node_modules/.bin/prettier '*.yml' '.github/**' 'assets/*.json' 'assets/*.mjs' 'assets/js/**' 'benchmarks/javascript/**' 'scripts/**' 'test/javascript/**' --config 'assets/.prettierrc.json' -u --write",
+        "cmd assets/node_modules/.bin/prettier '*.yml' '.github/**' 'assets/*.json' 'benchmarks/javascript/**' 'scripts/**' 'test/javascript/**' --config 'assets/.prettierrc.json' -u --write",
       "format.js.check":
-        "cmd assets/node_modules/.bin/prettier '*.yml' '.github/**' 'assets/*.json' 'assets/*.mjs' 'assets/js/**' 'benchmarks/javascript/**' 'scripts/**' 'test/javascript/**' --check --config 'assets/.prettierrc.json' --no-error-on-unmatched-pattern -u",
+        "cmd assets/node_modules/.bin/prettier '*.yml' '.github/**' 'assets/*.json' 'benchmarks/javascript/**' 'scripts/**' 'test/javascript/**' --check --config 'assets/.prettierrc.json' --no-error-on-unmatched-pattern -u",
       setup: [
         "deps.get",
         "cmd --cd assets npm install",
@@ -29,8 +28,8 @@ defmodule Hologram.MixProject do
         "cmd --cd test/umbrella mix deps.get",
         "cmd --cd test/umbrella/assets npm install"
       ],
-      t: ["test", "test.js"],
-      "test.js": [&test_js/1]
+      t: ["test"],
+      ci: ["check"]
     ]
   end
 
@@ -49,11 +48,11 @@ defmodule Hologram.MixProject do
 
   def cli do
     [
-      preferred_envs: [t: :test]
+      preferred_envs: [t: :test, ci: :test]
     ]
   end
 
-  def deps do
+  defp deps do
     [
       {:beam_file, "0.6.4"},
       {:benchee, "~> 1.0", only: :dev, runtime: false},
@@ -64,6 +63,8 @@ defmodule Hologram.MixProject do
       {:doctor, "~> 0.21", only: [:dev, :test], runtime: false},
       {:ecto, "~> 3.0", only: :test, runtime: false},
       {:ex_check, "~> 0.15", only: [:dev, :test], runtime: false},
+      {:ex_dna, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:ex_slop, "~> 0.4", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:file_system, "~> 1.0"},
       {:gproc, "~> 1.0"},
@@ -76,6 +77,7 @@ defmodule Hologram.MixProject do
       {:phoenix_pubsub, "~> 2.0"},
       {:playwright_ex, "~> 0.5", only: :test},
       {:plug_crypto, "~> 2.0"},
+      {:reach, "~> 2.0", only: [:dev, :test], runtime: false},
       {:recode, "~> 0.7", only: :dev, runtime: false},
       {:sobelow, "~> 0.12", only: [:dev, :test], runtime: false},
       {:telemetry, "~> 1.0"},

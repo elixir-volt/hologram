@@ -39,17 +39,11 @@ defmodule Hologram.Page do
       quote do
         @behaviour Page
 
-        use Hologram.Middleware.Builder
+        unquote(Hologram.Component.__using_setup__())
 
         import Hologram.Component, only: unquote(Hologram.Component.__helper_imports__())
         import Hologram.Page, only: [layout: 1, layout: 2, param: 2, param: 3, route: 1]
-        import Hologram.Router.Helpers, only: [asset_path: 1, page_path: 1, page_path: 2]
-        import Hologram.Server, only: unquote(Hologram.Server.__helper_imports__())
-        import Hologram.Template, only: [sigil_HOLO: 2]
 
-        alias Hologram.Component
-        alias Hologram.Component.Action
-        alias Hologram.Component.Command
         alias Hologram.Page
 
         @before_compile Page
@@ -97,13 +91,9 @@ defmodule Hologram.Page do
   """
   @spec cast_params(%{(atom | String.t()) => any}, module) :: %{atom => any}
   def cast_params(params, page_module) do
-    types =
-      page_module.__params__()
-      |> Enum.map(fn {name, type, _opts} -> {name, type} end)
-      |> Enum.into(%{})
+    types = Map.new(page_module.__params__(), fn {name, type, _opts} -> {name, type} end)
 
-    params
-    |> Enum.map(fn {name, value} ->
+    Map.new(params, fn {name, value} ->
       name_atom = if is_atom(name), do: name, else: String.to_existing_atom(name)
 
       unless types[name_atom] do
@@ -114,7 +104,6 @@ defmodule Hologram.Page do
 
       {name_atom, cast_param(types[name_atom], value, name_atom, page_module)}
     end)
-    |> Enum.into(%{})
   end
 
   defp cast_param(:atom, value, _name, _page_module) when is_atom(value) do

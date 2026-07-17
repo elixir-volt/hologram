@@ -7,6 +7,8 @@ opts = [enabled: true, env: %{"MIX_ENV" => "test"}]
     {:credo, opts},
     {:dialyzer, opts},
     {:doctor, opts},
+    {:ex_dna, "mix ex_dna --max-clones 0", opts},
+    {:reach, "mix reach.check --arch --smells --strict", opts},
     {:volt_js, "mix volt.js.check", opts},
     {:ex_doc, enabled: false},
     {:ex_formatter, "mix format", opts},

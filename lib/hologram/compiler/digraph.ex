@@ -287,42 +287,16 @@ defmodule Hologram.Compiler.Digraph do
     # Clean up edges: remove references to the removed vertex
     # from all vertices that pointed to it
     cleaned_outgoing_edges =
-      Enum.reduce(old_incoming_sources, outgoing_edges_without_vertex, fn {source, _target},
-                                                                          acc_outgoing_edges ->
-        case Map.get(acc_outgoing_edges, source) do
-          nil ->
-            acc_outgoing_edges
-
-          targets ->
-            cleaned_targets = Map.delete(targets, vertex)
-
-            if map_size(cleaned_targets) == 0 do
-              Map.delete(acc_outgoing_edges, source)
-            else
-              Map.put(acc_outgoing_edges, source, cleaned_targets)
-            end
-        end
-      end)
+      old_incoming_sources
+      |> Map.keys()
+      |> clean_edge_references(outgoing_edges_without_vertex, &Map.delete(&1, vertex))
 
     # Clean up reverse edges: remove references to the removed vertex
     # from all vertices it pointed to
     cleaned_incoming_edges =
-      Enum.reduce(old_outgoing_targets, incoming_edges_without_vertex, fn {target, _source},
-                                                                          acc_incomming_edges ->
-        case Map.get(acc_incomming_edges, target) do
-          nil ->
-            acc_incomming_edges
-
-          sources ->
-            cleaned_sources = Map.delete(sources, vertex)
-
-            if map_size(cleaned_sources) == 0 do
-              Map.delete(acc_incomming_edges, target)
-            else
-              Map.put(acc_incomming_edges, target, cleaned_sources)
-            end
-        end
-      end)
+      old_outgoing_targets
+      |> Map.keys()
+      |> clean_edge_references(incoming_edges_without_vertex, &Map.delete(&1, vertex))
 
     %{
       graph
@@ -373,47 +347,19 @@ defmodule Hologram.Compiler.Digraph do
     # Clean up outgoing edges: remove references to removed vertices
     # from all vertices that pointed to them
     cleaned_outgoing_edges =
-      Enum.reduce(
+      clean_edge_references(
         vertices_needing_outgoing_cleanup,
         outgoing_edges_without_removed_vertices,
-        fn source, acc_outgoing_edges ->
-          case Map.get(acc_outgoing_edges, source) do
-            nil ->
-              acc_outgoing_edges
-
-            targets ->
-              cleaned_targets = Map.drop(targets, vertices_to_remove)
-
-              if map_size(cleaned_targets) == 0 do
-                Map.delete(acc_outgoing_edges, source)
-              else
-                Map.put(acc_outgoing_edges, source, cleaned_targets)
-              end
-          end
-        end
+        &Map.drop(&1, vertices_to_remove)
       )
 
     # Clean up incoming edges: remove references to removed vertices
     # from all vertices they pointed to
     cleaned_incoming_edges =
-      Enum.reduce(
+      clean_edge_references(
         vertices_needing_incoming_cleanup,
         incoming_edges_without_removed_vertices,
-        fn target, acc_incoming_edges ->
-          case Map.get(acc_incoming_edges, target) do
-            nil ->
-              acc_incoming_edges
-
-            sources ->
-              cleaned_sources = Map.drop(sources, vertices_to_remove)
-
-              if map_size(cleaned_sources) == 0 do
-                Map.delete(acc_incoming_edges, target)
-              else
-                Map.put(acc_incoming_edges, target, cleaned_sources)
-              end
-          end
-        end
+        &Map.drop(&1, vertices_to_remove)
       )
 
     %{
@@ -422,6 +368,24 @@ defmodule Hologram.Compiler.Digraph do
         outgoing_edges: cleaned_outgoing_edges,
         incoming_edges: cleaned_incoming_edges
     }
+  end
+
+  defp clean_edge_references(keys, edges, clean_references) do
+    Enum.reduce(keys, edges, fn key, acc ->
+      case Map.fetch(acc, key) do
+        :error ->
+          acc
+
+        {:ok, references} ->
+          cleaned_references = clean_references.(references)
+
+          if map_size(cleaned_references) == 0 do
+            Map.delete(acc, key)
+          else
+            Map.put(acc, key, cleaned_references)
+          end
+      end
+    end)
   end
 
   @doc """

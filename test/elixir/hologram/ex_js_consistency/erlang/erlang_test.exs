@@ -3839,10 +3839,11 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
       assert :erlang.convert_time_unit(-42, :millisecond, :millisecond) == -42
     end
 
+    @tag :skip_on_windows
     test "supports native time unit" do
       # :native is the time unit of :erlang.monotonic_time/0. It's technically
-      # platform-dependent, but is nanoseconds on all major platforms (Linux,
-      # macOS, Windows). The JS port standardizes on nanoseconds.
+      # platform-dependent and Windows uses a different native unit. Linux and
+      # macOS use nanoseconds, which is also what the JS port standardizes on.
       assert :erlang.convert_time_unit(1, :second, :native) == 1_000_000_000
     end
 

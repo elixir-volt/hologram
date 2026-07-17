@@ -4,14 +4,15 @@ defmodule Hologram.Commons.SystemUtilsTest do
   alias Hologram.Reflection
 
   describe "cmd_cross_platform/3" do
-    setup do
+    setup %{test: test} do
       test_dir =
         Path.join([
           Reflection.tmp_dir(),
           "tests",
           "commons",
           "system_utils",
-          "cmd_cross_platform_3"
+          "cmd_cross_platform_3",
+          Atom.to_string(test)
         ])
 
       clean_dir(test_dir)
@@ -40,8 +41,9 @@ defmodule Hologram.Commons.SystemUtilsTest do
       assert result =~ "Elixir"
     end
 
-    test "returns non-zero exit status for failing commands" do
-      {_result, exit_status} = cmd_cross_platform("false", [], [])
+    test "returns non-zero exit status for failing commands", %{test_dir: test_dir} do
+      command_path = write_test_command!(test_dir, "fail", 1)
+      {_result, exit_status} = cmd_cross_platform(command_path, [], [])
 
       assert exit_status != 0
     end
@@ -58,11 +60,27 @@ defmodule Hologram.Commons.SystemUtilsTest do
       end
     end
 
-    test "handles empty arguments list" do
-      {result, exit_status} = cmd_cross_platform("echo", [], [])
+    test "handles empty arguments list", %{test_dir: test_dir} do
+      command_path = write_test_command!(test_dir, "empty", 0)
+      {result, exit_status} = cmd_cross_platform(command_path, [], [])
 
       assert exit_status == 0
-      assert String.trim_trailing(result) == ""
+      assert result == ""
+    end
+  end
+
+  defp write_test_command!(dir, name, exit_status) do
+    case :os.type() do
+      {:win32, _name} ->
+        path = Path.join(dir, "#{name}.cmd")
+        File.write!(path, "@echo off\r\nexit /b #{exit_status}\r\n")
+        path
+
+      _unix ->
+        path = Path.join(dir, name)
+        File.write!(path, "#!/bin/sh\nexit #{exit_status}\n")
+        File.chmod!(path, 0o755)
+        path
     end
   end
 

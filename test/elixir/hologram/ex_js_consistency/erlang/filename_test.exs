@@ -675,6 +675,7 @@ defmodule Hologram.ExJsConsistency.Erlang.FilenameTest do
       assert :filename.join(["/", "usr", "local"]) == "/usr/local"
     end
 
+    @tag :skip_on_windows
     test "handles multiple consecutive slashes" do
       assert :filename.join(["//usr", "local"]) == "/usr/local"
     end
@@ -794,6 +795,7 @@ defmodule Hologram.ExJsConsistency.Erlang.FilenameTest do
       assert :filename.join([[?u, ?s, ?r]], [[?l, ?o, ?c, ?a, ?l]]) == ~c"usr/local"
     end
 
+    @tag :skip_on_windows
     test "normalizes redundant slashes" do
       assert :filename.join("usr//", "//local") == "/local"
     end
@@ -1179,6 +1181,7 @@ defmodule Hologram.ExJsConsistency.Erlang.FilenameTest do
       assert :filename.split("") == []
     end
 
+    @tag :skip_on_windows
     test "multiple consecutive slashes" do
       assert :filename.split("//") == ["/"]
     end
@@ -1227,6 +1230,7 @@ defmodule Hologram.ExJsConsistency.Erlang.FilenameTest do
       assert :filename.split("foo//bar") == ["foo", "bar"]
     end
 
+    @tag :skip_on_windows
     test "drive letter with colon and forward slash" do
       assert :filename.split("a:/msdev/include") == ["a:", "msdev", "include"]
     end

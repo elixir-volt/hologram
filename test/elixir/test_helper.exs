@@ -37,7 +37,8 @@ excluded_tags = ex_unit_config[:exclude]
 
 javascript_tests_requested? =
   not tag_configured?.(excluded_tags, :js) and
-    (included_tags == [] or tag_configured?.(included_tags, :js))
+    (included_tags == [] or tag_configured?.(included_tags, :js) or
+       tag_configured?.(included_tags, :browser_js))
 
 if javascript_tests_requested? do
   browser_files = ~w[
@@ -52,7 +53,7 @@ if javascript_tests_requested? do
   common_opts = [
     root: ".",
     granularity: :file,
-    playwright: [executable: Path.expand("assets/node_modules/.bin/playwright")],
+    playwright: [executable: Path.expand("assets/node_modules/playwright/cli.js")],
     bundle: [
       aliases: %{
         "hologram:test/browser-helpers" =>

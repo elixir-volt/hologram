@@ -15,7 +15,6 @@ defmodule Mix.Tasks.Holo.Test.CheckFileNames do
   use Mix.Task
 
   alias Hologram.Commons.FileUtils
-  alias Hologram.Commons.PathUtils
 
   @requirements ["app.config"]
 
@@ -33,7 +32,7 @@ defmodule Mix.Tasks.Holo.Test.CheckFileNames do
     |> FileUtils.list_files_recursively()
     |> Enum.reject(
       &(String.ends_with?(&1, "_test.exs") ||
-          String.starts_with?(&1, Path.join(path, "support") <> PathUtils.path_separator()) ||
+          &1 |> Path.relative_to(path) |> Path.split() |> List.first() == "support" ||
           &1 == Path.join(path, "test_helper.exs"))
     )
   end

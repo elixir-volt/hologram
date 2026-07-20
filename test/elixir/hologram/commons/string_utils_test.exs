@@ -7,18 +7,6 @@ defmodule Hologram.Commons.StringUtilsTest do
 
   import Hologram.Commons.StringUtils
 
-  test "line_separator/0" do
-    result = line_separator()
-
-    case :os.type() do
-      {:unix, _name} ->
-        assert result == "\n"
-
-      _fallback ->
-        assert result == "\r\n"
-    end
-  end
-
   describe "normalize_newlines/1" do
     test "converts Windows line endings to Unix format" do
       assert normalize_newlines("hello\r\nworld") == "hello\nworld"

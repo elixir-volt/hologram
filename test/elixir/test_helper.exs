@@ -13,11 +13,11 @@ System.put_env(
   "test_secret_key_base_that_is_long_enough_for_testing_purposes_in_hologram"
 )
 
-# Skip tests that don't work reliably on either OS type
+# Exclude assertions whose semantics are intentionally platform-specific.
 exclude_opts =
   case :os.type() do
-    {:unix, _name} -> [:skip_on_unix]
-    {:win32, _name} -> [:skip_on_windows]
+    {:unix, _name} -> []
+    {:win32, _name} -> [:nanosecond_native_time, :posix_permissions, :unix_filename_semantics]
   end
 
 ExUnit.start(exclude: exclude_opts)

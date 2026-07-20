@@ -147,8 +147,7 @@ defmodule Hologram.Commons.FileUtilsTest do
       refute File.exists?(path)
     end
 
-    # chmod may be a no-op on Windows, making this test unreliable on Windows
-    @tag :skip_on_windows
+    @tag :posix_permissions
     test "raises if cannot remove after retries due to permissions" do
       dir_path = Path.join(@base_dir, "protected_dir")
       clean_dir(dir_path)

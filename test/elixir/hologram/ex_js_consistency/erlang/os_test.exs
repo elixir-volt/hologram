@@ -10,7 +10,7 @@ defmodule Hologram.ExJsConsistency.Erlang.OsTest do
   @moduletag :consistency
 
   describe "system_time/0" do
-    @tag :skip_on_windows
+    @tag :nanosecond_native_time
     test "returns current system time in native time unit (nanoseconds)" do
       before_ns = :os.system_time(:nanosecond)
       result = :os.system_time()

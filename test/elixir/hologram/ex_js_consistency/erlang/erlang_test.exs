@@ -3839,7 +3839,7 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
       assert :erlang.convert_time_unit(-42, :millisecond, :millisecond) == -42
     end
 
-    @tag :skip_on_windows
+    @tag :nanosecond_native_time
     test "supports native time unit" do
       # :native is the time unit of :erlang.monotonic_time/0. It's technically
       # platform-dependent and Windows uses a different native unit. Linux and

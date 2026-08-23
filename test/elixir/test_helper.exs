@@ -17,7 +17,13 @@ System.put_env(
 exclude_opts =
   case :os.type() do
     {:unix, _name} -> []
-    {:win32, _name} -> [:nanosecond_native_time, :posix_permissions, :unix_filename_semantics]
+    {:win32, _name} ->
+      [
+        :erlang_stacktrace_source_metadata,
+        :nanosecond_native_time,
+        :posix_permissions,
+        :unix_filename_semantics
+      ]
   end
 
 ExUnit.start(exclude: exclude_opts)

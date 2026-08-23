@@ -1718,6 +1718,7 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
         assert :erlang.atom_to_binary(:全息图) == :erlang.atom_to_binary(:全息图, :utf8)
       end
 
+      @tag :erlang_stacktrace_source_metadata
       test "error frame carries args and error_info" do
         arg = wrap_term(1)
 
@@ -2231,6 +2232,7 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
       assert :erlang.binary_to_integer("123") == :erlang.binary_to_integer("123", 10)
     end
 
+    @tag :erlang_stacktrace_source_metadata
     test "error frame carries args and error_info" do
       arg = wrap_term("abc")
 
@@ -2345,6 +2347,7 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
                    {:erlang, :binary_to_integer, ["123", 37]}
     end
 
+    @tag :erlang_stacktrace_source_metadata
     test "error frame carries args and error_info" do
       arg = wrap_term("abc")
 
@@ -3917,6 +3920,7 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
                    {:erlang, :convert_time_unit, [1, "second", :second]}
     end
 
+    @tag :erlang_stacktrace_source_metadata
     test "error frame carries args and error_info" do
       arg = wrap_term(:a)
 
@@ -5091,6 +5095,7 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
                    {:erlang, :fun_info, [:abc]}
     end
 
+    @tag :erlang_stacktrace_source_metadata
     test "error frame carries args and error_info" do
       arg = wrap_term(:abc)
 
@@ -6196,6 +6201,7 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
                :erlang.list_to_integer([49, 50, 51], 10)
     end
 
+    @tag :erlang_stacktrace_source_metadata
     test "error frame carries args and error_info" do
       arg = wrap_term(:abc)
 
@@ -6363,6 +6369,7 @@ defmodule Hologram.ExJsConsistency.Erlang.ErlangTest do
                    {:erlang, :list_to_integer, [[49, 50, 51], 37]}
     end
 
+    @tag :erlang_stacktrace_source_metadata
     test "error frame carries args and error_info" do
       arg = wrap_term(:abc)
 

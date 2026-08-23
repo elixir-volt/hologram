@@ -2197,7 +2197,7 @@ defmodule Hologram.Template.RendererTest do
 
     test "returns the tree the HTML is printed from" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module48,
         "102790adb6c3b1956db310be523a7693"
       )
@@ -2210,7 +2210,7 @@ defmodule Hologram.Template.RendererTest do
 
     test "interpolates the runtime JS into the tree's scripts, leaving the Realtime placeholders" do
       ETS.put(
-        PageDigestRegistryStub.ets_table_name(),
+        BundleManifestStub.ets_table_name(),
         Module48,
         "102790adb6c3b1956db310be523a7693"
       )

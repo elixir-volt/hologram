@@ -30,8 +30,7 @@ export default class CallStack {
       moduleTerm = Type.atom(frame.module);
     }
 
-    const functionTerm =
-      frame.function === null ? Type.nil() : Type.atom(frame.function);
+    const functionTerm = frame.function === null ? Type.nil() : Type.atom(frame.function);
 
     let arityOrArgsTerm;
 
@@ -57,12 +56,7 @@ export default class CallStack {
       location.push(Type.tuple([Type.atom("error_info"), frame.errorInfo]));
     }
 
-    return Type.tuple([
-      moduleTerm,
-      functionTerm,
-      arityOrArgsTerm,
-      Type.list(location),
-    ]);
+    return Type.tuple([moduleTerm, functionTerm, arityOrArgsTerm, Type.list(location)]);
   }
 
   // Returns the innermost frame without removing it, or undefined when the stack is empty.
@@ -109,8 +103,7 @@ export default class CallStack {
       return null;
     }
 
-    const [module, functionName, arityOrArgs, location] =
-      stacktrace.data[0].data;
+    const [module, functionName, arityOrArgs, location] = stacktrace.data[0].data;
 
     const errorInfoEntry = Type.isList(location)
       ? location.data.find(

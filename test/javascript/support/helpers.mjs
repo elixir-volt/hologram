@@ -1,6 +1,6 @@
 "use strict";
 
-import {assert} from "../../../assets/node_modules/chai/index.js";
+import {assert} from "chai";
 
 import Bitstring from "hologram:runtime/bitstring";
 import ComponentRegistry from "hologram:runtime/component_registry";
@@ -39,13 +39,10 @@ import Serializer from "hologram:runtime/serializer";
 import Type from "hologram:runtime/type";
 import Utils from "hologram:runtime/utils";
 
-export {assert} from "../../../assets/node_modules/chai/index.js";
+import {JSDOM, vnode} from "hologram:test/browser-helpers";
+import {sinon} from "./sinon_helpers.mjs";
 
-import {JSDOM} from "../../../assets/node_modules/jsdom/lib/api.js";
-export {JSDOM};
-
-export * as sinon from "../../../assets/node_modules/sinon/pkg/sinon-esm.js";
-export {h as vnode} from "../../../assets/js/vendor/snabbdom/build/index.js";
+export {assert, JSDOM, sinon, vnode};
 
 export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -1179,6 +1176,38 @@ export function putState(component, state) {
 }
 
 export function registerWebApis() {
+  if (typeof globalThis.DOMParser !== "undefined") {
+    const testHistory = {
+      state: null,
+      pushState(state) {
+        this.state = state;
+      },
+      replaceState(state) {
+        this.state = state;
+      },
+    };
+
+    Object.defineProperty(globalThis, "history", {
+      configurable: true,
+      value: testHistory,
+    });
+
+    const appendChild = document.head.appendChild.bind(document.head);
+
+    document.head.appendChild = (node) => {
+      if (
+        node instanceof HTMLScriptElement &&
+        node.src.includes("/hologram/page-")
+      ) {
+        node.type = "application/json";
+      }
+
+      return appendChild(node);
+    };
+
+    return;
+  }
+
   const {window} = new JSDOM("", {url: "http://localhost"});
 
   globalThis.window = window;

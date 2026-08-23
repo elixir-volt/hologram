@@ -126,10 +126,7 @@ export default class Deserializer {
     const result = Interpreter.moduleProxy("re")["compile/2"](source, opts);
     const compiledRef = result.data[1].data[4];
 
-    ERTS.regexPatternRegistry.put(
-      ref,
-      ERTS.regexPatternRegistry.get(compiledRef),
-    );
+    ERTS.regexPatternRegistry.put(ref, ERTS.regexPatternRegistry.get(compiledRef));
   }
 
   static #regexStructField(map, key) {

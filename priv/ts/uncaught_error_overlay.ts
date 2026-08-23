@@ -11,13 +11,7 @@ const OVERLAY_ID = "hologram-uncaught-error-overlay";
 // the run instead of having to be found in it. A frame naming no application is
 // taken to be the app's own, since an unknown one is likelier to be the page's
 // code than the framework under it.
-const FRAMEWORK_APPS = new Set([
-  "elixir",
-  "erts",
-  "hologram",
-  "kernel",
-  "stdlib",
-]);
+const FRAMEWORK_APPS = new Set(["elixir", "erts", "hologram", "kernel", "stdlib"]);
 
 // The overlay reporting an uncaught client error in the page. Dismissable,
 // since a runtime error often leaves the rest of the page usable.
@@ -67,13 +61,9 @@ export default class UncaughtErrorOverlay {
     // by the spacing that does it.
     // Built from the parts rather than read off the message, which carries the
     // whole report for the browser to print.
-    const message = [
-      {text: `** (${error.type}) ${error.text}`, tone: "banner"},
-    ];
+    const message = [{text: `** (${error.type}) ${error.text}`, tone: "banner"}];
 
-    const frames = Interpreter.boxStacktrace(error).data.map((frame) =>
-      $.#toFrameSegments(frame),
-    );
+    const frames = Interpreter.boxStacktrace(error).data.map((frame) => $.#toFrameSegments(frame));
 
     return [message, ...frames];
   }

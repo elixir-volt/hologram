@@ -7,15 +7,8 @@ import Type from "../type.ts";
 const Elixir_URI = {
   "encode/2": (string, predicate) => {
     // Make it consistent with encode/2 guards: when is_binary(string) and is_function(predicate, 1)
-    if (
-      !Type.isBinary(string) ||
-      !Type.isAnonymousFunction(predicate) ||
-      predicate.arity !== 1
-    ) {
-      Interpreter.raiseFunctionClauseError("URI", "encode", 2, [
-        string,
-        predicate,
-      ]);
+    if (!Type.isBinary(string) || !Type.isAnonymousFunction(predicate) || predicate.arity !== 1) {
+      Interpreter.raiseFunctionClauseError("URI", "encode", 2, [string, predicate]);
     }
 
     // Ensure bytes are available from the bitstring
@@ -24,8 +17,7 @@ const Elixir_URI = {
 
     // Check if predicate is &URI.char_unreserved?/1
     const isCharUnreservedPredicate =
-      predicate.capturedModule === "URI" &&
-      predicate.capturedFunction === "char_unreserved?";
+      predicate.capturedModule === "URI" && predicate.capturedFunction === "char_unreserved?";
 
     let result = "";
 
@@ -51,9 +43,7 @@ const Elixir_URI = {
       } else {
         // Generic path: apply predicate to each byte
 
-        const predicateResult = Interpreter.callAnonymousFunction(predicate, [
-          Type.integer(byte),
-        ]);
+        const predicateResult = Interpreter.callAnonymousFunction(predicate, [Type.integer(byte)]);
 
         shouldEncode = !Type.isTrue(predicateResult);
       }

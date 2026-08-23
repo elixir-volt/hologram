@@ -42,11 +42,15 @@ javascript_tests_requested? =
 
 if javascript_tests_requested? do
   browser_files = ~w[
+    test/javascript/client_test.mjs
+    test/javascript/connection_test.mjs
     test/javascript/elixir/hologram/js_test.mjs
+    test/javascript/erlang/re_test.mjs
+    test/javascript/error_overlay_test.mjs
     test/javascript/events/change_event_test.mjs
     test/javascript/events/submit_event_test.mjs
+    test/javascript/hologram_test.mjs
     test/javascript/intl_pluralrules_test.mjs
-    test/javascript/live_reload_test.mjs
     test/javascript/vdom_test.mjs
   ]
 

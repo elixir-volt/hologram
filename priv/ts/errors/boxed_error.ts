@@ -158,14 +158,10 @@ export default class HologramBoxedError extends Error {
     this.blamedStruct = this.struct;
 
     this.type =
-      this.struct === null
-        ? "error"
-        : Interpreter.inspect(this.struct.data["atom(__struct__)"][1]);
+      this.struct === null ? "error" : Interpreter.inspect(this.struct.data["atom(__struct__)"][1]);
 
     const fault =
-      derivationError === null
-        ? ""
-        : ` (message derivation failed: ${derivationError.message})`;
+      derivationError === null ? "" : ` (message derivation failed: ${derivationError.message})`;
 
     this.text = `${Interpreter.inspect(this.value)}${fault}`;
     this.message = $.#report(this);

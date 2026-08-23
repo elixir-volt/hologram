@@ -58,9 +58,7 @@ export function buildTrueVariantsMap() {
     const foldingClasses = [];
 
     for (const codePoint of members) {
-      const matched = foldingClasses.find((foldingClass) =>
-        foldEqual(foldingClass[0], codePoint),
-      );
+      const matched = foldingClasses.find((foldingClass) => foldEqual(foldingClass[0], codePoint));
 
       if (matched !== undefined) {
         matched.push(codePoint);
@@ -107,7 +105,5 @@ export function naiveVariants(codePoint) {
 }
 
 function singleCodePoint(str) {
-  return str.length === String.fromCodePoint(str.codePointAt(0)).length
-    ? str.codePointAt(0)
-    : null;
+  return str.length === String.fromCodePoint(str.codePointAt(0)).length ? str.codePointAt(0) : null;
 }

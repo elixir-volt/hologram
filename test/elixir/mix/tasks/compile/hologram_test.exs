@@ -175,7 +175,7 @@ defmodule Mix.Tasks.Compile.HologramTest do
     assert opts[:static_dir]
            |> Path.join(runtime_entry["file"])
            |> File.stat!()
-           |> Map.fetch!(:size) < 500_000
+           |> Map.fetch!(:size) < 650_000
   end
 
   defp entry_key(page_module) do

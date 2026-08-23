@@ -41,9 +41,7 @@ const Erlang_String = {
     // The server converts the pattern with unicode:characters_to_list/1, so
     // its badarg reports that identity.
     const raiseInvalidPattern = () =>
-      Interpreter.raiseBifError("badarg", "unicode", "characters_to_list", [
-        searchPattern,
-      ]);
+      Interpreter.raiseBifError("badarg", "unicode", "characters_to_list", [searchPattern]);
 
     let patternBinary;
 
@@ -61,15 +59,8 @@ const Erlang_String = {
       raiseInvalidPattern();
     }
 
-    if (
-      !Type.isAtom(direction) ||
-      !["leading", "trailing"].includes(direction.value)
-    ) {
-      Interpreter.raiseFunctionClauseError("string", "find", 3, [
-        string,
-        searchPattern,
-        direction,
-      ]);
+    if (!Type.isAtom(direction) || !["leading", "trailing"].includes(direction.value)) {
+      Interpreter.raiseFunctionClauseError("string", "find", 3, [string, searchPattern, direction]);
     }
 
     const directionValue = direction.value;
@@ -79,9 +70,7 @@ const Erlang_String = {
 
     // Empty pattern returns the string as-is
     if (Bitstring.isEmpty(patternBinary)) {
-      return Type.isList(string)
-        ? Type.charlist(stringText)
-        : Type.bitstring(stringText);
+      return Type.isList(string) ? Type.charlist(stringText) : Type.bitstring(stringText);
     }
 
     // Find the pattern
@@ -167,10 +156,7 @@ const Erlang_String = {
     }
 
     const similarity =
-      (matchCount / len1 +
-        matchCount / len2 +
-        (matchCount - transpositions / 2) / matchCount) /
-      3;
+      (matchCount / len1 + matchCount / len2 + (matchCount - transpositions / 2) / matchCount) / 3;
 
     return Type.float(similarity);
   },
@@ -180,24 +166,16 @@ const Erlang_String = {
   // Start join/2
   "join/2": (list, separator) => {
     if (!Type.isList(list)) {
-      Interpreter.raiseFunctionClauseError("string", "join", 2, [
-        list,
-        separator,
-      ]);
+      Interpreter.raiseFunctionClauseError("string", "join", 2, [list, separator]);
     }
 
     if (!Type.isProperList(list)) {
-      Erlang["error/1"](
-        Type.tuple([Type.atom("bad_generator"), list.data.at(-1)]),
-      );
+      Erlang["error/1"](Type.tuple([Type.atom("bad_generator"), list.data.at(-1)]));
     }
 
     if (list.data.length === 0) {
       if (!Type.isProperList(separator)) {
-        Interpreter.raiseFunctionClauseError("string", "join", 2, [
-          list,
-          separator,
-        ]);
+        Interpreter.raiseFunctionClauseError("string", "join", 2, [list, separator]);
       }
 
       return Type.list();
@@ -210,10 +188,7 @@ const Erlang_String = {
       if (!Type.isList(element)) {
         // The server fails concatenating the element with the joined rest,
         // so its badarg reports :erlang.++/2.
-        Interpreter.raiseBifError("badarg", "erlang", "++", [
-          element,
-          Type.list(),
-        ]);
+        Interpreter.raiseBifError("badarg", "erlang", "++", [element, Type.list()]);
       }
 
       return element;
@@ -353,12 +328,7 @@ const Erlang_String = {
 
   // Start replace/3
   "replace/3": (string, pattern, replacement) => {
-    return Erlang_String["replace/4"](
-      string,
-      pattern,
-      replacement,
-      Type.atom("leading"),
-    );
+    return Erlang_String["replace/4"](string, pattern, replacement, Type.atom("leading"));
   },
   // End replace/3
   // Deps: [:string.replace/4]
@@ -385,9 +355,7 @@ const Erlang_String = {
     // The server converts the pattern with unicode:characters_to_list/1, so
     // its badarg reports that identity.
     const raiseInvalidPattern = () =>
-      Interpreter.raiseBifError("badarg", "unicode", "characters_to_list", [
-        pattern,
-      ]);
+      Interpreter.raiseBifError("badarg", "unicode", "characters_to_list", [pattern]);
 
     let patternBinary;
 
@@ -421,9 +389,7 @@ const Erlang_String = {
     switch (direction.value) {
       case "all":
         resultList = stringText.split(patternText).flatMap((elem, idx) => {
-          return idx === 0
-            ? [Type.bitstring(elem)]
-            : [replacement, Type.bitstring(elem)];
+          return idx === 0 ? [Type.bitstring(elem)] : [replacement, Type.bitstring(elem)];
         });
         break;
 
@@ -481,9 +447,7 @@ const Erlang_String = {
     // The server converts the pattern with unicode:characters_to_list/1, so
     // its badarg reports that identity.
     const raiseInvalidPattern = () =>
-      Interpreter.raiseBifError("badarg", "unicode", "characters_to_list", [
-        pattern,
-      ]);
+      Interpreter.raiseBifError("badarg", "unicode", "characters_to_list", [pattern]);
 
     let patternBinary;
 
@@ -514,13 +478,9 @@ const Erlang_String = {
     const subjectText = Bitstring.toText(subjectBinary);
     const patternText = Bitstring.toText(patternBinary);
 
-    const convertResult = (str) =>
-      Type.isList(subject) ? Type.charlist(str) : str;
+    const convertResult = (str) => (Type.isList(subject) ? Type.charlist(str) : str);
 
-    if (
-      Bitstring.isEmpty(patternBinary) ||
-      !subjectText.includes(patternText)
-    ) {
+    if (Bitstring.isEmpty(patternBinary) || !subjectText.includes(patternText)) {
       return Type.list([convertResult(subjectText)]);
     }
 
@@ -534,10 +494,7 @@ const Erlang_String = {
           ? subjectText.lastIndexOf(patternText)
           : subjectText.indexOf(patternText);
 
-      parts = [
-        subjectText.slice(0, index),
-        subjectText.slice(index + patternText.length),
-      ];
+      parts = [subjectText.slice(0, index), subjectText.slice(index + patternText.length)];
     }
 
     return Type.list(parts.map(convertResult));
@@ -695,9 +652,7 @@ const Erlang_String = {
       }
 
       const {codepointNum, rest} = extraction;
-      const uppercasedCodepoints = uppercaseCodepoint(codepointNum).map((cp) =>
-        Type.integer(cp),
-      );
+      const uppercasedCodepoints = uppercaseCodepoint(codepointNum).map((cp) => Type.integer(cp));
 
       const firstRest = rest.length > 0 ? rest[0] : null;
 
@@ -715,11 +670,7 @@ const Erlang_String = {
       }
 
       // Filter out empty binary at the end (for improper list tails)
-      if (
-        rest.length === 1 &&
-        Type.isBitstring(firstRest) &&
-        firstRest.text.length === 0
-      ) {
+      if (rest.length === 1 && Type.isBitstring(firstRest) && firstRest.text.length === 0) {
         return Type.list([...uppercasedCodepoints]);
       }
 
@@ -762,9 +713,7 @@ const Erlang_String = {
         // gc/1 may return a multi-element improper tail, e.g. [grapheme | [rest | tail]];
         // reconstruct it rather than dropping everything past the second element.
         current =
-          result.data.length === 2
-            ? result.data[1]
-            : Type.improperList(result.data.slice(1));
+          result.data.length === 2 ? result.data[1] : Type.improperList(result.data.slice(1));
 
         if (Type.isBitstring(current) && Bitstring.isEmpty(current)) {
           break;

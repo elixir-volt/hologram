@@ -27,9 +27,7 @@ const Erlang_Binary = {
       }
 
       // Transition to next state or reset to root
-      candidateNode = candidateNode
-        ? candidateNode.children.get(byte) || rootNode
-        : rootNode;
+      candidateNode = candidateNode ? candidateNode.children.get(byte) || rootNode : rootNode;
 
       // Check if current state has any pattern matches
       if (candidateNode.output.length > 0) {
@@ -42,8 +40,7 @@ const Erlang_Binary = {
           if (
             bestMatch === null ||
             matchIndex < bestMatch.index ||
-            (matchIndex === bestMatch.index &&
-              matchedPatternLength > bestMatch.length)
+            (matchIndex === bestMatch.index && matchedPatternLength > bestMatch.length)
           ) {
             bestMatch = {index: matchIndex, length: matchedPatternLength};
           }
@@ -139,9 +136,7 @@ const Erlang_Binary = {
     }
 
     return (
-      Type.isProperList(pattern) &&
-      pattern.data.length > 0 &&
-      pattern.data.every(isNonEmptyBinary)
+      Type.isProperList(pattern) && pattern.data.length > 0 && pattern.data.every(isNonEmptyBinary)
     );
   },
   // End _is_valid_pattern/1
@@ -236,9 +231,7 @@ const Erlang_Binary = {
   // Start compile_pattern/1
   "compile_pattern/1": (pattern) => {
     const raiseInvalidPattern = () => {
-      Interpreter.raiseBifError("badarg", "binary", "compile_pattern", [
-        pattern,
-      ]);
+      Interpreter.raiseBifError("badarg", "binary", "compile_pattern", [pattern]);
     };
 
     const compileBoyerMoorePattern = (singlePattern) => {
@@ -321,8 +314,7 @@ const Erlang_Binary = {
             failureNode = failureNode.failure;
           }
 
-          childNode.failure =
-            failureNode === null ? rootNode : failureNode.children.get(byte);
+          childNode.failure = failureNode === null ? rootNode : failureNode.children.get(byte);
 
           childNode.output = childNode.output.concat(childNode.failure.output);
         }
@@ -424,10 +416,7 @@ const Erlang_Binary = {
       // Re-raise with this arity's own identity - the BEAM reports the
       // called function's frame, not the delegate's.
       if (error.struct) {
-        Interpreter.raiseBifError("badarg", "binary", "match", [
-          subject,
-          pattern,
-        ]);
+        Interpreter.raiseBifError("badarg", "binary", "match", [subject, pattern]);
       }
 
       throw error;
@@ -439,11 +428,7 @@ const Erlang_Binary = {
   // Start match/3
   "match/3": (subject, pattern, options) => {
     const raiseBadarg = () => {
-      Interpreter.raiseBifError("badarg", "binary", "match", [
-        subject,
-        pattern,
-        options,
-      ]);
+      Interpreter.raiseBifError("badarg", "binary", "match", [subject, pattern, options]);
     };
 
     if (!Type.isBinary(subject)) {
@@ -476,8 +461,7 @@ const Erlang_Binary = {
       raiseBadarg();
     }
 
-    const effectiveLength =
-      scopeLength === null ? subject.bytes.length - scopeStart : scopeLength;
+    const effectiveLength = scopeLength === null ? subject.bytes.length - scopeStart : scopeLength;
 
     // Validate scope doesn't extend beyond subject
     if (scopeStart + effectiveLength > subject.bytes.length) {
@@ -496,9 +480,7 @@ const Erlang_Binary = {
     let compiledPattern;
 
     try {
-      compiledPattern = isCompiledPattern
-        ? pattern
-        : Erlang_Binary["compile_pattern/1"](pattern);
+      compiledPattern = isCompiledPattern ? pattern : Erlang_Binary["compile_pattern/1"](pattern);
     } catch (error) {
       // Re-raise pattern compilation errors with this function's identity
       if (error.struct) {
@@ -541,11 +523,7 @@ const Erlang_Binary = {
         0,
       );
     } else {
-      match = Erlang_Binary["_aho_corasick_search/3"](
-        scopedSubject,
-        compiledData.rootNode,
-        0,
-      );
+      match = Erlang_Binary["_aho_corasick_search/3"](scopedSubject, compiledData.rootNode, 0);
     }
 
     if (match === null) {
@@ -568,10 +546,7 @@ const Erlang_Binary = {
       // Re-raise with this arity's own identity - the BEAM reports the
       // called function's frame, not the delegate's.
       if (error.struct) {
-        Interpreter.raiseBifError("badarg", "binary", "matches", [
-          subject,
-          pattern,
-        ]);
+        Interpreter.raiseBifError("badarg", "binary", "matches", [subject, pattern]);
       }
 
       throw error;
@@ -583,11 +558,7 @@ const Erlang_Binary = {
   // Start matches/3
   "matches/3": (subject, pattern, options) => {
     const raiseBadarg = () => {
-      Interpreter.raiseBifError("badarg", "binary", "matches", [
-        subject,
-        pattern,
-        options,
-      ]);
+      Interpreter.raiseBifError("badarg", "binary", "matches", [subject, pattern, options]);
     };
 
     if (!Type.isBinary(subject)) {
@@ -621,9 +592,7 @@ const Erlang_Binary = {
     let compiledPattern;
 
     try {
-      compiledPattern = isCompiledPattern
-        ? pattern
-        : Erlang_Binary["compile_pattern/1"](pattern);
+      compiledPattern = isCompiledPattern ? pattern : Erlang_Binary["compile_pattern/1"](pattern);
     } catch (error) {
       // Re-raise pattern compilation errors with this function's identity
       if (error.struct) {
@@ -641,8 +610,7 @@ const Erlang_Binary = {
       raiseBadarg();
     }
 
-    const effectiveLength =
-      scopeLength === null ? subject.bytes.length - scopeStart : scopeLength;
+    const effectiveLength = scopeLength === null ? subject.bytes.length - scopeStart : scopeLength;
 
     if (scopeStart + effectiveLength > subject.bytes.length) {
       raiseBadarg();
@@ -665,18 +633,11 @@ const Erlang_Binary = {
       const matchOptions = Type.list([
         Type.tuple([
           Type.atom("scope"),
-          Type.tuple([
-            Type.integer(currentStart),
-            Type.integer(remainingLength),
-          ]),
+          Type.tuple([Type.integer(currentStart), Type.integer(remainingLength)]),
         ]),
       ]);
 
-      const matchResult = Erlang_Binary["match/3"](
-        subject,
-        compiledPattern,
-        matchOptions,
-      );
+      const matchResult = Erlang_Binary["match/3"](subject, compiledPattern, matchOptions);
 
       if (Type.isAtom(matchResult) && matchResult.value === "nomatch") {
         break;
@@ -698,21 +659,12 @@ const Erlang_Binary = {
   // Start replace/3
   "replace/3": (subject, pattern, replacement) => {
     try {
-      return Erlang_Binary["replace/4"](
-        subject,
-        pattern,
-        replacement,
-        Type.list(),
-      );
+      return Erlang_Binary["replace/4"](subject, pattern, replacement, Type.list());
     } catch (error) {
       // Re-raise with this arity's own identity - the BEAM reports the
       // called function's frame, not the delegate's.
       if (error.struct) {
-        Interpreter.raiseBifError("badarg", "binary", "replace", [
-          subject,
-          pattern,
-          replacement,
-        ]);
+        Interpreter.raiseBifError("badarg", "binary", "replace", [subject, pattern, replacement]);
       }
 
       throw error;
@@ -758,8 +710,7 @@ const Erlang_Binary = {
         raiseBadarg();
       }
 
-      const effectiveLength =
-        length === null ? subjectBin.bytes.length - start : length;
+      const effectiveLength = length === null ? subjectBin.bytes.length - start : length;
 
       if (start + effectiveLength > subjectBin.bytes.length) {
         raiseBadarg();
@@ -786,11 +737,7 @@ const Erlang_Binary = {
       return {type, data};
     };
 
-    const insertReplacedAtPositions = (
-      replacementBin,
-      matchedBin,
-      insertPositions,
-    ) => {
+    const insertReplacedAtPositions = (replacementBin, matchedBin, insertPositions) => {
       const positions = Type.isList(insertPositions)
         ? insertPositions.data.map((p) => Number(p.value))
         : [Number(insertPositions.value)];
@@ -875,10 +822,7 @@ const Erlang_Binary = {
             raiseBadopt();
           }
 
-          if (
-            !Type.isInteger(scopeData.data[0]) ||
-            !Type.isInteger(scopeData.data[1])
-          ) {
+          if (!Type.isInteger(scopeData.data[0]) || !Type.isInteger(scopeData.data[1])) {
             raiseBadarg();
           }
 
@@ -909,9 +853,7 @@ const Erlang_Binary = {
             // Reject improper lists to match top-level options validation
             if (Type.isImproperList(insertData)) raiseBadarg();
 
-            const allIntegers = insertData.data.every((item) =>
-              Type.isInteger(item),
-            );
+            const allIntegers = insertData.data.every((item) => Type.isInteger(item));
 
             if (!allIntegers) raiseBadarg();
 
@@ -955,10 +897,9 @@ const Erlang_Binary = {
     // Helper closes over isReplacementFunction and replacement for clarity
     const buildReplacementBytes = (matchedBitstring, insertPositionsOpt) => {
       if (isReplacementFunction) {
-        const replacementResult = Interpreter.callAnonymousFunction(
-          replacement,
-          [matchedBitstring],
-        );
+        const replacementResult = Interpreter.callAnonymousFunction(replacement, [
+          matchedBitstring,
+        ]);
 
         if (!Type.isBinary(replacementResult)) {
           raiseBadarg();
@@ -1019,8 +960,7 @@ const Erlang_Binary = {
     // Validate pattern before checking scope length - pattern errors take priority
     const compiledPattern = compilePatternOrRaise(pattern);
 
-    const {type: patternType, data: compiledData} =
-      getCompiledData(compiledPattern);
+    const {type: patternType, data: compiledData} = getCompiledData(compiledPattern);
 
     // After pattern validation passes, check if search range is available
     if (scopeLength === 0) {
@@ -1037,19 +977,12 @@ const Erlang_Binary = {
         splitOpts.push(
           Type.tuple([
             Type.atom("scope"),
-            Type.tuple([
-              Type.integer(actualStart),
-              Type.integer(actualEnd - actualStart),
-            ]),
+            Type.tuple([Type.integer(actualStart), Type.integer(actualEnd - actualStart)]),
           ]),
         );
       }
 
-      const parts = Erlang_Binary["split/3"](
-        subject,
-        compiledPattern,
-        Type.list(splitOpts),
-      );
+      const parts = Erlang_Binary["split/3"](subject, compiledPattern, Type.list(splitOpts));
 
       return interleaveReplacement(parts, replacement);
     }
@@ -1099,23 +1032,15 @@ const Erlang_Binary = {
       foundAny = true;
 
       if (matchStartScoped > cursor) {
-        scopedSegments.push(
-          subject.bytes.subarray(actualStart + cursor, absMatchStart),
-        );
+        scopedSegments.push(subject.bytes.subarray(actualStart + cursor, absMatchStart));
       }
 
-      const matchedBytes = subject.bytes.subarray(
-        absMatchStart,
-        absMatchStart + matchLength,
-      );
+      const matchedBytes = subject.bytes.subarray(absMatchStart, absMatchStart + matchLength);
 
       const matchedBitstring = bytesToBitstring(matchedBytes);
       Bitstring.maybeSetBytesFromText(matchedBitstring);
 
-      const replacementBytes = buildReplacementBytes(
-        matchedBitstring,
-        insertPositionsOpt,
-      );
+      const replacementBytes = buildReplacementBytes(matchedBitstring, insertPositionsOpt);
 
       scopedSegments.push(replacementBytes);
 
@@ -1123,9 +1048,7 @@ const Erlang_Binary = {
 
       if (!global) {
         if (cursor < scopedBytes.length) {
-          scopedSegments.push(
-            subject.bytes.subarray(actualStart + cursor, actualEnd),
-          );
+          scopedSegments.push(subject.bytes.subarray(actualStart + cursor, actualEnd));
         }
 
         break;
@@ -1133,9 +1056,7 @@ const Erlang_Binary = {
     }
 
     if (foundAny && global && cursor < scopedBytes.length) {
-      scopedSegments.push(
-        subject.bytes.subarray(actualStart + cursor, actualEnd),
-      );
+      scopedSegments.push(subject.bytes.subarray(actualStart + cursor, actualEnd));
     } else if (!foundAny) {
       scopedSegments.push(subject.bytes.subarray(actualStart, actualEnd));
     }
@@ -1151,9 +1072,7 @@ const Erlang_Binary = {
     }
 
     // Build final result from all segments
-    const resultBytes = new Uint8Array(
-      resultSegments.reduce((sum, seg) => sum + seg.length, 0),
-    );
+    const resultBytes = new Uint8Array(resultSegments.reduce((sum, seg) => sum + seg.length, 0));
 
     let offset = 0;
 
@@ -1177,10 +1096,7 @@ const Erlang_Binary = {
       // Re-raise with this arity's own identity - the BEAM reports the
       // called function's frame, not the delegate's.
       if (error.struct) {
-        Interpreter.raiseBifError("badarg", "binary", "split", [
-          subject,
-          pattern,
-        ]);
+        Interpreter.raiseBifError("badarg", "binary", "split", [subject, pattern]);
       }
 
       throw error;
@@ -1224,11 +1140,7 @@ const Erlang_Binary = {
     };
 
     const raiseBadarg = () => {
-      Interpreter.raiseBifError("badarg", "binary", "split", [
-        subject,
-        pattern,
-        options,
-      ]);
+      Interpreter.raiseBifError("badarg", "binary", "split", [subject, pattern, options]);
     };
 
     // Validate subject is a binary
@@ -1266,8 +1178,7 @@ const Erlang_Binary = {
       ? pattern
       : Erlang_Binary["compile_pattern/1"](pattern);
 
-    const effectiveLength =
-      scopeLength === null ? subject.bytes.length - scopeStart : scopeLength;
+    const effectiveLength = scopeLength === null ? subject.bytes.length - scopeStart : scopeLength;
 
     // Validate scope doesn't extend beyond subject
     if (scopeStart + effectiveLength > subject.bytes.length) {
@@ -1304,11 +1215,7 @@ const Erlang_Binary = {
       ]);
 
       // Use match/3 to find next occurrence with pre-compiled pattern
-      const matchResult = Erlang_Binary["match/3"](
-        subject,
-        compiledPattern,
-        matchOptions,
-      );
+      const matchResult = Erlang_Binary["match/3"](subject, compiledPattern, matchOptions);
 
       // No more matches found
       if (Type.isAtom(matchResult) && matchResult.value === "nomatch") {
@@ -1331,9 +1238,7 @@ const Erlang_Binary = {
 
       // Add part before match (if any)
       if (matchStart > cursor) {
-        const beforeMatch = bytesToBitstring(
-          subject.bytes.slice(cursor, matchStart),
-        );
+        const beforeMatch = bytesToBitstring(subject.bytes.slice(cursor, matchStart));
 
         results.push(beforeMatch);
       } else if (matchStart === cursor) {

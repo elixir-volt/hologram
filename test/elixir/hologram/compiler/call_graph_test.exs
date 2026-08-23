@@ -56,7 +56,7 @@ defmodule Hologram.Compiler.CallGraphTest do
 
   alias String.Chars.Hologram.Test.Fixtures.Compiler.CallGraph.Module12, as: StringCharsModule12
 
-  @erlang_js_dir Path.join([Reflection.root_dir(), "assets", "js", "erlang"])
+  @erlang_js_dir Volt.Priv.path({:hologram, "ts"}, "erlang")
 
   @tmp_dir Reflection.tmp_dir()
 
@@ -68,11 +68,11 @@ defmodule Hologram.Compiler.CallGraphTest do
   # every port carries under its End marker. The comment is what a port author
   # writes down, so it is the statement the edge table has to answer to.
   defp list_declared_erlang_deps do
-    [@erlang_js_dir, "*.mjs"]
+    [@erlang_js_dir, "*.ts"]
     |> Path.join()
     |> Path.wildcard()
     |> Enum.flat_map(fn file_path ->
-      basename = Path.basename(file_path, ".mjs")
+      basename = Path.basename(file_path, ".ts")
 
       # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom
       module = String.to_atom(basename)

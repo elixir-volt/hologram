@@ -19,10 +19,7 @@ const Erlang_Rand = {
   // TODO: Erlang docs say that "state in the process dictionary" is used
   // Start uniform/1
   "uniform/1": (integer) => {
-    if (
-      !Type.isInteger(integer) ||
-      Interpreter.compareTerms(integer, Type.integer(0)) < 1
-    ) {
+    if (!Type.isInteger(integer) || Interpreter.compareTerms(integer, Type.integer(0)) < 1) {
       // The server's clause mismatch reports :rand.uniform_s/2 with the
       // seed state as the second argument, which the client cannot mirror,
       // so the frame carries the bare arity.

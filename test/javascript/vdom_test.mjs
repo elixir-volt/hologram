@@ -13,7 +13,7 @@ import {
   attributesModule,
   eventListenersModule,
   init,
-} from "../../assets/js/vendor/snabbdom/build/index.js";
+} from "snabbdom";
 
 defineRuntimeGlobals();
 registerWebApis();

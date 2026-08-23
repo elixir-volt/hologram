@@ -61,19 +61,16 @@ const Erlang_Erl_Kernel_Errors = {
     const frame = ERTS.callStack.unboxTopFrame(stacktrace);
 
     if (frame === null) {
-      Interpreter.raiseFunctionClauseError(
-        "erl_kernel_errors",
-        "format_error",
-        2,
-        [reason, stacktrace],
-      );
+      Interpreter.raiseFunctionClauseError("erl_kernel_errors", "format_error", 2, [
+        reason,
+        stacktrace,
+      ]);
     }
 
     // Mirrors OTP's cause lookup: the frame's error_info map may carry a
     // cause entry that refines the formatter's diagnosis, defaulting to
     // :none.
-    const causeEntry =
-      frame.errorInfo?.data[Type.encodeMapKey(Type.atom("cause"))];
+    const causeEntry = frame.errorInfo?.data[Type.encodeMapKey(Type.atom("cause"))];
 
     const cause = causeEntry ? causeEntry[1] : Type.atom("none");
 
@@ -87,11 +84,7 @@ const Erlang_Erl_Kernel_Errors = {
       );
     }
 
-    return Erlang_Erl_Kernel_Errors["_format_error_map/3"](
-      fragments,
-      1,
-      Type.map(),
-    );
+    return Erlang_Erl_Kernel_Errors["_format_error_map/3"](fragments, 1, Type.map());
   },
   // End format_error/2
   // Deps: [:erl_kernel_errors._format_error_map/3, :erl_kernel_errors._format_os_error/3]

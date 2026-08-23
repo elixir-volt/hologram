@@ -398,10 +398,7 @@ export default class RegexParser {
 
         return {
           min: Math.min(yes.min, no.min),
-          max:
-            yes.max === null || no.max === null
-              ? null
-              : Math.max(yes.max, no.max),
+          max: yes.max === null || no.max === null ? null : Math.max(yes.max, no.max),
         };
       }
 
@@ -416,8 +413,7 @@ export default class RegexParser {
         const min = item.min * node.min;
 
         if (item.max === 0 || node.max === 0) return {min: min, max: 0};
-        if (item.max === null || node.max === null)
-          return {min: min, max: null};
+        if (item.max === null || node.max === null) return {min: min, max: null};
 
         return {min: min, max: item.max * node.max};
       }
@@ -460,10 +456,7 @@ export default class RegexParser {
         (error) => error.number === node.number && error.name === node.name,
       );
 
-      throw new RegexParseError(
-        "reference to non-existent subpattern",
-        reference.position,
-      );
+      throw new RegexParseError("reference to non-existent subpattern", reference.position);
     }
 
     if (activeGroups.has(content)) return unbounded;
@@ -501,18 +494,12 @@ export default class RegexParser {
   // lookbehind's opening parenthesis. A lookbehind with a variable-length
   // branch caps every branch at 255 chars, an all-fixed one at 65535.
   #checkLookbehindLength(content, position) {
-    const branches =
-      content.type === "alternation" ? content.branches : [content];
+    const branches = content.type === "alternation" ? content.branches : [content];
 
-    const ranges = branches.map((branch) =>
-      this.#calculateBranchLengthRange(branch, new Set()),
-    );
+    const ranges = branches.map((branch) => this.#calculateBranchLengthRange(branch, new Set()));
 
     if (ranges.some((range) => range.max === null)) {
-      throw new RegexParseError(
-        "length of lookbehind assertion is not limited",
-        position,
-      );
+      throw new RegexParseError("length of lookbehind assertion is not limited", position);
     }
 
     if (ranges.some((range) => range.min !== range.max)) {
@@ -530,9 +517,7 @@ export default class RegexParser {
   #containsMatchStartReset(node) {
     switch (node.type) {
       case "alternation":
-        return node.branches.some((branch) =>
-          this.#containsMatchStartReset(branch),
-        );
+        return node.branches.some((branch) => this.#containsMatchStartReset(branch));
 
       case "atomicGroup":
       case "branchResetGroup":
@@ -563,11 +548,7 @@ export default class RegexParser {
   }
 
   #isAlphanumeric(char) {
-    return (
-      (char >= "a" && char <= "z") ||
-      (char >= "A" && char <= "Z") ||
-      this.#isDigit(char)
-    );
+    return (char >= "a" && char <= "z") || (char >= "A" && char <= "Z") || this.#isDigit(char);
   }
 
   #isDigit(char) {
@@ -575,11 +556,7 @@ export default class RegexParser {
   }
 
   #isHexDigit(char) {
-    return (
-      this.#isDigit(char) ||
-      (char >= "a" && char <= "f") ||
-      (char >= "A" && char <= "F")
-    );
+    return this.#isDigit(char) || (char >= "a" && char <= "f") || (char >= "A" && char <= "F");
   }
 
   // In UTF mode PCRE2 extends subpattern name syntax beyond ASCII word chars
@@ -639,9 +616,7 @@ export default class RegexParser {
       branches.push(this.#parseConcatenation());
     }
 
-    return branches.length === 1
-      ? branches[0]
-      : {type: "alternation", branches: branches};
+    return branches.length === 1 ? branches[0] : {type: "alternation", branches: branches};
   }
 
   #parseAtom() {
@@ -725,10 +700,7 @@ export default class RegexParser {
     this.#groupNames = collectedNames;
     this.#requireGroupClose();
 
-    const content =
-      branches.length === 1
-        ? branches[0]
-        : {type: "alternation", branches: branches};
+    const content = branches.length === 1 ? branches[0] : {type: "alternation", branches: branches};
 
     return {type: "branchResetGroup", content: content};
   }
@@ -788,10 +760,7 @@ export default class RegexParser {
       }
 
       if (this.#atEnd()) {
-        throw new RegexParseError(
-          "missing terminating ] for character class",
-          this.#position,
-        );
+        throw new RegexParseError("missing terminating ] for character class", this.#position);
       }
 
       if (this.#inClassQuote) {
@@ -810,18 +779,14 @@ export default class RegexParser {
 
       isFirstItem = false;
 
-      if (
-        char === "\\" &&
-        SHORTHAND_CLASS_LETTERS.has(this.#source[this.#position + 1])
-      ) {
+      if (char === "\\" && SHORTHAND_CLASS_LETTERS.has(this.#source[this.#position + 1])) {
         items.push(this.#parseClassShorthand());
         continue;
       }
 
       if (
         char === "\\" &&
-        (this.#source[this.#position + 1] === "p" ||
-          this.#source[this.#position + 1] === "P")
+        (this.#source[this.#position + 1] === "p" || this.#source[this.#position + 1] === "P")
       ) {
         this.#position++;
         items.push(this.#parseUnicodeProperty(this.#peek()));
@@ -834,10 +799,7 @@ export default class RegexParser {
           this.#position + 1 < this.#source.length
         ) {
           this.#position++;
-          throw new RegexParseError(
-            "invalid range in character class",
-            this.#position,
-          );
+          throw new RegexParseError("invalid range in character class", this.#position);
         }
 
         continue;
@@ -879,28 +841,18 @@ export default class RegexParser {
     this.#skipClassQuoteMarkers();
 
     if (!this.#inClassQuote) {
-      if (
-        this.#peek() === "\\" &&
-        SHORTHAND_CLASS_LETTERS.has(this.#source[this.#position + 1])
-      ) {
+      if (this.#peek() === "\\" && SHORTHAND_CLASS_LETTERS.has(this.#source[this.#position + 1])) {
         this.#position += 2;
-        throw new RegexParseError(
-          "invalid range in character class",
-          this.#position,
-        );
+        throw new RegexParseError("invalid range in character class", this.#position);
       }
 
       if (
         this.#peek() === "\\" &&
-        (this.#source[this.#position + 1] === "p" ||
-          this.#source[this.#position + 1] === "P")
+        (this.#source[this.#position + 1] === "p" || this.#source[this.#position + 1] === "P")
       ) {
         this.#position++;
         this.#parseUnicodeProperty(this.#peek());
-        throw new RegexParseError(
-          "invalid range in character class",
-          this.#position,
-        );
+        throw new RegexParseError("invalid range in character class", this.#position);
       }
 
       if (
@@ -908,20 +860,14 @@ export default class RegexParser {
         this.#source[this.#position + 1] === ":" &&
         this.#tryParsePosixClass() !== null
       ) {
-        throw new RegexParseError(
-          "invalid range in character class",
-          this.#position,
-        );
+        throw new RegexParseError("invalid range in character class", this.#position);
       }
     }
 
     const to = this.#parseClassSingleCodePoint();
 
     if (to < from) {
-      throw new RegexParseError(
-        "range out of order in character class",
-        this.#position,
-      );
+      throw new RegexParseError("range out of order in character class", this.#position);
     }
 
     return {type: "range", from: from, to: to};
@@ -940,10 +886,7 @@ export default class RegexParser {
       this.#position + 1 < this.#source.length
     ) {
       this.#position++;
-      throw new RegexParseError(
-        "invalid range in character class",
-        this.#position,
-      );
+      throw new RegexParseError("invalid range in character class", this.#position);
     }
 
     return this.#buildShorthand(letter);
@@ -966,18 +909,12 @@ export default class RegexParser {
 
     if (char === "N") {
       this.#position++;
-      throw new RegexParseError(
-        "\\N is not supported in a class",
-        this.#position,
-      );
+      throw new RegexParseError("\\N is not supported in a class", this.#position);
     }
 
     if (char === "C" || char === "R" || char === "X") {
       this.#position++;
-      throw new RegexParseError(
-        "escape sequence is invalid in character class",
-        this.#position,
-      );
+      throw new RegexParseError("escape sequence is invalid in character class", this.#position);
     }
 
     const codePoint = this.#tryParseCharEscapeCodePoint(true);
@@ -1012,10 +949,7 @@ export default class RegexParser {
         this.#position += 2;
 
         while (!this.#atEnd()) {
-          if (
-            this.#peek() === "\\" &&
-            this.#source[this.#position + 1] === "E"
-          ) {
+          if (this.#peek() === "\\" && this.#source[this.#position + 1] === "E") {
             this.#position += 2;
             break;
           }
@@ -1048,10 +982,7 @@ export default class RegexParser {
         lastItem.type === "verb" ||
         lastItem.type === "matchStartReset"
       ) {
-        throw new RegexParseError(
-          "quantifier does not follow a repeatable item",
-          this.#position,
-        );
+        throw new RegexParseError("quantifier does not follow a repeatable item", this.#position);
       }
 
       items[items.length - 1] = {
@@ -1063,9 +994,7 @@ export default class RegexParser {
       };
     }
 
-    return items.length === 1
-      ? items[0]
-      : {type: "concatenation", items: items};
+    return items.length === 1 ? items[0] : {type: "concatenation", items: items};
   }
 
   // Parses the condition of a conditional group, with the position just past
@@ -1082,10 +1011,7 @@ export default class RegexParser {
       const assertion = this.#parseGroupExtension();
 
       if (assertion.type !== "lookaround") {
-        throw new RegexParseError(
-          "assertion expected after (?( or (?(?C)",
-          conditionOpenPosition,
-        );
+        throw new RegexParseError("assertion expected after (?( or (?(?C)", conditionOpenPosition);
       }
 
       return {kind: "assertion", assertion: assertion};
@@ -1094,8 +1020,7 @@ export default class RegexParser {
     // Numeric condition, absolute or relative
     if (
       this.#isDigit(char) ||
-      ((char === "+" || char === "-") &&
-        this.#isDigit(this.#source[this.#position + 1]))
+      ((char === "+" || char === "-") && this.#isDigit(this.#source[this.#position + 1]))
     ) {
       const isRelative = !this.#isDigit(char);
       const signPosition = this.#position;
@@ -1104,16 +1029,10 @@ export default class RegexParser {
       this.#requireConditionClose();
 
       if (isRelative && number <= 0) {
-        throw new RegexParseError(
-          "reference to non-existent subpattern",
-          signPosition,
-        );
+        throw new RegexParseError("reference to non-existent subpattern", signPosition);
       }
 
-      this.#validateNumericReference(
-        number,
-        isRelative ? signPosition : conditionOpenPosition,
-      );
+      this.#validateNumericReference(number, isRelative ? signPosition : conditionOpenPosition);
 
       return {kind: "group", number: number, name: null};
     }
@@ -1171,10 +1090,7 @@ export default class RegexParser {
     }
 
     if (word.length === 0) {
-      throw new RegexParseError(
-        "assertion expected after (?( or (?(?C)",
-        conditionOpenPosition,
-      );
+      throw new RegexParseError("assertion expected after (?( or (?(?C)", conditionOpenPosition);
     }
 
     if (this.#peek() !== ")") {
@@ -1201,8 +1117,7 @@ export default class RegexParser {
     const condition = this.#parseCondition(conditionOpenPosition);
     const content = this.#parseDelimitedContent();
 
-    const branches =
-      content.type === "alternation" ? content.branches : [content];
+    const branches = content.type === "alternation" ? content.branches : [content];
 
     if (condition.kind === "define") {
       if (branches.length > 1) {
@@ -1241,8 +1156,7 @@ export default class RegexParser {
       );
     }
 
-    const upperCased =
-      codePoint >= 97 && codePoint <= 122 ? codePoint - 32 : codePoint;
+    const upperCased = codePoint >= 97 && codePoint <= 122 ? codePoint - 32 : codePoint;
 
     return upperCased ^ 0x40;
   }
@@ -1396,10 +1310,7 @@ export default class RegexParser {
         const offset = Number(this.#source.slice(digitsStart, this.#position));
 
         // Relative references resolve against the groups opened so far
-        const number =
-          sign === "-"
-            ? this.#groupCount + 1 - offset
-            : this.#groupCount + offset;
+        const number = sign === "-" ? this.#groupCount + 1 - offset : this.#groupCount + offset;
 
         if (this.#peek() !== "}") {
           throw new RegexParseError(
@@ -1411,10 +1322,7 @@ export default class RegexParser {
         this.#position++;
 
         if (number <= 0) {
-          throw new RegexParseError(
-            "reference to non-existent subpattern",
-            afterG,
-          );
+          throw new RegexParseError("reference to non-existent subpattern", afterG);
         }
 
         this.#validateNumericReference(number, this.#position);
@@ -1456,8 +1364,7 @@ export default class RegexParser {
 
       if (
         this.#isDigit(next) ||
-        ((next === "+" || next === "-") &&
-          this.#isDigit(this.#source[this.#position + 1]))
+        ((next === "+" || next === "-") && this.#isDigit(this.#source[this.#position + 1]))
       ) {
         const isRelative = !this.#isDigit(next);
         const number = this.#parseSubroutineNumber();
@@ -1472,10 +1379,7 @@ export default class RegexParser {
         this.#position++;
 
         if (isRelative && number <= 0) {
-          throw new RegexParseError(
-            "reference to non-existent subpattern",
-            this.#position,
-          );
+          throw new RegexParseError("reference to non-existent subpattern", this.#position);
         }
 
         if (number > 0) this.#validateNumericReference(number, this.#position);
@@ -1568,12 +1472,7 @@ export default class RegexParser {
 
         this.#position += 2;
 
-        return this.#parseLookaround(
-          "behind",
-          nextChar === "!",
-          nextChar !== "*",
-          lookbehindStart,
-        );
+        return this.#parseLookaround("behind", nextChar === "!", nextChar !== "*", lookbehindStart);
       }
 
       this.#position++;
@@ -1610,10 +1509,7 @@ export default class RegexParser {
       }
 
       this.#position += 2;
-      throw new RegexParseError(
-        "unrecognized character after (?P",
-        this.#position,
-      );
+      throw new RegexParseError("unrecognized character after (?P", this.#position);
     }
 
     if (char === "R") {
@@ -1633,24 +1529,17 @@ export default class RegexParser {
 
     if (
       this.#isDigit(char) ||
-      ((char === "+" || char === "-") &&
-        this.#isDigit(this.#source[this.#position + 1]))
+      ((char === "+" || char === "-") && this.#isDigit(this.#source[this.#position + 1]))
     ) {
       const isRelative = !this.#isDigit(char);
       const number = this.#parseSubroutineNumber();
 
       if (this.#peek() !== ")") {
-        throw new RegexParseError(
-          "missing closing parenthesis",
-          this.#position,
-        );
+        throw new RegexParseError("missing closing parenthesis", this.#position);
       }
 
       if (isRelative && number <= 0) {
-        throw new RegexParseError(
-          "reference to non-existent subpattern",
-          this.#position,
-        );
+        throw new RegexParseError("reference to non-existent subpattern", this.#position);
       }
 
       if (number > 0) this.#validateNumericReference(number, this.#position);
@@ -1675,10 +1564,7 @@ export default class RegexParser {
     if (char === "|") return this.#parseBranchReset();
 
     this.#position++;
-    throw new RegexParseError(
-      "unrecognized character after (? or (?-",
-      this.#position,
-    );
+    throw new RegexParseError("unrecognized character after (? or (?-", this.#position);
   }
 
   // Parses a \xhh or \x{hhh...} hex escape, with the position just past the x.
@@ -1746,10 +1632,7 @@ export default class RegexParser {
   #parseLookaround(direction, negated, atomic, start) {
     const content = this.#parseDelimitedContent();
 
-    if (
-      this.#kViolationPosition === null &&
-      this.#containsMatchStartReset(content)
-    ) {
+    if (this.#kViolationPosition === null && this.#containsMatchStartReset(content)) {
       this.#kViolationPosition = this.#position;
     }
 
@@ -1823,10 +1706,7 @@ export default class RegexParser {
   // Parses a \o{ddd...} octal escape, with the position just past the o.
   #parseOctalBraceEscape() {
     if (this.#peek() !== "{") {
-      throw new RegexParseError(
-        "missing opening brace after \\o",
-        this.#position,
-      );
+      throw new RegexParseError("missing opening brace after \\o", this.#position);
     }
 
     this.#position++;
@@ -1848,10 +1728,7 @@ export default class RegexParser {
   #parseOctalEscape() {
     const digitsStart = this.#position;
 
-    while (
-      this.#position - digitsStart < 3 &&
-      this.#isOctalDigit(this.#peek())
-    ) {
+    while (this.#position - digitsStart < 3 && this.#isOctalDigit(this.#peek())) {
       this.#position++;
     }
 
@@ -1885,10 +1762,7 @@ export default class RegexParser {
       this.#position++;
 
       if (reset) {
-        throw new RegexParseError(
-          "invalid hyphen in option setting",
-          this.#position,
-        );
+        throw new RegexParseError("invalid hyphen in option setting", this.#position);
       }
 
       unset = this.#scanOptionLetters();
@@ -1921,10 +1795,7 @@ export default class RegexParser {
     }
 
     this.#position++;
-    throw new RegexParseError(
-      "unrecognized character after (? or (?-",
-      this.#position,
-    );
+    throw new RegexParseError("unrecognized character after (? or (?-", this.#position);
   }
 
   #parsePattern() {
@@ -1934,10 +1805,7 @@ export default class RegexParser {
     // Only an unmatched ) can stop the top-level alternation before the end
     if (!this.#atEnd()) {
       this.#position++;
-      throw new RegexParseError(
-        "unmatched closing parenthesis",
-        this.#position,
-      );
+      throw new RegexParseError("unmatched closing parenthesis", this.#position);
     }
 
     if (startOptions.length === 0) return node;
@@ -1958,10 +1826,7 @@ export default class RegexParser {
 
       if (name === "UTF" || name === "UTF8") {
         if (this.#neverUtf) {
-          throw new RegexParseError(
-            "using UTF is disabled by the application",
-            this.#position,
-          );
+          throw new RegexParseError("using UTF is disabled by the application", this.#position);
         }
 
         this.#unicode = true;
@@ -1979,15 +1844,9 @@ export default class RegexParser {
     const nameStart = this.#position;
     const firstCodePoint = this.#source.codePointAt(this.#position);
 
-    if (
-      firstCodePoint !== undefined &&
-      this.#isNameDigitCodePoint(firstCodePoint)
-    ) {
+    if (firstCodePoint !== undefined && this.#isNameDigitCodePoint(firstCodePoint)) {
       this.#takeCodePoint();
-      throw new RegexParseError(
-        "subpattern name must start with a non-digit",
-        this.#position,
-      );
+      throw new RegexParseError("subpattern name must start with a non-digit", this.#position);
     }
 
     while (!this.#atEnd()) {
@@ -2056,20 +1915,14 @@ export default class RegexParser {
 
     if (this.#peek() !== "{") {
       if (this.#atEnd()) {
-        throw new RegexParseError(
-          "malformed \\P or \\p sequence",
-          this.#position,
-        );
+        throw new RegexParseError("malformed \\P or \\p sequence", this.#position);
       }
 
       const name = this.#peek();
       this.#position++;
 
       if (!GENERAL_CATEGORIES.has(name)) {
-        throw new RegexParseError(
-          "unknown property after \\P or \\p",
-          this.#position,
-        );
+        throw new RegexParseError("unknown property after \\P or \\p", this.#position);
       }
 
       return {type: "unicodeProperty", name: name, negated: negated};
@@ -2087,10 +1940,7 @@ export default class RegexParser {
     while (!this.#atEnd() && this.#peek() !== "}") this.#position++;
 
     if (this.#atEnd()) {
-      throw new RegexParseError(
-        "malformed \\P or \\p sequence",
-        this.#position,
-      );
+      throw new RegexParseError("malformed \\P or \\p sequence", this.#position);
     }
 
     const name = this.#source.slice(nameStart, this.#position);
@@ -2099,10 +1949,7 @@ export default class RegexParser {
     // TODO: validate longer property names (scripts, name=value pairs)
     // against Unicode tables
     if (name === "" || (name.length <= 2 && !GENERAL_CATEGORIES.has(name))) {
-      throw new RegexParseError(
-        "unknown property after \\P or \\p",
-        this.#position,
-      );
+      throw new RegexParseError("unknown property after \\P or \\p", this.#position);
     }
 
     return {type: "unicodeProperty", name: name, negated: negated};
@@ -2152,10 +1999,7 @@ export default class RegexParser {
         );
       }
 
-      throw new RegexParseError(
-        "(*VERB) not recognized or malformed",
-        this.#position,
-      );
+      throw new RegexParseError("(*VERB) not recognized or malformed", this.#position);
     }
 
     let name = null;
@@ -2171,17 +2015,11 @@ export default class RegexParser {
     }
 
     if (kind === "mark" && (name === null || name === "")) {
-      throw new RegexParseError(
-        "(*MARK) must have an argument",
-        this.#position,
-      );
+      throw new RegexParseError("(*MARK) must have an argument", this.#position);
     }
 
     if (this.#peek() !== ")") {
-      throw new RegexParseError(
-        "(*VERB) not recognized or malformed",
-        this.#position,
-      );
+      throw new RegexParseError("(*VERB) not recognized or malformed", this.#position);
     }
 
     this.#position++;
@@ -2254,10 +2092,7 @@ export default class RegexParser {
     }
 
     this.#position++;
-    throw new RegexParseError(
-      "unrecognized character follows \\",
-      this.#position,
-    );
+    throw new RegexParseError("unrecognized character follows \\", this.#position);
   }
 
   // Detects the common mistake of using [:name:] as a whole class,
@@ -2271,10 +2106,7 @@ export default class RegexParser {
 
     while (this.#isPosixNameChar(this.#source[scanPosition])) scanPosition++;
 
-    if (
-      this.#source[scanPosition] === ":" &&
-      this.#source[scanPosition + 1] === "]"
-    ) {
+    if (this.#source[scanPosition] === ":" && this.#source[scanPosition + 1] === "]") {
       throw new RegexParseError(
         "POSIX named classes are supported only within a class",
         scanPosition + 2,
@@ -2304,20 +2136,14 @@ export default class RegexParser {
     }
 
     if (reference !== undefined) {
-      throw new RegexParseError(
-        "reference to non-existent subpattern",
-        reference.position,
-      );
+      throw new RegexParseError("reference to non-existent subpattern", reference.position);
     }
   }
 
   // Consumes the closing parenthesis of a condition, raising when absent.
   #requireConditionClose() {
     if (this.#peek() !== ")") {
-      throw new RegexParseError(
-        "missing closing parenthesis for condition",
-        this.#position,
-      );
+      throw new RegexParseError("missing closing parenthesis for condition", this.#position);
     }
 
     this.#position++;
@@ -2458,16 +2284,10 @@ export default class RegexParser {
 
     if (minDigitCount === 0 && !(hasComma && maxDigitCount > 0)) return null;
 
-    const min =
-      minDigitCount > 0
-        ? Number(source.slice(minStart, minStart + minDigitCount))
-        : 0;
+    const min = minDigitCount > 0 ? Number(source.slice(minStart, minStart + minDigitCount)) : 0;
 
     if (min > MAX_QUANTIFIER_BOUND) {
-      throw new RegexParseError(
-        "number too big in {} quantifier",
-        minStart + minDigitCount,
-      );
+      throw new RegexParseError("number too big in {} quantifier", minStart + minDigitCount);
     }
 
     let max;
@@ -2480,17 +2300,11 @@ export default class RegexParser {
       max = Number(source.slice(maxStart, scanPosition));
 
       if (max > MAX_QUANTIFIER_BOUND) {
-        throw new RegexParseError(
-          "number too big in {} quantifier",
-          scanPosition,
-        );
+        throw new RegexParseError("number too big in {} quantifier", scanPosition);
       }
 
       if (min > max) {
-        throw new RegexParseError(
-          "numbers out of order in {} quantifier",
-          scanPosition,
-        );
+        throw new RegexParseError("numbers out of order in {} quantifier", scanPosition);
       }
     }
 
@@ -2571,10 +2385,7 @@ export default class RegexParser {
 
     while (this.#isPosixNameChar(this.#source[scanPosition])) scanPosition++;
 
-    if (
-      this.#source[scanPosition] !== ":" ||
-      this.#source[scanPosition + 1] !== "]"
-    ) {
+    if (this.#source[scanPosition] !== ":" || this.#source[scanPosition + 1] !== "]") {
       return null;
     }
 

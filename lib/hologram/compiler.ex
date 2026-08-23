@@ -2,10 +2,8 @@ defmodule Hologram.Compiler do
   @moduledoc false
 
   alias Hologram.Assets.NPMDeps
-  alias Hologram.Commons.CryptographicUtils
   alias Hologram.Commons.MapUtils
   alias Hologram.Commons.PLT
-  alias Hologram.Commons.SystemUtils
   alias Hologram.Commons.TaskUtils
   alias Hologram.Commons.Types, as: T
   alias Hologram.Compiler.CallGraph
@@ -240,7 +238,7 @@ defmodule Hologram.Compiler do
         ir_plt,
         async_mfas,
         server_callback_analysis_by_templatable,
-        js_dir
+        _js_dir
       ) do
     mfas =
       CallGraph.list_page_mfas(call_graph, page_module, server_callback_analysis_by_templatable)
@@ -259,7 +257,7 @@ defmodule Hologram.Compiler do
       |> render_js_bindings_registration_call()
       |> render_block()
 
-    erlang_js_dir = Path.join(js_dir, "erlang")
+    erlang_js_dir = Volt.Priv.path(@runtime_source, "erlang")
 
     erlang_function_defs =
       mfas
@@ -292,10 +290,10 @@ defmodule Hologram.Compiler do
   """
   @spec build_runtime_js(list(mfa), PLT.t(), MapSet.t(mfa), keyword(String.t()), T.file_path()) ::
           String.t()
-  def build_runtime_js(runtime_mfas, ir_plt, async_mfas, app_versions, js_dir) do
+  def build_runtime_js(runtime_mfas, ir_plt, async_mfas, app_versions, _js_dir) do
     erlang_function_defs =
       runtime_mfas
-      |> render_erlang_function_defs(Path.join(js_dir, "erlang"))
+      |> render_erlang_function_defs(Volt.Priv.path(@runtime_source, "erlang"))
       |> render_block()
 
     elixir_function_defs =
@@ -422,9 +420,9 @@ defmodule Hologram.Compiler do
   def get_erlang_function_js(module, function, arity, erlang_js_dir) do
     file_path =
       if module == :erlang do
-        "#{erlang_js_dir}/erlang.mjs"
+        "#{erlang_js_dir}/erlang.ts"
       else
-        "#{erlang_js_dir}/#{module}.mjs"
+        "#{erlang_js_dir}/#{module}.ts"
       end
 
     if File.exists?(file_path) do
@@ -440,32 +438,6 @@ defmodule Hologram.Compiler do
   @spec group_mfas_by_module(list(mfa)) :: %{module => mfa}
   def group_mfas_by_module(mfas) do
     Enum.group_by(mfas, fn {module, _function, _arity} -> module end)
-  end
-
-  @doc """
-  Installs JavaScript deps which are specified in package.json located in assets_dir.
-  Saves the package.json digest to package_json_digest.bin file in build_dir.
-  """
-  @spec install_js_deps(T.file_path(), T.file_path()) :: :ok
-  # sobelow_skip ["CI.System"]
-  def install_js_deps(assets_dir, build_dir) do
-    # Run from the project root, not from inside assets_dir, so version managers like
-    # asdf/mise resolve the Node.js version from the consuming project's config rather
-    # than any .tool-versions inside a git-checked-out dependency. npm still installs
-    # into assets_dir via --prefix.
-    opts = [into: IO.stream(:stdio, :line)]
-
-    {_result, exit_status} =
-      SystemUtils.cmd_cross_platform("npm", ["install", "--prefix", assets_dir], opts)
-
-    if exit_status != 0 do
-      raise RuntimeError, message: "npm install command failed"
-    end
-
-    package_json_digest = get_package_json_digest(assets_dir)
-    package_json_digest_path = Path.join(build_dir, "package_json_digest.bin")
-
-    File.write!(package_json_digest_path, package_json_digest)
   end
 
   @doc """
@@ -490,28 +462,6 @@ defmodule Hologram.Compiler do
     ir
     |> collect_component_usages([])
     |> Enum.reverse()
-  end
-
-  @doc """
-  Installs JavaScript deps if package.json has changed or if the deps haven't been installed yet.
-
-  Benchmarks: https://github.com/bartblast/hologram/blob/master/benchmarks/compiler/maybe_install_js_deps_2/README.md
-  """
-  @spec maybe_install_js_deps(T.file_path(), T.file_path()) :: :ok | nil
-  def maybe_install_js_deps(assets_dir, build_dir) do
-    package_json_digest_path = Path.join(build_dir, "package_json_digest.bin")
-    package_json_lock_path = Path.join(assets_dir, "package-lock.json")
-
-    if !File.exists?(package_json_digest_path) or !File.exists?(package_json_lock_path) do
-      install_js_deps(assets_dir, build_dir)
-    else
-      old_package_json_digest = File.read!(package_json_digest_path)
-      new_package_json_digest = get_package_json_digest(assets_dir)
-
-      if new_package_json_digest != old_package_json_digest do
-        install_js_deps(assets_dir, build_dir)
-      end
-    end
   end
 
   @doc """
@@ -750,13 +700,6 @@ defmodule Hologram.Compiler do
     Enum.filter(mfas, fn {module, _function, _arity} -> Reflection.erlang_module?(module) end)
   end
 
-  defp get_package_json_digest(assets_dir) do
-    assets_dir
-    |> Path.join("package.json")
-    |> File.read!()
-    |> CryptographicUtils.digest(:sha256, :binary)
-  end
-
   defp has_spread?(props) do
     Enum.any?(props, &match?(%IR.TupleType{data: [%IR.AtomType{value: :spread}, _expr]}, &1))
   end
@@ -767,10 +710,8 @@ defmodule Hologram.Compiler do
   defp invalid_prop_values(component_module, prop_entries) do
     values_by_name =
       component_module.__props__()
-      |> Enum.flat_map(fn {name, _type, opts} ->
-        if opts[:values], do: [{to_string(name), opts[:values]}], else: []
-      end)
-      |> Map.new()
+      |> Enum.filter(fn {_name, _type, opts} -> opts[:values] end)
+      |> Map.new(fn {name, _type, opts} -> {to_string(name), opts[:values]} end)
 
     Enum.flat_map(prop_entries, fn
       {name, {:ok, value}} ->

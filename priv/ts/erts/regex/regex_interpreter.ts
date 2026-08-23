@@ -1,19 +1,11 @@
 "use strict";
 
 import ERTS from "../../erts.ts";
-import RegexAnalyzer, {
-  resolveGroupNumbers,
-  walkAst,
-} from "./regex_analyzer.ts";
+import RegexAnalyzer, {resolveGroupNumbers, walkAst} from "./regex_analyzer.ts";
 
 import {caseVariants} from "./regex_case_folding.ts";
 
-import {
-  codePointInRanges,
-  isWordCodePoint,
-  POSIX_SETS,
-  SHORTHAND_SETS,
-} from "./regex_char_sets.ts";
+import {codePointInRanges, isWordCodePoint, POSIX_SETS, SHORTHAND_SETS} from "./regex_char_sets.ts";
 
 import {
   newlineLengthAt,
@@ -82,10 +74,7 @@ export default class RegexInterpreter {
     const effectiveOpts = mergeStartOptions(ast, opts);
     const startPosition = opts.startPosition ?? 0;
 
-    const maxStartPosition = Math.min(
-      subject.length,
-      opts.maxStartPosition ?? Infinity,
-    );
+    const maxStartPosition = Math.min(subject.length, opts.maxStartPosition ?? Infinity);
 
     const state = {
       bsrAnycrlf: effectiveOpts.bsr_anycrlf === true,
@@ -123,8 +112,7 @@ export default class RegexInterpreter {
 
       // An empty match is one whose reported region has zero length
       const rejectEmpty =
-        opts.notempty === true ||
-        (opts.notemptyAtStart === true && start === startPosition);
+        opts.notempty === true || (opts.notemptyAtStart === true && start === startPosition);
 
       let matched = false;
       let matchEnd = null;
@@ -132,10 +120,7 @@ export default class RegexInterpreter {
 
       try {
         matched = $.#matchNode(ast, state, start, (position) => {
-          if (
-            rejectEmpty &&
-            position === (state.shared.reportedStart ?? start)
-          ) {
+          if (rejectEmpty && position === (state.shared.reportedStart ?? start)) {
             return false;
           }
 
@@ -144,10 +129,7 @@ export default class RegexInterpreter {
         });
       } catch (signal) {
         if (signal instanceof AcceptSignal) {
-          if (
-            !rejectEmpty ||
-            signal.position !== (state.shared.reportedStart ?? start)
-          ) {
+          if (!rejectEmpty || signal.position !== (state.shared.reportedStart ?? start)) {
             matched = true;
             matchEnd = signal.position;
           }
@@ -156,10 +138,7 @@ export default class RegexInterpreter {
           return null;
         } else if (signal instanceof SkipSignal) {
           skipTo = signal.position;
-        } else if (
-          signal instanceof PruneSignal ||
-          signal instanceof ThenSignal
-        ) {
+        } else if (signal instanceof PruneSignal || signal instanceof ThenSignal) {
           // The attempt at this start position is abandoned
         } else if (signal instanceof LimitSignal) {
           return null;
@@ -207,11 +186,7 @@ export default class RegexInterpreter {
     const previous = state.subject.charCodeAt(position - 1);
 
     if (state.newline === "crlf") {
-      return (
-        position >= 2 &&
-        previous === 0x0a &&
-        state.subject.charCodeAt(position - 2) === 0x0d
-      );
+      return position >= 2 && previous === 0x0a && state.subject.charCodeAt(position - 2) === 0x0d;
     }
 
     if (!NEWLINE_SINGLES[state.newline].includes(previous)) return false;
@@ -256,9 +231,7 @@ export default class RegexInterpreter {
           break;
 
         case "posixClass":
-          if (
-            codePointInRanges(POSIX_SETS[item.name], codePoint) !== item.negated
-          ) {
+          if (codePointInRanges(POSIX_SETS[item.name], codePoint) !== item.negated) {
             return true;
           }
           break;
@@ -268,26 +241,19 @@ export default class RegexInterpreter {
           break;
 
         case "shorthand":
-          if (
-            codePointInRanges(SHORTHAND_SETS[item.letter], codePoint) !==
-            item.negated
-          ) {
+          if (codePointInRanges(SHORTHAND_SETS[item.letter], codePoint) !== item.negated) {
             return true;
           }
           break;
 
         case "unicodeProperty":
-          if (
-            $.#unicodePropertyMatches(item.name, codePoint) !== item.negated
-          ) {
+          if ($.#unicodePropertyMatches(item.name, codePoint) !== item.negated) {
             return true;
           }
           break;
 
         default:
-          throw new Error(
-            `unsupported class member for interpretation: ${item.type}`,
-          );
+          throw new Error(`unsupported class member for interpretation: ${item.type}`);
       }
     }
 
@@ -349,9 +315,7 @@ export default class RegexInterpreter {
         const numbers = resolveGroupNumbers(condition, state.groupNames);
 
         return numbers.some(
-          (number) =>
-            state.captures[number] !== undefined &&
-            state.captures[number] !== null,
+          (number) => state.captures[number] !== undefined && state.captures[number] !== null,
         );
       }
 
@@ -360,28 +324,21 @@ export default class RegexInterpreter {
           return state.callStack.length > 0;
         }
 
-        return resolveGroupNumbers(condition, state.groupNames).includes(
-          state.callStack.at(-1),
-        );
+        return resolveGroupNumbers(condition, state.groupNames).includes(state.callStack.at(-1));
       }
 
       case "version": {
         const {major, minor} = EMULATED_PCRE2_VERSION;
 
         if (condition.gte) {
-          return (
-            major > condition.major ||
-            (major === condition.major && minor >= condition.minor)
-          );
+          return major > condition.major || (major === condition.major && minor >= condition.minor);
         }
 
         return major === condition.major && minor === condition.minor;
       }
 
       default:
-        throw new Error(
-          `unsupported condition for interpretation: ${condition.kind}`,
-        );
+        throw new Error(`unsupported condition for interpretation: ${condition.kind}`);
     }
   }
 
@@ -390,15 +347,9 @@ export default class RegexInterpreter {
   static #endsBeforeFinalNewline(state, position) {
     if (position === state.subject.length) return true;
 
-    const newlineLength = newlineLengthAt(
-      state.newline,
-      state.subject,
-      position,
-    );
+    const newlineLength = newlineLengthAt(state.newline, state.subject, position);
 
-    return (
-      newlineLength > 0 && position + newlineLength === state.subject.length
-    );
+    return newlineLength > 0 && position + newlineLength === state.subject.length;
   }
 
   // Returns true for verb signals that a lookaround or subroutine boundary
@@ -441,8 +392,7 @@ export default class RegexInterpreter {
       case "nonWordBoundary":
       case "wordBoundary": {
         const beforeIsWord =
-          position > 0 &&
-          isWordCodePoint(state.subject.charCodeAt(position - 1));
+          position > 0 && isWordCodePoint(state.subject.charCodeAt(position - 1));
 
         const atCodePoint = $.#subjectCodePointAt(state, position);
         const atIsWord = atCodePoint !== null && isWordCodePoint(atCodePoint);
@@ -533,8 +483,7 @@ export default class RegexInterpreter {
           node.content,
           state,
           from,
-          (endPosition) =>
-            endPosition === position && innerContinuation(endPosition),
+          (endPosition) => endPosition === position && innerContinuation(endPosition),
         );
 
         if (matched) return true;
@@ -549,8 +498,7 @@ export default class RegexInterpreter {
       try {
         return {found: matcher()};
       } catch (signal) {
-        if (signal instanceof AcceptSignal)
-          return {accepted: true, found: true};
+        if (signal instanceof AcceptSignal) return {accepted: true, found: true};
 
         if ($.#isConfinableVerbSignal(signal)) return {found: false};
 
@@ -580,9 +528,7 @@ export default class RegexInterpreter {
       return false;
     }
 
-    const result = runConfined(() =>
-      assertionMatcher(() => continuation(position)),
-    );
+    const result = runConfined(() => assertionMatcher(() => continuation(position)));
 
     return result.accepted === true ? continuation(position) : result.found;
   }
@@ -590,8 +536,7 @@ export default class RegexInterpreter {
   static #matchNode(node, state, position, continuation) {
     if (++state.shared.steps > state.matchLimit) throw new LimitSignal();
 
-    if (state.shared.depth >= state.matchLimitRecursion)
-      throw new LimitSignal();
+    if (state.shared.depth >= state.matchLimitRecursion) throw new LimitSignal();
 
     state.shared.depth++;
 
@@ -630,8 +575,7 @@ export default class RegexInterpreter {
 
       case "atomicGroup":
         return $.#matchAtomically(
-          (matcherContinuation) =>
-            $.#matchNode(node.content, state, position, matcherContinuation),
+          (matcherContinuation) => $.#matchNode(node.content, state, position, matcherContinuation),
           state,
           continuation,
         );
@@ -663,8 +607,7 @@ export default class RegexInterpreter {
           state,
           position,
           continuation,
-          (codePoint) =>
-            $.#classMatches(node, codePoint, state) !== node.negated,
+          (codePoint) => $.#classMatches(node, codePoint, state) !== node.negated,
         );
 
       case "concatenation":
@@ -672,9 +615,7 @@ export default class RegexInterpreter {
 
       case "conditional": {
         const savedCaptures = $.#saveCaptures(state);
-        const branch = $.#conditionHolds(node.condition, state, position)
-          ? node.yes
-          : node.no;
+        const branch = $.#conditionHolds(node.condition, state, position) ? node.yes : node.no;
 
         const matched =
           branch === null
@@ -694,8 +635,7 @@ export default class RegexInterpreter {
           state,
           position,
           continuation,
-          (codePoint) =>
-            state.dotall || !NEWLINE_SINGLES[state.newline].includes(codePoint),
+          (codePoint) => state.dotall || !NEWLINE_SINGLES[state.newline].includes(codePoint),
         );
 
       // \X matches one extended grapheme cluster, in byte mode too,
@@ -704,9 +644,7 @@ export default class RegexInterpreter {
         if (position >= state.subject.length) return false;
 
         if (state.shared.graphemeSegments === null) {
-          state.shared.graphemeSegments = ERTS.graphemeSegmenter.segment(
-            state.subject,
-          );
+          state.shared.graphemeSegments = ERTS.graphemeSegmenter.segment(state.subject);
         }
 
         const segment = state.shared.graphemeSegments.containing(position);
@@ -720,20 +658,15 @@ export default class RegexInterpreter {
         // Track the open group so (*ACCEPT) can capture it mid-content
         state.openGroups.push({number: node.number, start: position});
 
-        const matched = $.#matchNode(
-          node.content,
-          state,
-          position,
-          (endPosition) => {
-            state.captures[node.number] = {start: position, end: endPosition};
+        const matched = $.#matchNode(node.content, state, position, (endPosition) => {
+          state.captures[node.number] = {start: position, end: endPosition};
 
-            if (continuation(endPosition)) return true;
+          if (continuation(endPosition)) return true;
 
-            state.captures[node.number] = previous;
+          state.captures[node.number] = previous;
 
-            return false;
-          },
-        );
+          return false;
+        });
 
         state.openGroups.pop();
 
@@ -743,11 +676,8 @@ export default class RegexInterpreter {
       }
 
       case "literal":
-        return $.#matchOneCodePoint(
-          state,
-          position,
-          continuation,
-          (codePoint) => $.#codePointsEqual(node.codePoint, codePoint, state),
+        return $.#matchOneCodePoint(state, position, continuation, (codePoint) =>
+          $.#codePointsEqual(node.codePoint, codePoint, state),
         );
 
       case "lookaround":
@@ -778,8 +708,7 @@ export default class RegexInterpreter {
         }
 
         const codePoint = $.#subjectCodePointAt(state, position);
-        const singles =
-          NEWLINE_SEQUENCE_SINGLES[state.bsrAnycrlf ? "anycrlf" : "unicode"];
+        const singles = NEWLINE_SEQUENCE_SINGLES[state.bsrAnycrlf ? "anycrlf" : "unicode"];
 
         if (codePoint !== null && singles.includes(codePoint)) {
           return continuation(position + 1);
@@ -801,12 +730,7 @@ export default class RegexInterpreter {
         );
 
       case "optionGroup":
-        return $.#matchNode(
-          node.content,
-          applyOptionSetting(state, node),
-          position,
-          continuation,
-        );
+        return $.#matchNode(node.content, applyOptionSetting(state, node), position, continuation);
 
       case "quantifier":
         return $.#matchQuantifier(node, state, position, continuation);
@@ -816,9 +740,7 @@ export default class RegexInterpreter {
           state,
           position,
           continuation,
-          (codePoint) =>
-            codePointInRanges(SHORTHAND_SETS[node.letter], codePoint) !==
-            node.negated,
+          (codePoint) => codePointInRanges(SHORTHAND_SETS[node.letter], codePoint) !== node.negated,
         );
 
       // TODO: in unicode mode \C should consume one UTF-8 byte instead of
@@ -885,15 +807,12 @@ export default class RegexInterpreter {
           state,
           position,
           continuation,
-          (codePoint) =>
-            $.#unicodePropertyMatches(node.name, codePoint) !== node.negated,
+          (codePoint) => $.#unicodePropertyMatches(node.name, codePoint) !== node.negated,
         );
 
       default:
         // TODO: shrink as remaining interpreter features are implemented
-        throw new Error(
-          `unsupported AST node for interpretation: ${node.type}`,
-        );
+        throw new Error(`unsupported AST node for interpretation: ${node.type}`);
     }
   }
 
@@ -914,14 +833,7 @@ export default class RegexInterpreter {
     if (node.mode === "possessive") {
       return $.#matchAtomically(
         (matcherContinuation) =>
-          $.#matchRepetitions(
-            node,
-            state,
-            position,
-            0,
-            false,
-            matcherContinuation,
-          ),
+          $.#matchRepetitions(node, state, position, 0, false, matcherContinuation),
         state,
         continuation,
       );
@@ -944,14 +856,7 @@ export default class RegexInterpreter {
         // forever, so it stops the repetition, matching PCRE2 behavior
         if (nextPosition === position && count >= node.min) return false;
 
-        return $.#matchRepetitions(
-          node,
-          state,
-          nextPosition,
-          count + 1,
-          isLazy,
-          continuation,
-        );
+        return $.#matchRepetitions(node, state, nextPosition, count + 1, isLazy, continuation);
       });
 
     if (isLazy) {
@@ -1035,9 +940,7 @@ export default class RegexInterpreter {
         if (continuation(position)) return true;
 
         if (node.name !== null) {
-          const mark = state.marks.findLast(
-            (candidate) => candidate.name === node.name,
-          );
+          const mark = state.marks.findLast((candidate) => candidate.name === node.name);
 
           // Without a matching mark, a named (*SKIP) is ignored
           if (mark === undefined) return false;
@@ -1072,8 +975,7 @@ export default class RegexInterpreter {
   // Returns the state as updated by option settings lexically contained in
   // an alternation branch, at its top concatenation level.
   static #stateAfterBranchOptions(branch, state) {
-    if (branch.type === "optionSetting")
-      return applyOptionSetting(state, branch);
+    if (branch.type === "optionSetting") return applyOptionSetting(state, branch);
 
     if (branch.type === "concatenation") {
       let currentState = state;
@@ -1091,9 +993,7 @@ export default class RegexInterpreter {
   static #subjectCodePointAt(state, position) {
     if (position >= state.subject.length) return null;
 
-    return state.unicode
-      ? state.subject.codePointAt(position)
-      : state.subject.charCodeAt(position);
+    return state.unicode ? state.subject.codePointAt(position) : state.subject.charCodeAt(position);
   }
 
   // Returns a cached predicate testing a code point against a PCRE2 Unicode

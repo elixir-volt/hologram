@@ -1369,7 +1369,7 @@ describe("Hologram", () => {
       )}])`;
 
     const payloadFor = (pageDigest, bodyText = "page content") => ({
-      pageDigest: pageDigest,
+      pageBundlePath: `/hologram/page-${pageDigest}.js`,
       pageModule: encodedModule7,
       tree: encodedTreeFor(pageDigest, bodyText),
       type: "page",

@@ -43,7 +43,5 @@ export function newlineLengthAt(newlineType, text, position) {
     return 2;
   }
 
-  return NEWLINE_SINGLES[newlineType].includes(text.charCodeAt(position))
-    ? 1
-    : 0;
+  return NEWLINE_SINGLES[newlineType].includes(text.charCodeAt(position)) ? 1 : 0;
 }

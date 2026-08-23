@@ -15,7 +15,7 @@ defmodule Hologram.RouterTest do
 
   use_module_stub :asset_manifest_cache
   use_module_stub :asset_path_registry
-  use_module_stub :page_digest_registry
+  use_module_stub :bundle_manifest
   use_module_stub :page_module_resolver
 
   setup :set_mox_global
@@ -37,7 +37,7 @@ defmodule Hologram.RouterTest do
 
     setup_asset_manifest_cache(AssetManifestCacheStub)
 
-    setup_page_digest_registry(PageDigestRegistryStub)
+    setup_bundle_manifest(BundleManifestStub)
 
     setup_page_module_resolver(PageModuleResolverStub)
 
@@ -93,7 +93,7 @@ defmodule Hologram.RouterTest do
 
   describe "/hologram/page" do
     test "routes POST page data request" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module1, :dummy_module_1_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module1, :dummy_module_1_digest)
 
       # Simulate that JSON has already been parsed upstream by Plug.Parsers
       parsed_json = [
@@ -214,7 +214,7 @@ defmodule Hologram.RouterTest do
 
   describe "catch-all route" do
     test "request path is matched" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module1, :dummy_module_1_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module1, :dummy_module_1_digest)
 
       conn =
         :get
@@ -248,7 +248,7 @@ defmodule Hologram.RouterTest do
     end
 
     test "passes the connection through for a path that would match a Hologram page" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module1, :dummy_module_1_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module1, :dummy_module_1_digest)
 
       conn =
         :get

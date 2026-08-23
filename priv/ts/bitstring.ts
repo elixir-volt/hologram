@@ -23,9 +23,7 @@ export default class Bitstring {
   static calculateBitCount(bitstring) {
     if (bitstring.bytes !== null) {
       const completeByteCount =
-        bitstring.leftoverBitCount === 0
-          ? bitstring.bytes.length
-          : bitstring.bytes.length - 1;
+        bitstring.leftoverBitCount === 0 ? bitstring.bytes.length : bitstring.bytes.length - 1;
 
       return 8 * completeByteCount + bitstring.leftoverBitCount;
     }
@@ -85,12 +83,9 @@ export default class Bitstring {
       const end4 = minLen - (minLen % 4);
       for (; i < end4; i += 4) {
         if (bytes1[i] !== bytes2[i]) return bytes1[i] < bytes2[i] ? -1 : 1;
-        if (bytes1[i + 1] !== bytes2[i + 1])
-          return bytes1[i + 1] < bytes2[i + 1] ? -1 : 1;
-        if (bytes1[i + 2] !== bytes2[i + 2])
-          return bytes1[i + 2] < bytes2[i + 2] ? -1 : 1;
-        if (bytes1[i + 3] !== bytes2[i + 3])
-          return bytes1[i + 3] < bytes2[i + 3] ? -1 : 1;
+        if (bytes1[i + 1] !== bytes2[i + 1]) return bytes1[i + 1] < bytes2[i + 1] ? -1 : 1;
+        if (bytes1[i + 2] !== bytes2[i + 2]) return bytes1[i + 2] < bytes2[i + 2] ? -1 : 1;
+        if (bytes1[i + 3] !== bytes2[i + 3]) return bytes1[i + 3] < bytes2[i + 3] ? -1 : 1;
       }
 
       // Handle remaining bytes
@@ -189,10 +184,7 @@ export default class Bitstring {
 
     // Complex case: handle leftover bits
 
-    const totalBitCount = bitstrings.reduce(
-      (acc, bs) => acc + $.calculateBitCount(bs),
-      0,
-    );
+    const totalBitCount = bitstrings.reduce((acc, bs) => acc + $.calculateBitCount(bs), 0);
 
     const resultByteCount = Math.ceil(totalBitCount / 8);
     const resultLeftoverBitCount = totalBitCount % 8;
@@ -213,12 +205,7 @@ export default class Bitstring {
         $.#appendBitstringAtByteBoundary(resultBytes, byteOffset, bs);
       } else {
         // We're not at a byte boundary - need to shift bits
-        $.#appendBitstringNotAtByteBoundary(
-          resultBytes,
-          byteOffset,
-          bitOffset,
-          bs,
-        );
+        $.#appendBitstringNotAtByteBoundary(resultBytes, byteOffset, bitOffset, bs);
       }
 
       bitOffset += bsBitCount;
@@ -332,8 +319,7 @@ export default class Bitstring {
   }
 
   static fromBytes(bytes) {
-    const uint8Bytes =
-      bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    const uint8Bytes = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
 
     return {
       type: "bitstring",
@@ -423,10 +409,7 @@ export default class Bitstring {
       };
     }
 
-    if (
-      value >= BigInt(Number.MIN_SAFE_INTEGER) &&
-      value <= BigInt(Number.MAX_SAFE_INTEGER)
-    ) {
+    if (value >= BigInt(Number.MIN_SAFE_INTEGER) && value <= BigInt(Number.MAX_SAFE_INTEGER)) {
       return $.#fromSegmentWithIntegerWithinNumberRangeValue(segment);
     }
 
@@ -738,10 +721,7 @@ export default class Bitstring {
       return {
         type: "bitstring",
         text: null,
-        bytes: bitstring.bytes.subarray(
-          startByteIndex,
-          startByteIndex + resultByteCount,
-        ),
+        bytes: bitstring.bytes.subarray(startByteIndex, startByteIndex + resultByteCount),
         leftoverBitCount: 0,
         hex: null,
       };
@@ -752,12 +732,7 @@ export default class Bitstring {
     if (startBitOffset === 0) {
       // Byte-aligned with leftover bits
 
-      resultBytes.set(
-        bitstring.bytes.subarray(
-          startByteIndex,
-          startByteIndex + resultByteCount,
-        ),
-      );
+      resultBytes.set(bitstring.bytes.subarray(startByteIndex, startByteIndex + resultByteCount));
 
       resultBytes[resultByteCount - 1] &= 0xff << (8 - resultLeftoverBits);
     } else {
@@ -771,8 +746,7 @@ export default class Bitstring {
         const firstByte = bytes[startByteIndex + i];
         const secondByte = bytes[startByteIndex + i + 1];
 
-        resultBytes[i] =
-          ((firstByte << leftShift) | (secondByte >>> rightShift)) & 0xff;
+        resultBytes[i] = ((firstByte << leftShift) | (secondByte >>> rightShift)) & 0xff;
       }
 
       // Mask out extra bits in the last byte if we have leftover bits
@@ -841,26 +815,16 @@ export default class Bitstring {
     if (byteCount === 1 && leftoverBitCount === 0) {
       const value = bytes[0];
 
-      return Type.integer(
-        isSigned && value & 0x80 ? BigInt(value - 256) : BigInt(value),
-      );
+      return Type.integer(isSigned && value & 0x80 ? BigInt(value - 256) : BigInt(value));
     }
 
     const isLittleEndian = endianness === "little";
 
     if (leftoverBitCount === 0) {
-      return $.#toIntegerFromBitstringWithoutLeftoverBits(
-        bitstring,
-        isSigned,
-        isLittleEndian,
-      );
+      return $.#toIntegerFromBitstringWithoutLeftoverBits(bitstring, isSigned, isLittleEndian);
     }
 
-    return $.#toIntegerFromBitstringWithLeftoverBits(
-      bitstring,
-      isSigned,
-      isLittleEndian,
-    );
+    return $.#toIntegerFromBitstringWithLeftoverBits(bitstring, isSigned, isLittleEndian);
   }
 
   static toText(bitstring) {
@@ -915,9 +879,7 @@ export default class Bitstring {
       codePoint = Number(codePoint);
     }
 
-    return (
-      Number.isInteger(codePoint) && codePoint >= 0 && codePoint <= 0x10ffff
-    );
+    return Number.isInteger(codePoint) && codePoint >= 0 && codePoint <= 0x10ffff;
   }
 
   static validateSegment(segment, index) {
@@ -967,12 +929,7 @@ export default class Bitstring {
     }
   }
 
-  static #appendBitstringNotAtByteBoundary(
-    resultBytes,
-    byteOffset,
-    bitOffset,
-    bitstring,
-  ) {
+  static #appendBitstringNotAtByteBoundary(resultBytes, byteOffset, bitOffset, bitstring) {
     const bytes = bitstring.bytes;
     const leftoverBitCount = bitstring.leftoverBitCount;
     const bitPositionInByte = bitOffset & 7; // Modulo 8 (position within byte)
@@ -980,8 +937,7 @@ export default class Bitstring {
     const bitsToShiftLeft = 8 - bitsToShiftRight; // How many bits to shift left when adding to next byte
 
     // Calculate how many complete bytes we have in the source bitstring
-    const completeByteCount =
-      leftoverBitCount === 0 ? bytes.length : bytes.length - 1;
+    const completeByteCount = leftoverBitCount === 0 ? bytes.length : bytes.length - 1;
 
     // Process all complete bytes in the source bitstring
     for (let i = 0; i < completeByteCount; i++) {
@@ -992,8 +948,7 @@ export default class Bitstring {
 
       // Add low bits to next byte (if we're not byte-aligned)
       if (bitsToShiftRight > 0) {
-        resultBytes[byteOffset + i + 1] =
-          (currentByte << bitsToShiftLeft) & 0xff;
+        resultBytes[byteOffset + i + 1] = (currentByte << bitsToShiftLeft) & 0xff;
       }
     }
 
@@ -1006,8 +961,7 @@ export default class Bitstring {
       const maskedLastByte = lastByte & leftoverBitsMask;
 
       // Add high bits of the last byte to current position
-      resultBytes[byteOffset + completeByteCount] |=
-        maskedLastByte >>> bitsToShiftRight;
+      resultBytes[byteOffset + completeByteCount] |= maskedLastByte >>> bitsToShiftRight;
 
       // Add low bits of the last byte to next position if we're not byte-aligned
       if (bitsToShiftRight > 0) {
@@ -1130,8 +1084,7 @@ export default class Bitstring {
       if (leftoverBits > 0) {
         const shiftAmount = 8 - leftoverBits;
 
-        bytesArray[completeBytes] =
-          (remainingValue & ((1 << leftoverBits) - 1)) << shiftAmount;
+        bytesArray[completeBytes] = (remainingValue & ((1 << leftoverBits) - 1)) << shiftAmount;
       }
     } else {
       // Big endian: MSB first
@@ -1145,8 +1098,7 @@ export default class Bitstring {
 
         const initialShift = totalBitsInInteger - bitCount;
 
-        let shiftedValue =
-          initialShift > 0 ? numberValue << initialShift : numberValue;
+        let shiftedValue = initialShift > 0 ? numberValue << initialShift : numberValue;
 
         // For complete bytes
         for (let i = 0; i < completeBytes; i++) {
@@ -1156,8 +1108,7 @@ export default class Bitstring {
 
         // Handle leftover bits
         if (leftoverBits > 0) {
-          bytesArray[completeBytes] =
-            (shiftedValue >>> (totalBitsInInteger - 8)) & 0xff;
+          bytesArray[completeBytes] = (shiftedValue >>> (totalBitsInInteger - 8)) & 0xff;
         }
       } else {
         // Division approach for larger integers
@@ -1184,8 +1135,7 @@ export default class Bitstring {
         // Handle leftover bits
         if (leftoverBits > 0) {
           // For leftover bits, we shift them to the most significant bits of the last byte
-          bytesArray[completeBytes] =
-            (remainingValue << (8 - leftoverBits)) & 0xff;
+          bytesArray[completeBytes] = (remainingValue << (8 - leftoverBits)) & 0xff;
         }
       }
     }
@@ -1288,9 +1238,7 @@ export default class Bitstring {
         const leftoverMask = (1n << BigInt(leftoverBits)) - 1n;
         const shiftAmount = BigInt(8 - leftoverBits);
 
-        bytesArray[completeBytes] = Number(
-          (remainingValue & leftoverMask) << shiftAmount,
-        );
+        bytesArray[completeBytes] = Number((remainingValue & leftoverMask) << shiftAmount);
       }
     } else {
       // Big endian: MSB first
@@ -1314,12 +1262,9 @@ export default class Bitstring {
         // 1. Get the remaining value (last bits)
         // 2. Shift it left to align with MSB of the last byte
 
-        const remainingBits =
-          remainingValue & ((1n << BigInt(leftoverBits)) - 1n);
+        const remainingBits = remainingValue & ((1n << BigInt(leftoverBits)) - 1n);
 
-        bytesArray[completeBytes] = Number(
-          remainingBits << BigInt(8 - leftoverBits),
-        );
+        bytesArray[completeBytes] = Number(remainingBits << BigInt(8 - leftoverBits));
       }
     }
 
@@ -1367,8 +1312,7 @@ export default class Bitstring {
     const fraction = Math.round((significand - 1) * 0x400);
 
     // Combine high byte: sign + 5 bits of exponent + top 2 bits of fraction
-    const highByte =
-      signByte | ((biasedExp & 0x1f) << 2) | ((fraction >> 8) & 0x03);
+    const highByte = signByte | ((biasedExp & 0x1f) << 2) | ((fraction >> 8) & 0x03);
 
     // Low byte: bottom 8 bits of fraction
     const lowByte = fraction & 0xff;
@@ -1383,11 +1327,7 @@ export default class Bitstring {
     }
   }
 
-  static #toIntegerFromBitstringWithLeftoverBits(
-    bitstring,
-    isSigned,
-    isLittleEndian,
-  ) {
+  static #toIntegerFromBitstringWithLeftoverBits(bitstring, isSigned, isLittleEndian) {
     const bytes = bitstring.bytes;
     const byteCount = bytes.length;
     const leftoverBitCount = bitstring.leftoverBitCount;
@@ -1435,11 +1375,7 @@ export default class Bitstring {
     return Type.integer(result);
   }
 
-  static #toIntegerFromBitstringWithoutLeftoverBits(
-    bitstring,
-    isSigned,
-    isLittleEndian,
-  ) {
+  static #toIntegerFromBitstringWithoutLeftoverBits(bitstring, isSigned, isLittleEndian) {
     const bytes = bitstring.bytes;
     const byteCount = bytes.length;
 
@@ -1509,21 +1445,11 @@ export default class Bitstring {
     const valueType = segment.value.type;
 
     if (valueType !== "bitstring" && valueType !== "string") {
-      Interpreter.raiseBitstringConstructionError(
-        index,
-        "binary",
-        "type",
-        segment.value,
-      );
+      Interpreter.raiseBitstringConstructionError(index, "binary", "type", segment.value);
     }
 
     if (valueType === "bitstring" && segment.value.leftoverBitCount !== 0) {
-      Interpreter.raiseBitstringConstructionError(
-        index,
-        "binary",
-        "unit",
-        segment.value,
-      );
+      Interpreter.raiseBitstringConstructionError(index, "binary", "unit", segment.value);
     }
 
     return true;
@@ -1533,21 +1459,11 @@ export default class Bitstring {
     const valueType = segment.value.type;
 
     if (valueType === "float" || valueType === "integer") {
-      Interpreter.raiseBitstringConstructionError(
-        index,
-        "binary",
-        "type",
-        segment.value,
-      );
+      Interpreter.raiseBitstringConstructionError(index, "binary", "type", segment.value);
     }
 
     if (segment.size !== null || segment.signedness !== null) {
-      Interpreter.raiseBitstringConstructionError(
-        index,
-        "integer",
-        "type",
-        segment.value,
-      );
+      Interpreter.raiseBitstringConstructionError(index, "integer", "type", segment.value);
     }
 
     return true;
@@ -1556,17 +1472,8 @@ export default class Bitstring {
   static #validateSegmentWithFloatType(segment, index) {
     const valueType = segment.value.type;
 
-    if (
-      valueType !== "float" &&
-      valueType !== "integer" &&
-      valueType !== "variable_pattern"
-    ) {
-      Interpreter.raiseBitstringConstructionError(
-        index,
-        "float",
-        "type",
-        segment.value,
-      );
+    if (valueType !== "float" && valueType !== "integer" && valueType !== "variable_pattern") {
+      Interpreter.raiseBitstringConstructionError(index, "float", "type", segment.value);
     }
 
     if (!(segment.size !== null) && segment.unit !== null) {
@@ -1593,12 +1500,7 @@ export default class Bitstring {
     const valueType = segment.value.type;
 
     if (valueType !== "integer" && valueType !== "variable_pattern") {
-      Interpreter.raiseBitstringConstructionError(
-        index,
-        "integer",
-        "type",
-        segment.value,
-      );
+      Interpreter.raiseBitstringConstructionError(index, "integer", "type", segment.value);
     }
 
     return true;
@@ -1608,25 +1510,11 @@ export default class Bitstring {
     const valueType = segment.value.type;
 
     if (valueType === "bitstring" || valueType === "float") {
-      Interpreter.raiseBitstringConstructionError(
-        index,
-        segment.type,
-        "type",
-        segment.value,
-      );
+      Interpreter.raiseBitstringConstructionError(index, segment.type, "type", segment.value);
     }
 
-    if (
-      segment.size !== null ||
-      segment.unit !== null ||
-      segment.signedness !== null
-    ) {
-      Interpreter.raiseBitstringConstructionError(
-        index,
-        "integer",
-        "type",
-        segment.value,
-      );
+    if (segment.size !== null || segment.unit !== null || segment.signedness !== null) {
+      Interpreter.raiseBitstringConstructionError(index, "integer", "type", segment.value);
     }
 
     return true;

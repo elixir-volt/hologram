@@ -2,6 +2,7 @@ defmodule Hologram.Realtime.Tombstone do
   @moduledoc false
 
   use GenServer
+  use Hologram.Realtime.Gossip, topic: "hologram:gossip:tombstones"
 
   alias Hologram.Realtime.Gossip
 
@@ -135,29 +136,6 @@ defmodule Hologram.Realtime.Tombstone do
   @impl GenServer
   def handle_info({:purge, key}, state) do
     handle_info({:purge, key, System.system_time(:millisecond)}, state)
-  end
-
-  @impl GenServer
-  def handle_info(:sweep_expired, state) do
-    delete_expired()
-    schedule_sweep()
-
-    {:noreply, state}
-  end
-
-  @impl GenServer
-  def handle_info({:nodedown, _node}, state) do
-    {:noreply, state}
-  end
-
-  @impl GenServer
-  def handle_info({:nodeup, node}, state) do
-    # Asked in both directions on purpose. This node asks the newcomer because a peer
-    # that went away and came back can hold what this one is missing, and the newcomer
-    # asks this node through the same handler on its own side.
-    Gossip.request_sync_from(node, @gossip_topic)
-
-    {:noreply, state}
   end
 
   @impl GenServer

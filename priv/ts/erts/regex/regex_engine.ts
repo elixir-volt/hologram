@@ -5,11 +5,7 @@ import ERTS from "../../erts.ts";
 import RegexAnalyzer from "./regex_analyzer.ts";
 import RegexInterpreter from "./regex_interpreter.ts";
 
-import {
-  newlineLengthAt,
-  NEWLINE_PAIR_CONVENTIONS,
-  NEWLINE_VERBS,
-} from "./regex_newlines.ts";
+import {newlineLengthAt, NEWLINE_PAIR_CONVENTIONS, NEWLINE_VERBS} from "./regex_newlines.ts";
 
 import {mergeStartOptions} from "./regex_options.ts";
 import RegexParseError from "./regex_parse_error.ts";
@@ -211,10 +207,7 @@ export default class RegexEngine {
           }
 
           if (first === 0xed && second >= 0xa0) {
-            return $.#utf8Error(
-              "code points 0xd800-0xdfff are not defined",
-              index,
-            );
+            return $.#utf8Error("code points 0xd800-0xdfff are not defined", index);
           }
           break;
 
@@ -224,10 +217,7 @@ export default class RegexEngine {
           }
 
           if (first > 0xf4 || (first === 0xf4 && second > 0x8f)) {
-            return $.#utf8Error(
-              "code points greater than 0x10ffff are not defined",
-              index,
-            );
+            return $.#utf8Error("code points greater than 0x10ffff are not defined", index);
           }
           break;
 
@@ -235,19 +225,13 @@ export default class RegexEngine {
           if (first === 0xf8 && (second & 0x38) === 0) {
             return $.#utf8Error("overlong 5-byte sequence", index);
           }
-          return $.#utf8Error(
-            "5-byte character is not allowed (RFC 3629)",
-            index,
-          );
+          return $.#utf8Error("5-byte character is not allowed (RFC 3629)", index);
 
         case 5:
           if (first === 0xfc && (second & 0x3c) === 0) {
             return $.#utf8Error("overlong 6-byte sequence", index);
           }
-          return $.#utf8Error(
-            "6-byte character is not allowed (RFC 3629)",
-            index,
-          );
+          return $.#utf8Error("6-byte character is not allowed (RFC 3629)", index);
       }
 
       let codePoint = first & (0x3f >> additionalByteCount);
@@ -332,9 +316,7 @@ export default class RegexEngine {
         const jsNumber = compiled.groupMapping.get(number);
         const indices = jsMatch.indices[jsNumber];
 
-        captures.push(
-          indices === undefined ? null : {start: indices[0], end: indices[1]},
-        );
+        captures.push(indices === undefined ? null : {start: indices[0], end: indices[1]});
       }
 
       return {
@@ -397,8 +379,7 @@ export default class RegexEngine {
         results.push(retry);
         position = retry.end;
       } else {
-        position =
-          result.start + $.#scanAdvance(compiled, subject, result.start);
+        position = result.start + $.#scanAdvance(compiled, subject, result.start);
       }
     }
 
@@ -481,7 +462,7 @@ export default class RegexEngine {
   static utf16IndexToByteOffset(text, utf16Index) {
     let byteOffset = 0;
 
-    for (let i = 0; i < utf16Index;) {
+    for (let i = 0; i < utf16Index; ) {
       const codePoint = text.codePointAt(i);
       byteOffset += $.#calculateCodePointByteCount(codePoint);
       i += codePoint > 0xffff ? 2 : 1;
@@ -552,18 +533,11 @@ export default class RegexEngine {
   // Returns how many UTF-16 units the global scan advances over the
   // character at the position.
   static #scanAdvance(compiled, subject, position) {
-    const newlineLength = newlineLengthAt(
-      compiled.newlineType,
-      subject,
-      position,
-    );
+    const newlineLength = newlineLengthAt(compiled.newlineType, subject, position);
 
     if (newlineLength === 2) return 2;
 
-    if (
-      compiled.opts.unicode === true &&
-      subject.codePointAt(position) > 0xffff
-    ) {
+    if (compiled.opts.unicode === true && subject.codePointAt(position) > 0xffff) {
       return 2;
     }
 
@@ -607,11 +581,7 @@ export default class RegexEngine {
       if (Type.isInteger(element)) {
         const codePoint = Number(element.value);
 
-        if (
-          codePoint < 0 ||
-          codePoint > 0x10ffff ||
-          (codePoint >= 0xd800 && codePoint <= 0xdfff)
-        ) {
+        if (codePoint < 0 || codePoint > 0x10ffff || (codePoint >= 0xd800 && codePoint <= 0xdfff)) {
           return null;
         }
 

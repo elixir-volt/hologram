@@ -20,9 +20,7 @@ const FOLD_SENSITIVE_POSIX_NAMES = new Set([
 // A name maps to multiple numbers with dupnames, and an unknown name maps
 // to no numbers.
 export function resolveGroupNumbers(reference, names) {
-  return reference.number !== null
-    ? [reference.number]
-    : (names.get(reference.name) ?? []);
+  return reference.number !== null ? [reference.number] : (names.get(reference.name) ?? []);
 }
 
 // Walks the AST pre-order, calling visit on every node and recursing into
@@ -106,11 +104,7 @@ export default class RegexAnalyzer {
     // JS /iu canonicalization folds U+017F and U+212A into the ASCII word
     // set, while PCRE2 keeps \w, \b and POSIX classes as fold-free type
     // checks under caseless matching
-    if (
-      unicode &&
-      $.#hasCaselessScope(ast, opts) &&
-      $.#hasFoldSensitiveWordSet(ast)
-    ) {
+    if (unicode && $.#hasCaselessScope(ast, opts) && $.#hasFoldSensitiveWordSet(ast)) {
       return "interpreted";
     }
 
@@ -147,12 +141,7 @@ export default class RegexAnalyzer {
       case "nonCapturingGroup":
       case "optionGroup":
       case "scriptRun":
-        return $.#collectDefiniteGroups(
-          node.content,
-          definite,
-          groupMap,
-          state,
-        );
+        return $.#collectDefiniteGroups(node.content, definite, groupMap, state);
 
       case "backreference": {
         const numbers = resolveGroupNumbers(node, groupMap.names);
@@ -173,12 +162,7 @@ export default class RegexAnalyzer {
       }
 
       case "group": {
-        const after = $.#collectDefiniteGroups(
-          node.content,
-          definite,
-          groupMap,
-          state,
-        );
+        const after = $.#collectDefiniteGroups(node.content, definite, groupMap, state);
 
         after.add(node.number);
 
@@ -186,23 +170,13 @@ export default class RegexAnalyzer {
       }
 
       case "lookaround": {
-        const inner = $.#collectDefiniteGroups(
-          node.content,
-          new Set(definite),
-          groupMap,
-          state,
-        );
+        const inner = $.#collectDefiniteGroups(node.content, new Set(definite), groupMap, state);
 
         return node.negated ? definite : inner;
       }
 
       case "quantifier": {
-        const inner = $.#collectDefiniteGroups(
-          node.item,
-          new Set(definite),
-          groupMap,
-          state,
-        );
+        const inner = $.#collectDefiniteGroups(node.item, new Set(definite), groupMap, state);
 
         return node.min >= 1 ? inner : definite;
       }
@@ -264,10 +238,7 @@ export default class RegexAnalyzer {
         for (const item of node.items) {
           if (item.type === "shorthand" && item.letter === "w") {
             found = true;
-          } else if (
-            item.type === "posixClass" &&
-            FOLD_SENSITIVE_POSIX_NAMES.has(item.name)
-          ) {
+          } else if (item.type === "posixClass" && FOLD_SENSITIVE_POSIX_NAMES.has(item.name)) {
             found = true;
           }
         }
@@ -314,9 +285,7 @@ export default class RegexAnalyzer {
         // Inline option settings leak into subsequent alternation branches
         // in PCRE2, which the tail-scoped native translation can't express
         return node.branches.some(
-          (branch) =>
-            $.#requiresInterpreter(branch, unicode) ||
-            $.#leaksOptionSetting(branch),
+          (branch) => $.#requiresInterpreter(branch, unicode) || $.#leaksOptionSetting(branch),
         );
 
       case "atomicGroup":
@@ -338,9 +307,7 @@ export default class RegexAnalyzer {
       case "class":
         // Property escapes need the JS u flag, unavailable on the byte-mode
         // native path
-        return (
-          !unicode && node.items.some((item) => item.type === "unicodeProperty")
-        );
+        return !unicode && node.items.some((item) => item.type === "unicodeProperty");
 
       case "concatenation":
         return node.items.some((item) => $.#requiresInterpreter(item, unicode));

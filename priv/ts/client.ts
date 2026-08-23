@@ -27,9 +27,9 @@ export default class Client {
     // Sent so the server can read this tab's subscriptions from signed receipts rather
     // than from its own node's registry, which holds nothing when the command lands on
     // a node that does not hold the connection.
-    const subReceipts = Array.from(
-      App.subscriptionReceiptRegistry.entries.values(),
-    ).map((triple) => triple.data[2]);
+    const subReceipts = Array.from(App.subscriptionReceiptRegistry.entries.values()).map(
+      (triple) => triple.data[2],
+    );
 
     return Type.map([
       [Type.atom("instance_id"), Type.bitstring(App.instanceId)],

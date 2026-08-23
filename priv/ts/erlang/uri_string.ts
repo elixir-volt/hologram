@@ -31,8 +31,7 @@ const Erlang_Uri_String = {
       }
 
       if (uri.port !== undefined) {
-        const portValue =
-          uri.port === null ? Type.atom("undefined") : Type.integer(uri.port);
+        const portValue = uri.port === null ? Type.atom("undefined") : Type.integer(uri.port);
 
         pairs.push([Type.atom("port"), portValue]);
       }
@@ -79,12 +78,10 @@ const Erlang_Uri_String = {
       const result = Erlang_Unicode["characters_to_binary/1"](list);
 
       if (!Type.isBinary(result)) {
-        Interpreter.raiseFunctionClauseError(
-          "uri_string",
-          "parse_scheme_start",
-          2,
-          [result, Type.map()],
-        );
+        Interpreter.raiseFunctionClauseError("uri_string", "parse_scheme_start", 2, [
+          result,
+          Type.map(),
+        ]);
       }
 
       Bitstring.maybeSetTextFromBytes(result);
@@ -97,12 +94,10 @@ const Erlang_Uri_String = {
       Bitstring.maybeSetTextFromBytes(binary);
 
       if (binary.text === false) {
-        Interpreter.raiseFunctionClauseError(
-          "uri_string",
-          "parse_scheme_start",
-          2,
-          [binary, Type.map()],
-        );
+        Interpreter.raiseFunctionClauseError("uri_string", "parse_scheme_start", 2, [
+          binary,
+          Type.map(),
+        ]);
       }
 
       return binary.text;
@@ -126,25 +121,18 @@ const Erlang_Uri_String = {
       const atIndex = withoutSlashes.indexOf("@");
       const slashIndex = withoutSlashes.search(/[/?#]/);
 
-      const hasUserinfo =
-        atIndex !== -1 && (slashIndex === -1 || atIndex < slashIndex);
+      const hasUserinfo = atIndex !== -1 && (slashIndex === -1 || atIndex < slashIndex);
 
-      const userinfo = hasUserinfo
-        ? withoutSlashes.slice(0, atIndex)
-        : undefined;
+      const userinfo = hasUserinfo ? withoutSlashes.slice(0, atIndex) : undefined;
 
-      const afterUserinfo = hasUserinfo
-        ? withoutSlashes.slice(atIndex + 1)
-        : withoutSlashes;
+      const afterUserinfo = hasUserinfo ? withoutSlashes.slice(atIndex + 1) : withoutSlashes;
 
       // Check for multiple @ symbols in the authority portion (before /, ?, or #).
       const authorityEndIndex = afterUserinfo.search(/[/?#]/);
 
       // Extract the authority portion (everything before /, ?, or #).
       const authorityPortion =
-        authorityEndIndex === -1
-          ? afterUserinfo
-          : afterUserinfo.slice(0, authorityEndIndex);
+        authorityEndIndex === -1 ? afterUserinfo : afterUserinfo.slice(0, authorityEndIndex);
 
       // If there's a @ in the authority portion after userinfo, it's invalid.
       // OTP payload differs depending on presence of scheme:
@@ -157,9 +145,7 @@ const Erlang_Uri_String = {
 
       const hasBracketHost = afterUserinfo.startsWith("[");
 
-      const closeBracketIndex = hasBracketHost
-        ? afterUserinfo.indexOf("]")
-        : -1;
+      const closeBracketIndex = hasBracketHost ? afterUserinfo.indexOf("]") : -1;
 
       if (hasBracketHost && closeBracketIndex === -1) {
         return invalidUriError();
@@ -202,8 +188,7 @@ const Erlang_Uri_String = {
     // Adds port if present; empty port string becomes null so it renders as :undefined in the result map.
     const parsePort = (uri, userinfo, host, remaining) => {
       if (!remaining.startsWith(":")) {
-        const newUri =
-          userinfo === undefined ? {...uri, host} : {...uri, host, userinfo};
+        const newUri = userinfo === undefined ? {...uri, host} : {...uri, host, userinfo};
 
         return {uri: newUri, remaining};
       }
@@ -212,9 +197,7 @@ const Erlang_Uri_String = {
       const digitMatch = afterColon.match(/^(\d+)/);
       const portStr = digitMatch ? digitMatch[1] : "";
 
-      const portRemainder = digitMatch
-        ? afterColon.slice(portStr.length)
-        : afterColon;
+      const portRemainder = digitMatch ? afterColon.slice(portStr.length) : afterColon;
 
       const isDelimiterStart =
         portRemainder === "" ||
@@ -241,10 +224,7 @@ const Erlang_Uri_String = {
 
       const port = parseInt(portStr, 10);
 
-      const newUri =
-        userinfo === undefined
-          ? {...uri, host, port}
-          : {...uri, host, port, userinfo};
+      const newUri = userinfo === undefined ? {...uri, host, port} : {...uri, host, port, userinfo};
 
       return {uri: newUri, remaining: portRemainder};
     };
@@ -260,9 +240,7 @@ const Erlang_Uri_String = {
     };
 
     const parseSchemePart = (state) => {
-      const schemeMatch = state.remaining.match(
-        /^([a-zA-Z][a-zA-Z0-9+\-.]*):(.*)$/s,
-      );
+      const schemeMatch = state.remaining.match(/^([a-zA-Z][a-zA-Z0-9+\-.]*):(.*)$/s);
 
       if (!schemeMatch) return state;
 

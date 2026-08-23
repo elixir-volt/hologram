@@ -49,10 +49,7 @@ export function mergeStartOptions(ast, opts) {
         item.value,
       );
     } else if (item.name === "LIMIT_MATCH") {
-      effectiveOpts.matchLimit = Math.min(
-        effectiveOpts.matchLimit ?? Infinity,
-        item.value,
-      );
+      effectiveOpts.matchLimit = Math.min(effectiveOpts.matchLimit ?? Infinity, item.value);
     } else if (item.name === "UTF" || item.name === "UTF8") {
       effectiveOpts.unicode = true;
     }

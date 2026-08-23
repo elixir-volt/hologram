@@ -40,13 +40,17 @@ defmodule Hologram.CompilerTest do
   alias Hologram.Test.Fixtures.Compiler.Module8
   alias Hologram.Test.Fixtures.Compiler.Module9
 
-  @root_dir Reflection.root_dir()
-  @assets_dir Path.join(@root_dir, "assets")
-  @js_dir Path.join(@assets_dir, "js")
+  @js_dir Volt.Priv.path({:hologram, "ts"}, ".")
   @erlang_js_dir Path.join(@js_dir, "erlang")
 
   @fixtures_compiler_dir Path.join(@fixtures_dir, "compiler")
   @tmp_dir Reflection.tmp_dir()
+
+  defp js_contains?(source, expected) do
+    source = String.replace(source, ~r/\s+/u, "")
+    expected = String.replace(expected, ~r/\s+/u, "")
+    String.contains?(source, expected)
+  end
 
   # validate_prop_usages/2 walks a module's template/0, so hand-built DOM IR has to be wrapped the way
   # a compiled module carries it. Built by hand rather than taken from a fixture module, because a
@@ -70,22 +74,6 @@ defmodule Hologram.CompilerTest do
         ]
       }
     }
-  end
-
-  defp setup_js_deps_test(test_subdir) do
-    test_tmp_dir = Path.join([@tmp_dir, "tests", "compiler", test_subdir])
-    assets_dir = Path.join(test_tmp_dir, "assets")
-    build_dir = Path.join(test_tmp_dir, "build")
-
-    clean_dir(test_tmp_dir)
-    File.mkdir_p!(assets_dir)
-    File.mkdir_p!(build_dir)
-
-    lib_package_json_path = Path.join(@assets_dir, "package.json")
-    fixture_package_json_path = Path.join(assets_dir, "package.json")
-    File.cp!(lib_package_json_path, fixture_package_json_path)
-
-    [assets_dir: assets_dir, build_dir: build_dir]
   end
 
   setup_all do
@@ -234,9 +222,9 @@ defmodule Hologram.CompilerTest do
       js_fragment_2 = ~s/Interpreter.defineElixirFunction/
       js_fragment_3 = ~s/Interpreter.defineErlangFunction/
 
-      assert String.contains?(result, js_fragment_1)
-      assert String.contains?(result, js_fragment_2)
-      assert String.contains?(result, js_fragment_3)
+      assert js_contains?(result, js_fragment_1)
+      assert js_contains?(result, js_fragment_2)
+      assert js_contains?(result, js_fragment_3)
     end
 
     test "has only Elixir defs", %{
@@ -258,9 +246,9 @@ defmodule Hologram.CompilerTest do
       js_fragment_2 = ~s/Interpreter.defineElixirFunction/
       js_fragment_3 = ~s/Interpreter.defineErlangFunction/
 
-      assert String.contains?(result, js_fragment_1)
-      assert String.contains?(result, js_fragment_2)
-      refute String.contains?(result, js_fragment_3)
+      assert js_contains?(result, js_fragment_1)
+      assert js_contains?(result, js_fragment_2)
+      refute js_contains?(result, js_fragment_3)
     end
 
     test "no JS imports", %{
@@ -278,8 +266,8 @@ defmodule Hologram.CompilerTest do
           @js_dir
         )
 
-      refute String.contains?(result, "import {")
-      refute String.contains?(result, "registerJsBindings")
+      refute js_contains?(result, "import {")
+      refute js_contains?(result, "registerJsBindings")
     end
 
     test "single JS import", %{
@@ -300,11 +288,11 @@ defmodule Hologram.CompilerTest do
       js_fixture_path = Path.join([@fixtures_dir, "compiler", "js_fixture_1.mjs"])
 
       assert length(Regex.scan(~r/import \{/, result)) == 1
-      assert String.contains?(result, ~s'import { export_1a as $1 } from "#{js_fixture_path}";')
+      assert js_contains?(result, ~s'import { export_1a as $1 } from "#{js_fixture_path}";')
 
       assert length(Regex.scan(~r/registerJsBindings/, result)) == 1
 
-      assert String.contains?(
+      assert js_contains?(
                result,
                ~s'Interpreter.registerJsBindings({"Hologram.Test.Fixtures.Compiler.Module18": {"alias_1a": $1}});'
              )
@@ -328,12 +316,12 @@ defmodule Hologram.CompilerTest do
       js_fixture_path = Path.join([@fixtures_dir, "compiler", "js_fixture_1.mjs"])
 
       assert length(Regex.scan(~r/import \{/, result)) == 2
-      assert String.contains?(result, ~s'import { export_1a as $1 } from "#{js_fixture_path}";')
-      assert String.contains?(result, ~s'import { export_1b as $2 } from "#{js_fixture_path}";')
+      assert js_contains?(result, ~s'import { export_1a as $1 } from "#{js_fixture_path}";')
+      assert js_contains?(result, ~s'import { export_1b as $2 } from "#{js_fixture_path}";')
 
       assert length(Regex.scan(~r/registerJsBindings/, result)) == 1
 
-      assert String.contains?(
+      assert js_contains?(
                result,
                ~s'Interpreter.registerJsBindings({"Hologram.Test.Fixtures.Compiler.Module20": {"alias_1a": $1, "alias_1b": $2}});'
              )
@@ -358,12 +346,12 @@ defmodule Hologram.CompilerTest do
       js_fixture_2_path = Path.join([@fixtures_dir, "compiler", "js_fixture_2.mjs"])
 
       assert length(Regex.scan(~r/import \{/, result)) == 2
-      assert String.contains?(result, ~s'import { export_1a as $1 } from "#{js_fixture_1_path}";')
-      assert String.contains?(result, ~s'import { export_2 as $2 } from "#{js_fixture_2_path}";')
+      assert js_contains?(result, ~s'import { export_1a as $1 } from "#{js_fixture_1_path}";')
+      assert js_contains?(result, ~s'import { export_2 as $2 } from "#{js_fixture_2_path}";')
 
       assert length(Regex.scan(~r/registerJsBindings/, result)) == 1
 
-      assert String.contains?(
+      assert js_contains?(
                result,
                ~s'Interpreter.registerJsBindings({"Hologram.Test.Fixtures.Compiler.Module18": {"alias_1a": $1}, "Hologram.Test.Fixtures.Compiler.Module22": {"alias_2": $2}});'
              )
@@ -431,34 +419,6 @@ defmodule Hologram.CompilerTest do
     end
   end
 
-  test "build_page_digest_plt/2" do
-    build_dir = Path.join("/", "my_build_dir")
-    opts = [build_dir: build_dir]
-
-    bundle_info = [
-      %{
-        digest: "my-digest-1",
-        entry_name: MyPage1
-      },
-      %{
-        digest: "my-digest-2",
-        entry_name: "runtime"
-      },
-      %{
-        digest: "my-digest-3",
-        entry_name: MyPage2
-      }
-    ]
-
-    expected_page_digest_plt_dump_path =
-      Path.join(build_dir, Reflection.page_digest_plt_dump_file_name())
-
-    assert {%PLT{} = plt, ^expected_page_digest_plt_dump_path} =
-             build_page_digest_plt(bundle_info, opts)
-
-    assert PLT.get_all(plt) == %{MyPage1 => "my-digest-1", MyPage2 => "my-digest-3"}
-  end
-
   describe "build_runtime_js/5" do
     setup do
       on_exit(fn ->
@@ -472,31 +432,31 @@ defmodule Hologram.CompilerTest do
     test "renders reachable function defs", %{ir_plt: ir_plt, runtime_mfas: runtime_mfas} do
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), [], @js_dir)
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/Interpreter.defineElixirFunction("Enum", "into", 2, "public"/
              )
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/Interpreter.defineElixirFunction("Enum", "into_protocol", 2, "private"/
              )
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/Interpreter.defineElixirFunction("String.Chars", "to_string", 1, "public"/
              )
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/Interpreter.defineElixirFunction("String.Chars", "impl_for!", 1, "public"/
              )
 
-      refute String.contains?(js, "Hologram.Test.Fixtures.Compiler.CallGraph.Module12")
+      refute js_contains?(js, "Hologram.Test.Fixtures.Compiler.CallGraph.Module12")
 
-      assert String.contains?(js, ~s/Interpreter.defineErlangFunction("erlang", "error", 1/)
+      assert js_contains?(js, ~s/Interpreter.defineErlangFunction("erlang", "error", 1/)
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/Interpreter.defineNotImplementedErlangFunction("erlang", "process_info", 2/
              )
@@ -508,13 +468,13 @@ defmodule Hologram.CompilerTest do
     } do
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), [], @js_dir)
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/Interpreter.defineFunctionClauseHeads("Code", "ensure_loaded", 1, "public", [{params: (context) => [Type.variablePattern("module_0")], guards: [(context) => Erlang["is_atom\/1"](context.vars.module_0)], blame: {params: ["module"], guards: [{source: "is_atom(module)", test: (context) => Erlang["is_atom\/1"](context.vars.module_0)}]}}]);/
              )
 
       # A default argument makes the ported arity differ from the raised one.
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/Interpreter.defineFunctionClauseHeads("Task", "await", 2, "public"/
              )
@@ -529,7 +489,7 @@ defmodule Hologram.CompilerTest do
 
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), [], @js_dir)
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                "globalThis.Hologram.config = {errorOverlay: true, stacktraces: true};"
              )
@@ -544,7 +504,7 @@ defmodule Hologram.CompilerTest do
 
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), [], @js_dir)
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                "globalThis.Hologram.config = {errorOverlay: false, stacktraces: false};"
              )
@@ -558,7 +518,7 @@ defmodule Hologram.CompilerTest do
 
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), [], @js_dir)
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/ERTS.registerModuleMetadata({"Access": {app: "elixir", file: "lib\/access.ex"/
              )
@@ -574,7 +534,7 @@ defmodule Hologram.CompilerTest do
 
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), app_versions, @js_dir)
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                ~s/ERTS.appVersions = {"hologram": "0.1.0", "my_app": "9.8.7"};/
              )
@@ -590,7 +550,7 @@ defmodule Hologram.CompilerTest do
 
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), app_versions, @js_dir)
 
-      assert String.contains?(js, ~s/ERTS.appVersions = {"my-app": "9.8.7"};/)
+      assert js_contains?(js, ~s/ERTS.appVersions = {"my-app": "9.8.7"};/)
     end
 
     test "injects no application versions when client stacktraces are disabled", %{
@@ -603,7 +563,7 @@ defmodule Hologram.CompilerTest do
 
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), app_versions, @js_dir)
 
-      assert String.contains?(js, "ERTS.appVersions = {};")
+      assert js_contains?(js, "ERTS.appVersions = {};")
     end
 
     test "injects the client config when the error overlay is opted out of", %{
@@ -615,376 +575,43 @@ defmodule Hologram.CompilerTest do
 
       js = build_runtime_js(runtime_mfas, ir_plt, MapSet.new(), [], @js_dir)
 
-      assert String.contains?(
+      assert js_contains?(
                js,
                "globalThis.Hologram.config = {errorOverlay: false, stacktraces: true};"
              )
     end
   end
 
-  test "bundle/2" do
-    node_modules_path = Path.join([@root_dir, "assets", "node_modules"])
-    tmp_dir = Path.join([Reflection.tmp_dir(), "tests", "compiler", "bundle_2"])
-
-    opts = [
-      esbuild_bin_path: Path.join([node_modules_path, ".bin", "esbuild"]),
-      node_modules_path: node_modules_path,
-      static_dir: Path.join(tmp_dir, "static"),
-      tmp_dir: tmp_dir
-    ]
-
-    clean_dir(tmp_dir)
-    File.mkdir!(opts[:static_dir])
-
-    entry_file_path_1 = Path.join(tmp_dir, "MyPage.entry.js")
-    File.write(entry_file_path_1, "export const myVar = 111;\n")
-
-    entry_file_path_2 = Path.join(tmp_dir, "runtime.entry.js")
-    File.write(entry_file_path_2, "export const myVar = 222;\n")
-
-    entry_files_info = [
-      {MyPage, entry_file_path_1, "page"},
-      {"runtime", entry_file_path_2, "runtime"}
-    ]
-
-    expected_static_bundle_path_1 =
-      Path.join(opts[:static_dir], "page-936cdd48d87d4ecd5720ad33b7fb4b7c.js")
-
-    expected_static_source_map_path_1 = "#{expected_static_bundle_path_1}.map"
-
-    expected_static_bundle_path_2 =
-      Path.join(opts[:static_dir], "runtime-52169d07278b312ea39145c3b94c0203.js")
-
-    expected_static_source_map_path_2 = "#{expected_static_bundle_path_2}.map"
-
-    assert bundle(entry_files_info, opts) == [
-             %{
-               digest: "936cdd48d87d4ecd5720ad33b7fb4b7c",
-               entry_name: MyPage,
-               bundle_name: "page",
-               static_bundle_path: expected_static_bundle_path_1,
-               static_source_map_path: expected_static_source_map_path_1
-             },
-             %{
-               digest: "52169d07278b312ea39145c3b94c0203",
-               entry_name: "runtime",
-               bundle_name: "runtime",
-               static_bundle_path: expected_static_bundle_path_2,
-               static_source_map_path: expected_static_source_map_path_2
-             }
-           ]
-
-    expected_bundle_js_1 =
-      normalize_newlines("""
-      (()=>{var o=111;})();
-      //# sourceMappingURL=page-936cdd48d87d4ecd5720ad33b7fb4b7c.js.map
-      """)
-
-    assert File.read!(expected_static_bundle_path_1) == expected_bundle_js_1
-
-    expected_bundle_js_2 =
-      normalize_newlines("""
-      (()=>{var o=222;})();
-      //# sourceMappingURL=runtime-52169d07278b312ea39145c3b94c0203.js.map
-      """)
-
-    assert File.read!(expected_static_bundle_path_2) == expected_bundle_js_2
-
-    expected_source_map_js_1 =
-      normalize_newlines("""
-      {
-        "version": 3,
-        "sources": ["MyPage.entry.js"],
-        "sourcesContent": ["export const myVar = 111;\\n"],
-        "mappings": "MAAO,IAAMA,EAAQ",
-        "names": ["myVar"]
-      }
-      """)
-
-    assert File.read!(expected_static_source_map_path_1) == expected_source_map_js_1
-
-    expected_source_map_js_2 =
-      normalize_newlines("""
-      {
-        "version": 3,
-        "sources": ["runtime.entry.js"],
-        "sourcesContent": ["export const myVar = 222;\\n"],
-        "mappings": "MAAO,IAAMA,EAAQ",
-        "names": ["myVar"]
-      }
-      """)
-
-    assert File.read!(expected_static_source_map_path_2) == expected_source_map_js_2
-  end
-
-  describe "bundle/4" do
-    test "valid entry file" do
-      node_modules_path = Path.join([@root_dir, "assets", "node_modules"])
-
-      tmp_dir =
-        Path.join([Reflection.tmp_dir(), "tests", "compiler", "bundle_4_valid_entry_file"])
-
-      opts = [
-        esbuild_bin_path: Path.join([node_modules_path, ".bin", "esbuild"]),
-        node_modules_path: node_modules_path,
-        static_dir: Path.join(tmp_dir, "static"),
-        tmp_dir: tmp_dir
-      ]
-
-      clean_dir(tmp_dir)
-      File.mkdir!(opts[:static_dir])
-
-      entry_file_path = Path.join(tmp_dir, "MyPage.entry.js")
-      File.write(entry_file_path, "export const myVar = 123;\n")
-
-      expected_static_bundle_path =
-        Path.join(opts[:static_dir], "my_bundle_name-76f1f092f95a34da067e35caad5e3317.js")
-
-      expected_static_source_map_path = "#{expected_static_bundle_path}.map"
-
-      assert bundle(MyPage, entry_file_path, "my_bundle_name", opts) == %{
-               bundle_name: "my_bundle_name",
-               digest: "76f1f092f95a34da067e35caad5e3317",
-               entry_name: MyPage,
-               static_bundle_path: expected_static_bundle_path,
-               static_source_map_path: expected_static_source_map_path
-             }
-
-      expected_bundle_js =
-        normalize_newlines("""
-        (()=>{var o=123;})();
-        //# sourceMappingURL=my_bundle_name-76f1f092f95a34da067e35caad5e3317.js.map
-        """)
-
-      assert File.read!(expected_static_bundle_path) == expected_bundle_js
-
-      expected_source_map_js =
-        normalize_newlines("""
-        {
-          "version": 3,
-          "sources": ["MyPage.entry.js"],
-          "sourcesContent": ["export const myVar = 123;\\n"],
-          "mappings": "MAAO,IAAMA,EAAQ",
-          "names": ["myVar"]
-        }
-        """)
-
-      assert File.read!(expected_static_source_map_path) == expected_source_map_js
-    end
-
-    test "isolates framework npm packages from application packages with the same name" do
-      tmp_dir =
-        Path.join([Reflection.tmp_dir(), "tests", "compiler", "bundle_4_package_scopes"])
-
-      node_modules = Path.join(tmp_dir, "node_modules")
-      package_dir = Path.join([node_modules, "@formatjs", "intl-pluralrules"])
-      static_dir = Path.join(tmp_dir, "static")
-      clean_dir(tmp_dir)
-      File.mkdir_p!(package_dir)
-      File.mkdir!(static_dir)
-
-      package_dir
-      |> Path.join("package.json")
-      |> File.write!(
-        Jason.encode!(%{"name" => "@formatjs/intl-pluralrules", "module" => "index.js"})
-      )
-
-      package_dir
-      |> Path.join("index.js")
-      |> File.write!("export default 'application plural rules';\n")
-
-      entry_file_path = Path.join(tmp_dir, "MyPage.entry.js")
-
-      File.write!(entry_file_path, """
-      import appPluralRules from "@formatjs/intl-pluralrules";
-      import "hologram:runtime/intl-pluralrules-polyfill";
-      console.log(appPluralRules);
-      """)
-
-      result =
-        bundle(MyPage, entry_file_path, "my_bundle_name",
-          resolve_dirs: [node_modules],
-          static_dir: static_dir,
-          tmp_dir: tmp_dir
-        )
-
-      assert File.read!(result.static_bundle_path) =~ "application plural rules"
-    end
-
-    test "rejects CSS and asset outputs that Hologram cannot publish" do
-      tmp_dir = Path.join([Reflection.tmp_dir(), "tests", "compiler", "bundle_4_css_output"])
+  describe "build_assets/2" do
+    test "builds entries through Volt" do
+      tmp_dir = Path.join([Reflection.tmp_dir(), "tests", "compiler", "build_assets_2"])
       static_dir = Path.join(tmp_dir, "static")
       clean_dir(tmp_dir)
       File.mkdir_p!(static_dir)
 
-      tmp_dir
-      |> Path.join("style.css")
-      |> File.write!("body { color: red; }")
+      entry_file_path = Path.join(tmp_dir, "MyPage.entry.ts")
+      File.write!(entry_file_path, "export const myVar: number = 123;\n")
 
-      entry_file_path = Path.join(tmp_dir, "MyPage.entry.js")
-      File.write!(entry_file_path, ~s(import "./style.css";))
+      result = build_assets([entry_file_path], static_dir: static_dir, tmp_dir: tmp_dir)
 
-      assert_raise RuntimeError, ~r/emitted unsupported CSS or asset output/, fn ->
-        bundle(MyPage, entry_file_path, "my_bundle_name",
-          static_dir: static_dir,
-          tmp_dir: tmp_dir
-        )
-      end
+      assert %Volt.Builder.ManifestEntry{
+               file: file,
+               isEntry: true,
+               src: "MyPage.entry.js"
+             } = result.manifest["MyPage.entry.js"]
 
-      assert File.ls!(static_dir) == []
+      assert static_dir
+             |> Path.join(file)
+             |> File.regular?()
+
+      assert static_dir
+             |> Path.join(file <> ".map")
+             |> File.regular?()
+
+      assert static_dir
+             |> Path.join("manifest.json")
+             |> File.regular?()
     end
-
-    test "invalid entry file" do
-      node_modules_path = Path.join([@root_dir, "assets", "node_modules"])
-
-      tmp_dir =
-        Path.join([Reflection.tmp_dir(), "tests", "compiler", "bundle_4_invalid_entry_file"])
-
-      opts = [
-        esbuild_bin_path: Path.join([node_modules_path, ".bin", "esbuild"]),
-        node_modules_path: node_modules_path,
-        static_dir: Path.join(tmp_dir, "static"),
-        tmp_dir: tmp_dir
-      ]
-
-      clean_dir(tmp_dir)
-      File.mkdir!(opts[:static_dir])
-
-      entry_file_path = Path.join(tmp_dir, "MyPage.entry.js")
-      File.write(entry_file_path, "export const myVar 123;\n")
-
-      assert_raise RuntimeError,
-                   "esbuild bundler failed for entry file: #{entry_file_path} (probably there were JavaScript syntax errors)",
-                   fn ->
-                     bundle(MyPage, entry_file_path, "my_bundle_name", opts)
-                   end
-
-      assert File.ls!(opts[:static_dir]) == []
-    end
-
-    test "raises when the generated bundle exceeds the specified :max_bundle_size (and does not copy the bundle to the static dir in such case) " do
-      node_modules_path = Path.join([@root_dir, "assets", "node_modules"])
-
-      tmp_dir =
-        Path.join([Reflection.tmp_dir(), "tests", "compiler", "bundle_4_exceeds_max_size"])
-
-      opts = [
-        esbuild_bin_path: Path.join([node_modules_path, ".bin", "esbuild"]),
-        node_modules_path: node_modules_path,
-        static_dir: Path.join(tmp_dir, "static"),
-        tmp_dir: tmp_dir
-      ]
-
-      clean_dir(tmp_dir)
-      File.mkdir!(opts[:static_dir])
-
-      entry_file_path = Path.join(tmp_dir, "MyPage.entry.js")
-      File.write!(entry_file_path, "export const myVar = 123;\n")
-
-      Application.put_env(:hologram, :max_bundle_size, 10)
-
-      on_exit(fn ->
-        Application.delete_env(:hologram, :max_bundle_size)
-      end)
-
-      exception =
-        assert_raise RuntimeError, fn ->
-          bundle(MyPage, entry_file_path, "my_bundle_name", opts)
-        end
-
-      assert exception.message =~ "early warning system"
-      assert File.ls!(opts[:static_dir]) == []
-    end
-  end
-
-  test "create_page_entry_files/5", %{
-    call_graph: call_graph,
-    ir_plt: ir_plt,
-    runtime_mfas: runtime_mfas
-  } do
-    opts = [
-      js_dir: @js_dir,
-      tmp_dir: Path.join([@tmp_dir, "tests", "compiler", "create_page_entry_files_5"])
-    ]
-
-    clean_dir(opts[:tmp_dir])
-
-    page_modules = Reflection.list_pages()
-
-    call_graph_without_runtime_mfas =
-      call_graph
-      |> CallGraph.clone()
-      |> CallGraph.remove_runtime_mfas!(runtime_mfas)
-
-    result =
-      create_page_entry_files(
-        page_modules,
-        call_graph_without_runtime_mfas,
-        ir_plt,
-        MapSet.new(),
-        opts
-      )
-
-    assert Enum.count(result) == Enum.count(page_modules)
-
-    Enum.each(result, fn {page_module, entry_file_path} ->
-      assert page_module in page_modules
-
-      module_name = Reflection.module_name(page_module)
-      assert entry_file_path == Path.join(opts[:tmp_dir], "#{module_name}.entry.js")
-
-      assert entry_file_path
-             |> File.read!()
-             |> String.contains?("Interpreter.defineElixirFunction")
-    end)
-  end
-
-  test "create_runtime_entry_file/5", %{ir_plt: ir_plt, runtime_mfas: runtime_mfas} do
-    opts = [
-      js_dir: @js_dir,
-      tmp_dir: Path.join([@tmp_dir, "tests", "compiler", "create_runtime_entry_file_5"])
-    ]
-
-    clean_dir(opts[:tmp_dir])
-
-    entry_file_path = create_runtime_entry_file(runtime_mfas, ir_plt, MapSet.new(), [], opts)
-
-    assert entry_file_path == Path.join(opts[:tmp_dir], "runtime.entry.js")
-
-    assert entry_file_path
-           |> File.read!()
-           |> String.contains?("Interpreter.defineElixirFunction")
-  end
-
-  test "diff_module_digest_plts/2" do
-    old_plt =
-      PLT.start()
-      |> PLT.put(:module_1, :digest_1)
-      |> PLT.put(:module_3, :digest_3a)
-      |> PLT.put(:module_5, :digest_5)
-      |> PLT.put(:module_6, :digest_6a)
-      |> PLT.put(:module_7, :digest_7)
-
-    new_plt =
-      PLT.start()
-      |> PLT.put(:module_1, :digest_1)
-      |> PLT.put(:module_2, :digest_2)
-      |> PLT.put(:module_3, :digest_3b)
-      |> PLT.put(:module_4, :digest_4)
-      |> PLT.put(:module_6, :digest_6b)
-
-    result = diff_module_digest_plts(old_plt, new_plt)
-
-    keys =
-      result
-      |> Map.keys()
-      |> Enum.sort()
-
-    assert keys == [:added_modules, :edited_modules, :removed_modules]
-
-    assert Enum.sort(result.added_modules) == [:module_2, :module_4]
-    assert Enum.sort(result.removed_modules) == [:module_5, :module_7]
-    assert Enum.sort(result.edited_modules) == [:module_3, :module_6]
   end
 
   describe "get_erlang_function_js/4" do
@@ -1021,10 +648,7 @@ defmodule Hologram.CompilerTest do
         normalize_newlines("""
         (key, map) => {
             if (!Type.isMap(map)) {
-              Interpreter.raiseBifError(["badmap", map], "erlang", "map_get", [
-                key,
-                map,
-              ]);
+              Interpreter.raiseBifError(["badmap", map], "erlang", "map_get", [key, map]);
             }
 
             const encodedKey = Type.encodeMapKey(key);
@@ -1120,58 +744,6 @@ defmodule Hologram.CompilerTest do
            }
   end
 
-  describe "install_js_deps/1" do
-    setup do
-      setup_js_deps_test("install_js_deps_1")
-    end
-
-    @tag timeout: 300_000
-    test "installs deps in node_modules dir and creates package-lock.json file", %{
-      assets_dir: assets_dir,
-      build_dir: build_dir
-    } do
-      install_js_deps(assets_dir, build_dir)
-
-      node_modules_dir = Path.join(assets_dir, "node_modules")
-      assert File.exists?(node_modules_dir)
-
-      package_lock_json_path = Path.join(assets_dir, "package-lock.json")
-      assert File.exists?(package_lock_json_path)
-    end
-
-    @tag timeout: 300_000
-    test "creates a file containing the digest of package.json", %{
-      assets_dir: assets_dir,
-      build_dir: build_dir
-    } do
-      install_js_deps(assets_dir, build_dir)
-
-      package_json_digest_path = Path.join(build_dir, "package_json_digest.bin")
-      assert File.exists?(package_json_digest_path)
-    end
-
-    test "raises RuntimeError if npm install command fails", %{
-      assets_dir: assets_dir,
-      build_dir: build_dir
-    } do
-      fixture_package_json_path = Path.join(assets_dir, "package.json")
-      File.rm!(fixture_package_json_path)
-
-      assert_raise RuntimeError, "npm install command failed", fn ->
-        install_js_deps(assets_dir, build_dir)
-      end
-
-      node_modules_dir = Path.join(assets_dir, "node_modules")
-      refute File.exists?(node_modules_dir)
-
-      package_lock_json_path = Path.join(assets_dir, "package-lock.json")
-      assert File.exists?(package_lock_json_path)
-
-      package_json_digest_path = Path.join(build_dir, "package_json_digest.bin")
-      refute File.exists?(package_json_digest_path)
-    end
-  end
-
   describe "list_component_usages/1" do
     test "collects plain and nested usages, in template order" do
       usages =
@@ -1225,62 +797,6 @@ defmodule Hologram.CompilerTest do
         |> list_component_usages()
 
       assert usages == []
-    end
-  end
-
-  describe "maybe_install_js_deps/1" do
-    setup do
-      setup_js_deps_test("maybe_install_js_deps_1")
-    end
-
-    @tag timeout: 300_000
-    test "package_json_digest.bin file doesn't exist", %{
-      assets_dir: assets_dir,
-      build_dir: build_dir
-    } do
-      install_js_deps(assets_dir, build_dir)
-
-      package_json_digest_path = Path.join(build_dir, "package_json_digest.bin")
-      File.rm!(package_json_digest_path)
-
-      assert maybe_install_js_deps(assets_dir, build_dir) == :ok
-      assert File.exists?(package_json_digest_path)
-    end
-
-    @tag timeout: 300_000
-    test "package-lock.json file doesn't exist", %{assets_dir: assets_dir, build_dir: build_dir} do
-      install_js_deps(assets_dir, build_dir)
-
-      package_lock_json_path = Path.join(assets_dir, "package-lock.json")
-      File.rm!(package_lock_json_path)
-
-      assert maybe_install_js_deps(assets_dir, build_dir) == :ok
-      assert File.exists?(package_lock_json_path)
-    end
-
-    @tag timeout: 300_000
-    test "package.json file changed", %{assets_dir: assets_dir, build_dir: build_dir} do
-      install_js_deps(assets_dir, build_dir)
-
-      package_json_digest_path = Path.join(build_dir, "package_json_digest.bin")
-      package_json_digest = File.read!(package_json_digest_path)
-
-      package_json_path = Path.join(assets_dir, "package.json")
-      File.write!(package_json_path, "{}")
-
-      assert maybe_install_js_deps(assets_dir, build_dir) == :ok
-      assert File.read!(package_json_digest_path) != package_json_digest
-    end
-
-    @tag timeout: 300_000
-    test "install is not needed", %{assets_dir: assets_dir, build_dir: build_dir} do
-      install_js_deps(assets_dir, build_dir)
-
-      package_json_digest_path = Path.join(build_dir, "package_json_digest.bin")
-      package_json_digest_mtime = File.stat!(package_json_digest_path).mtime
-
-      assert maybe_install_js_deps(assets_dir, build_dir) == nil
-      assert File.stat!(package_json_digest_path).mtime == package_json_digest_mtime
     end
   end
 
@@ -1567,16 +1083,16 @@ defmodule Hologram.CompilerTest do
       |> prune_module_def(reachable_mfas)
       |> Encoder.encode_ir(%Context{module: String.Chars, async_mfas: MapSet.new()})
 
-    assert String.contains?(
+    assert js_contains?(
              js,
              ~s/Interpreter.defineElixirFunction("String.Chars", "impl_for!", 1, "public"/
            )
 
-    assert String.contains?(js, ~s/Type.atom("Elixir.String.Chars.Atom")/)
-    assert String.contains?(js, ~s/Type.atom("Elixir.String.Chars.URI")/)
+    assert js_contains?(js, ~s/Type.atom("Elixir.String.Chars.Atom")/)
+    assert js_contains?(js, ~s/Type.atom("Elixir.String.Chars.URI")/)
 
-    refute String.contains?(js, "Elixir.String.Chars.Version")
-    refute String.contains?(js, "Hologram.Test.Fixtures.Compiler.CallGraph.Module12")
+    refute js_contains?(js, "Elixir.String.Chars.Version")
+    refute js_contains?(js, "Hologram.Test.Fixtures.Compiler.CallGraph.Module12")
   end
 
   describe "validate_prop_usages/2" do

@@ -38,9 +38,7 @@ const outputFile = __dirname + "/classes_javascript.txt";
 
 const maxCodepoint = 0x10ffff;
 
-console.log(
-  `Generating identifier classes for codepoints 0 to ${maxCodepoint}...`,
-);
+console.log(`Generating identifier classes for codepoints 0 to ${maxCodepoint}...`);
 
 // UTS 39 Table 5 (recommended scripts), plus Common and Inherited. The revision to
 // follow is the one the BEAM implements, since what it accepts is the side being
@@ -109,8 +107,7 @@ for (let codepoint = 0; codepoint <= maxCodepoint; codepoint++) {
   const char = String.fromCodePoint(codepoint);
   const start = startClass(codepoint, char);
 
-  const continues =
-    idContinueRegex.test(char) && recommendedRegex.test(char) ? "1" : "0";
+  const continues = idContinueRegex.test(char) && recommendedRegex.test(char) ? "1" : "0";
 
   lines.push(`${codepoint}:${start}:${continues}`);
 }

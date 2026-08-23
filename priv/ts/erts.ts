@@ -14,11 +14,7 @@ import Utils from "./utils.ts";
 
 const REF_KEY = Type.encodeMapKey(Type.atom("ref"));
 
-const TASK_MFA = Type.tuple([
-  Type.alias("Hologram.JS"),
-  Type.atom("call"),
-  Type.integer(3),
-]);
+const TASK_MFA = Type.tuple([Type.alias("Hologram.JS"), Type.atom("call"), Type.integer(3)]);
 
 export default class ERTS {
   // The PID of the init process (#PID<0.0.0>), which is the first process started
@@ -105,10 +101,7 @@ export default class ERTS {
       if (typeof fragment === "object" && "general" in fragment) {
         const generalKey = Type.atom("general");
 
-        result.data[Type.encodeMapKey(generalKey)] = [
-          generalKey,
-          expandError(fragment.general),
-        ];
+        result.data[Type.encodeMapKey(generalKey)] = [generalKey, expandError(fragment.general)];
 
         continue;
       }
@@ -160,11 +153,7 @@ export default class ERTS {
     const creation = 0;
 
     // TODO: implement ID words similarly to how it's done in Erlang
-    const idWords = [
-      Utils.randomUint32(),
-      Utils.randomUint32(),
-      $.referenceSequence.next(),
-    ];
+    const idWords = [Utils.randomUint32(), Utils.randomUint32(), $.referenceSequence.next()];
 
     return Type.reference(node, creation, idWords);
   }

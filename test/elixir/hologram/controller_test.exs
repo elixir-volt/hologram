@@ -63,7 +63,7 @@ defmodule Hologram.ControllerTest do
 
   use_module_stub :asset_manifest_cache
   use_module_stub :asset_path_registry
-  use_module_stub :page_digest_registry
+  use_module_stub :bundle_manifest
   use_module_stub :page_module_resolver
 
   setup :set_mox_global
@@ -251,7 +251,7 @@ defmodule Hologram.ControllerTest do
 
     setup_asset_manifest_cache(AssetManifestCacheStub)
 
-    setup_page_digest_registry(PageDigestRegistryStub)
+    setup_bundle_manifest(BundleManifestStub)
   end
 
   describe "extract_params/2" do
@@ -453,7 +453,7 @@ defmodule Hologram.ControllerTest do
   describe "build_page_data_payload/1" do
     setup do
       fields = %{
-        page_digest: "abcdef1234567890",
+        page_bundle_path: "/hologram/page-abcdef1234567890.js",
         page_module: Module1,
         tree: [{:element, "div", [{"$key", [text: "a1b2c3:0"]}], [{:text, "abc"}]}]
       }
@@ -461,8 +461,9 @@ defmodule Hologram.ControllerTest do
       [fields: fields]
     end
 
-    test "carries the digest naming the page's bundle", %{fields: fields} do
-      assert %{pageDigest: "abcdef1234567890", type: "page"} = build_page_data_payload(fields)
+    test "carries the path naming the page's bundle", %{fields: fields} do
+      assert %{pageBundlePath: "/hologram/page-abcdef1234567890.js", type: "page"} =
+               build_page_data_payload(fields)
     end
 
     # Each term lands under its own key: the encoded values are opaque strings, so a pair of them
@@ -480,7 +481,7 @@ defmodule Hologram.ControllerTest do
       assert fields
              |> build_page_data_payload()
              |> Map.keys()
-             |> Enum.sort() == [:pageDigest, :pageModule, :tree, :type]
+             |> Enum.sort() == [:pageBundlePath, :pageModule, :tree, :type]
     end
 
     test "survives the JSON encoding it is sent over", %{fields: fields} do
@@ -492,7 +493,7 @@ defmodule Hologram.ControllerTest do
         |> Jason.decode!()
 
       assert decoded["type"] == "page"
-      assert decoded["pageDigest"] == "abcdef1234567890"
+      assert decoded["pageBundlePath"] == "/hologram/page-abcdef1234567890.js"
       assert decoded["tree"] == payload.tree
     end
 
@@ -1715,7 +1716,7 @@ defmodule Hologram.ControllerTest do
 
   describe "handle_initial_page_request/2" do
     test "updates Plug.Conn fields related to HTTP response and halts the pipeline" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       conn =
         :get
@@ -1730,7 +1731,7 @@ defmodule Hologram.ControllerTest do
 
     # TODO: uncomment when standalone Hologram is supported
     # test "initializes Hologram session" do
-    #   ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+    #   ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
     #   conn =
     #     :get
@@ -1741,7 +1742,7 @@ defmodule Hologram.ControllerTest do
     # end
 
     test "extracts and casts page params and passes them to page renderer" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module1, :dummy_module_1_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module1, :dummy_module_1_digest)
 
       conn =
         :get
@@ -1753,7 +1754,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "decodes URL-encoded params" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module11, :dummy_module_11_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module11, :dummy_module_11_digest)
 
       # URL encoded: "hello world" -> "hello%20world", "foo/bar" -> "foo%2Fbar"
       conn =
@@ -1766,7 +1767,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "passes server struct with session to page init/3" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module9, :dummy_module_9_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module9, :dummy_module_9_digest)
 
       conn =
         :get
@@ -1778,7 +1779,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "passes server struct with empty subscriptions to page init/3" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module13, :dummy_module_13_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module13, :dummy_module_13_digest)
 
       conn =
         :get
@@ -1790,7 +1791,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "passes server struct with cookies to page init/3" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module2, :dummy_module_2_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module2, :dummy_module_2_digest)
 
       conn =
         :get
@@ -1803,7 +1804,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "passes to renderer the initial_page? opt set to true" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module5, :dummy_module_5_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module5, :dummy_module_5_digest)
 
       conn =
         :get
@@ -1816,7 +1817,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "generates and includes CSRF token for initial page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       conn =
         :get
@@ -1831,7 +1832,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "generates and embeds instance_id for initial page requests" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module5, :dummy_module_5_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module5, :dummy_module_5_digest)
 
       conn =
         :get
@@ -1846,7 +1847,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "generates a fresh instance_id on each initial page request" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module5, :dummy_module_5_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module5, :dummy_module_5_digest)
 
       conn_1 =
         :get
@@ -1864,7 +1865,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "updates Plug.Conn session" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module10, :dummy_module_10_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module10, :dummy_module_10_digest)
 
       conn =
         :get
@@ -1876,7 +1877,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "establishes a Hologram session ID" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       conn =
         :get
@@ -1890,7 +1891,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "updates Plug.Conn cookies" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module3, :dummy_module_3_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module3, :dummy_module_3_digest)
 
       conn =
         :get
@@ -1902,7 +1903,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "fires broadcasts queued during page init after successful render" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module12, :dummy_module_12_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module12, :dummy_module_12_digest)
 
       topic = Realtime.identity_topic(:user, "test-broadcast-user")
       Phoenix.PubSub.subscribe(Hologram.PubSub, topic)
@@ -1926,14 +1927,14 @@ defmodule Hologram.ControllerTest do
     # The tests below assert the subscription-wiring and cid-binding slices.
 
     setup do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module14, :dummy_module_14_digest)
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module15, :dummy_module_15_digest)
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module18, :dummy_module_18_digest)
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module19, :dummy_module_19_digest)
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module20, :dummy_module_20_digest)
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module21, :dummy_module_21_digest)
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module22, :dummy_module_22_digest)
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module26, :dummy_module_26_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module14, :dummy_module_14_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module15, :dummy_module_15_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module18, :dummy_module_18_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module19, :dummy_module_19_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module20, :dummy_module_20_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module21, :dummy_module_21_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module22, :dummy_module_22_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module26, :dummy_module_26_digest)
 
       :ok
     end
@@ -2049,7 +2050,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "treats client-claimed keys as advisory so a lying client cannot manufacture subscriptions" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       topic = Realtime.instance_announce_topic("test-instance-id")
       Phoenix.PubSub.subscribe(Hologram.PubSub, topic)
@@ -2421,7 +2422,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "answers with the page described as data and halts the pipeline" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module4"
@@ -2435,12 +2436,12 @@ defmodule Hologram.ControllerTest do
       assert conn.status == 200
 
       assert response["type"] == "page"
-      assert response["pageDigest"] == "dummy_module_4_digest"
+      assert response["pageBundlePath"] == "dummy_module_4_digest"
       assert response["tree"] =~ ~r/^Type\.list\(/
     end
 
     test "casts page params and carries them in the payload" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module1, :dummy_module_1_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module1, :dummy_module_1_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module1?aaa=111&bbb=222"
@@ -2456,7 +2457,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "carries the render as a tree with the Realtime JS interpolated" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module5, :dummy_module_5_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module5, :dummy_module_5_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module5"
@@ -2471,7 +2472,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "marks a page payload as page data" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module4"
@@ -2484,7 +2485,7 @@ defmodule Hologram.ControllerTest do
     # A redirect cannot survive the trip: the fetch this answers either follows it out of sight or
     # is refused its Location. So it travels as data, naming the page the client should ask for.
     test "describes a redirecting middleware's target as data" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module29, :dummy_module_29_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module29, :dummy_module_29_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module29"
@@ -2504,7 +2505,7 @@ defmodule Hologram.ControllerTest do
     # The redirect itself cannot survive the trip, but a header set alongside it was meant for the
     # response, and the HTML path keeps it.
     test "keeps a header the redirecting middleware set" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module31, :dummy_module_31_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module31, :dummy_module_31_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module31"
@@ -2518,7 +2519,7 @@ defmodule Hologram.ControllerTest do
     # The payload names where the client is going, so a location header on this 200 would name
     # somewhere it is not.
     test "does not send the redirect's location header" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module29, :dummy_module_29_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module29, :dummy_module_29_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module29"
@@ -2531,7 +2532,7 @@ defmodule Hologram.ControllerTest do
     # A dead end rather than a navigation: sent as it stands, so the client can hand the path to the
     # browser and get what a typed-in URL would have given, and so logs and proxies see the denial.
     test "sends a denying middleware's response as it stands" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module25, :dummy_module_25_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module25, :dummy_module_25_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module25"
@@ -2545,7 +2546,7 @@ defmodule Hologram.ControllerTest do
     # Status alone cannot tell a page payload from a page's own answer, which is what the marker
     # header is for.
     test "sends a terminal 200 from middleware without marking it as page data" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module30, :dummy_module_30_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module30, :dummy_module_30_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module30"
@@ -2558,7 +2559,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "applies the cookie operations the run accumulated" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module3, :dummy_module_3_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module3, :dummy_module_3_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module3"
@@ -2569,7 +2570,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "establishes a Hologram session ID" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module4"
@@ -2582,7 +2583,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "decodes URL-encoded query params" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module11, :dummy_module_11_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module11, :dummy_module_11_digest)
 
       # URL encoded: "hello world" -> "hello%20world", "foo/bar" -> "foo%2Fbar"
       conn =
@@ -2597,7 +2598,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "updates Plug.Conn session" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module10, :dummy_module_10_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module10, :dummy_module_10_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module10"
@@ -2610,7 +2611,7 @@ defmodule Hologram.ControllerTest do
     # A navigation is not where a CSRF token is minted: the page it navigates from already carries
     # one.
     test "does not generate a CSRF token" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       conn =
         "/hologram/page/Hologram.Test.Fixtures.Controller.Module4"
@@ -2621,7 +2622,7 @@ defmodule Hologram.ControllerTest do
     end
 
     test "addresses the replacement to the instance named in the request body" do
-      ETS.put(PageDigestRegistryStub.ets_table_name(), Module4, :dummy_module_4_digest)
+      ETS.put(BundleManifestStub.ets_table_name(), Module4, :dummy_module_4_digest)
 
       topic = Realtime.instance_announce_topic("test-instance-id")
       Phoenix.PubSub.subscribe(Hologram.PubSub, topic)

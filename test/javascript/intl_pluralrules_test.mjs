@@ -36,10 +36,12 @@ describe("Intl.PluralRules compatibility", () => {
   });
 
   test("applies English cardinal rules to integers, decimals, and negatives", () => {
-    expect(Utils.naiveNounPlural("car", 1)).toBe("car");
-    expect(Utils.naiveNounPlural("car", 1.2)).toBe("cars");
-    expect(Utils.naiveNounPlural("car", -1)).toBe("car");
-    expect(Utils.naiveNounPlural("car", -2)).toBe("cars");
+    const rules = new Intl.PluralRules("en");
+
+    expect(rules.select(1)).toBe("one");
+    expect(rules.select(1.2)).toBe("other");
+    expect(rules.select(-1)).toBe("one");
+    expect(rules.select(-2)).toBe("other");
   });
 
   test("applies English ordinal teen exceptions", () => {

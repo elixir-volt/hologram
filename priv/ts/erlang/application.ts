@@ -17,12 +17,7 @@ const Erlang_Application = {
   // Start get_application/1
   "get_application/1": (module) => {
     if (!Type.isAtom(module)) {
-      Interpreter.raiseFunctionClauseError(
-        "application",
-        "get_application",
-        1,
-        [module],
-      );
+      Interpreter.raiseFunctionClauseError("application", "get_application", 1, [module]);
     }
 
     const app = ERTS.moduleMetadata[Interpreter.moduleExName(module)]?.app;
@@ -51,10 +46,7 @@ const Erlang_Application = {
       return Type.atom("undefined");
     }
 
-    return Type.tuple([
-      Type.atom("ok"),
-      Type.charlist(ERTS.appVersions[app.value]),
-    ]);
+    return Type.tuple([Type.atom("ok"), Type.charlist(ERTS.appVersions[app.value])]);
   },
   // End get_key/2
   // Deps: []

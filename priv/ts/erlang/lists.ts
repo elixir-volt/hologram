@@ -16,17 +16,11 @@ const Erlang_Lists = {
   // Start _do_flatten/2
   "_do_flatten/2": (term, tail) => {
     if (!Type.isList(term)) {
-      Interpreter.raiseFunctionClauseError("lists", "do_flatten", 2, [
-        term,
-        tail,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "do_flatten", 2, [term, tail]);
     }
 
     if (!term.isProper) {
-      Interpreter.raiseFunctionClauseError("lists", "do_flatten", 2, [
-        term.data.at(-1),
-        tail,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "do_flatten", 2, [term.data.at(-1), tail]);
     }
 
     let result = tail;
@@ -58,9 +52,7 @@ const Erlang_Lists = {
       Interpreter.raiseCaseClauseError(list);
     }
 
-    const properLength = list.isProper
-      ? list.data.length
-      : list.data.length - 1;
+    const properLength = list.isProper ? list.data.length : list.data.length - 1;
 
     for (let i = 0; i < properLength; i++) {
       const res = Interpreter.callAnonymousFunction(fun, [list.data[i]]);
@@ -71,10 +63,7 @@ const Erlang_Lists = {
     }
 
     if (!list.isProper) {
-      Interpreter.raiseFunctionClauseError("lists", "all_1", 2, [
-        fun,
-        list.data.at(-1),
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "all_1", 2, [fun, list.data.at(-1)]);
     }
 
     return Type.boolean(true);
@@ -92,9 +81,7 @@ const Erlang_Lists = {
       Interpreter.raiseCaseClauseError(list);
     }
 
-    const properLength = list.isProper
-      ? list.data.length
-      : list.data.length - 1;
+    const properLength = list.isProper ? list.data.length : list.data.length - 1;
 
     for (let i = 0; i < properLength; i++) {
       const res = Interpreter.callAnonymousFunction(fun, [list.data[i]]);
@@ -105,10 +92,7 @@ const Erlang_Lists = {
     }
 
     if (!list.isProper) {
-      Interpreter.raiseFunctionClauseError("lists", "any_1", 2, [
-        fun,
-        list.data.at(-1),
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "any_1", 2, [fun, list.data.at(-1)]);
     }
 
     return Type.boolean(false);
@@ -145,9 +129,7 @@ const Erlang_Lists = {
     }
 
     if (!Type.isProperList(list)) {
-      Erlang["error/1"](
-        Type.tuple([Type.atom("bad_generator"), list.data.at(-1)]),
-      );
+      Erlang["error/1"](Type.tuple([Type.atom("bad_generator"), list.data.at(-1)]));
     }
 
     return Type.list(
@@ -172,22 +154,14 @@ const Erlang_Lists = {
     }
 
     if (!Type.isList(list)) {
-      Interpreter.raiseFunctionClauseError("lists", "flatmap_1", 2, [
-        fun,
-        list,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "flatmap_1", 2, [fun, list]);
     }
 
     if (!Type.isProperList(list)) {
-      Interpreter.raiseFunctionClauseError("lists", "flatmap_1", 2, [
-        fun,
-        list.data.at(-1),
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "flatmap_1", 2, [fun, list.data.at(-1)]);
     }
 
-    const mappedResults = list.data.map((elem) =>
-      Interpreter.callAnonymousFunction(fun, [elem]),
-    );
+    const mappedResults = list.data.map((elem) => Interpreter.callAnonymousFunction(fun, [elem]));
 
     // The server concatenates the mapped results back-to-front, so an
     // invalid mapper result fails in the ++ BIF with the flattened suffix
@@ -198,10 +172,7 @@ const Erlang_Lists = {
       const mapped = mappedResults[i];
 
       if (!Type.isProperList(mapped)) {
-        Interpreter.raiseBifError("badarg", "erlang", "++", [
-          mapped,
-          Type.list(acc),
-        ]);
+        Interpreter.raiseBifError("badarg", "erlang", "++", [mapped, Type.list(acc)]);
       }
 
       acc = mapped.data.concat(acc);
@@ -237,20 +208,14 @@ const Erlang_Lists = {
   // Start foldl/3
   "foldl/3": (fun, initialAcc, list) => {
     if (!Type.isAnonymousFunction(fun) || fun.arity !== 2) {
-      Interpreter.raiseFunctionClauseError("lists", "foldl", 3, [
-        fun,
-        initialAcc,
-        list,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "foldl", 3, [fun, initialAcc, list]);
     }
 
     if (!Type.isList(list)) {
       Interpreter.raiseCaseClauseError(list);
     }
 
-    const properLength = list.isProper
-      ? list.data.length
-      : list.data.length - 1;
+    const properLength = list.isProper ? list.data.length : list.data.length - 1;
 
     let acc = initialAcc;
 
@@ -261,11 +226,7 @@ const Erlang_Lists = {
     // The server folds the proper prefix before failing on the tail, so the
     // frame carries the accumulator built so far.
     if (!list.isProper) {
-      Interpreter.raiseFunctionClauseError("lists", "foldl_1", 3, [
-        fun,
-        acc,
-        list.data.at(-1),
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "foldl_1", 3, [fun, acc, list.data.at(-1)]);
     }
 
     return acc;
@@ -276,22 +237,14 @@ const Erlang_Lists = {
   // Start foldr/3
   "foldr/3": (fun, initialAcc, list) => {
     if (!Type.isAnonymousFunction(fun) || fun.arity !== 2) {
-      Interpreter.raiseFunctionClauseError("lists", "foldr", 3, [
-        fun,
-        initialAcc,
-        list,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "foldr", 3, [fun, initialAcc, list]);
     }
 
     // The server recurses to the end of the list before folding, so a bad
     // list fails with the initial accumulator and the offending term, and no
     // fun application happens.
     if (!Type.isList(list)) {
-      Interpreter.raiseFunctionClauseError("lists", "foldr_1", 3, [
-        fun,
-        initialAcc,
-        list,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "foldr_1", 3, [fun, initialAcc, list]);
     }
 
     if (!Type.isProperList(list)) {
@@ -317,15 +270,10 @@ const Erlang_Lists = {
     }
 
     if (!Type.isList(list)) {
-      Interpreter.raiseFunctionClauseError("lists", "foreach_1", 2, [
-        fun,
-        list,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "foreach_1", 2, [fun, list]);
     }
 
-    const properLength = list.isProper
-      ? list.data.length
-      : list.data.length - 1;
+    const properLength = list.isProper ? list.data.length : list.data.length - 1;
 
     for (let i = 0; i < properLength; i++) {
       Interpreter.callAnonymousFunction(fun, [list.data[i]]);
@@ -334,10 +282,7 @@ const Erlang_Lists = {
     // The server applies the fun through the proper prefix before failing
     // on the tail.
     if (!list.isProper) {
-      Interpreter.raiseFunctionClauseError("lists", "foreach_1", 2, [
-        fun,
-        list.data.at(-1),
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "foreach_1", 2, [fun, list.data.at(-1)]);
     }
 
     return Type.atom("ok");
@@ -348,21 +293,13 @@ const Erlang_Lists = {
   // Start keydelete/3
   "keydelete/3": (key, index, tuples) => {
     if (!Type.isInteger(index) || index.value < 1n) {
-      Interpreter.raiseFunctionClauseError("lists", "keydelete", 3, [
-        key,
-        index,
-        tuples,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "keydelete", 3, [key, index, tuples]);
     }
 
     if (!Type.isProperList(tuples)) {
       const thirdArg = Type.isList(tuples) ? tuples.data.at(-1) : tuples;
 
-      Interpreter.raiseFunctionClauseError("lists", "keydelete3", 3, [
-        key,
-        index,
-        thirdArg,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "keydelete3", 3, [key, index, thirdArg]);
     }
 
     let result = tuples.data;
@@ -387,16 +324,8 @@ const Erlang_Lists = {
 
   // Start keyfind/3
   "keyfind/3": (value, index, tuples) => {
-    if (
-      !Type.isInteger(index) ||
-      index.value < 1n ||
-      !Type.isProperList(tuples)
-    ) {
-      Interpreter.raiseBifError("badarg", "lists", "keyfind", [
-        value,
-        index,
-        tuples,
-      ]);
+    if (!Type.isInteger(index) || index.value < 1n || !Type.isProperList(tuples)) {
+      Interpreter.raiseBifError("badarg", "lists", "keyfind", [value, index, tuples]);
     }
 
     for (const tuple of tuples.data) {
@@ -425,11 +354,7 @@ const Erlang_Lists = {
       if (error.struct) {
         // Re-raise with this function's own identity - the BEAM reports the
         // called function's frame, not the delegate's.
-        Interpreter.raiseBifError("badarg", "lists", "keymember", [
-          value,
-          index,
-          tuples,
-        ]);
+        Interpreter.raiseBifError("badarg", "lists", "keymember", [value, index, tuples]);
       }
 
       throw error;
@@ -472,11 +397,7 @@ const Erlang_Lists = {
         tuple.data.length >= index.value &&
         Interpreter.isEqual(tuple.data[Number(index.value) - 1], key)
       ) {
-        resultData = [
-          ...tuples.data.slice(0, i),
-          newTuple,
-          ...tuples.data.slice(i + 1),
-        ];
+        resultData = [...tuples.data.slice(0, i), newTuple, ...tuples.data.slice(i + 1)];
         break;
       }
     }
@@ -489,10 +410,7 @@ const Erlang_Lists = {
   // Start keysort/2
   "keysort/2": (index, tuples) => {
     if (!Type.isInteger(index) || index.value <= 0n) {
-      Interpreter.raiseFunctionClauseError("lists", "keysort", 2, [
-        index,
-        tuples,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "keysort", 2, [index, tuples]);
     }
 
     if (!Type.isList(tuples)) {
@@ -512,10 +430,7 @@ const Erlang_Lists = {
         // element, so its badarg reports :erlang.element/2.
         const badItem = tuples.data.find((item) => !Type.isTuple(item));
 
-        Interpreter.raiseBifError("badarg", "erlang", "element", [
-          index,
-          badItem,
-        ]);
+        Interpreter.raiseBifError("badarg", "erlang", "element", [index, badItem]);
       }
     }
 
@@ -538,12 +453,7 @@ const Erlang_Lists = {
   // Start keystore/4
   "keystore/4": (key, index, tuples, newTuple) => {
     if (!Type.isInteger(index) || index.value < 1n || !Type.isTuple(newTuple)) {
-      Interpreter.raiseFunctionClauseError("lists", "keystore", 4, [
-        key,
-        index,
-        tuples,
-        newTuple,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "keystore", 4, [key, index, tuples, newTuple]);
     }
 
     if (!Type.isProperList(tuples)) {
@@ -565,11 +475,7 @@ const Erlang_Lists = {
         tuple.data.length >= index.value &&
         Interpreter.isEqual(tuple.data[Number(index.value) - 1], key)
       ) {
-        const resultData = [
-          ...tuples.data.slice(0, i),
-          newTuple,
-          ...tuples.data.slice(i + 1),
-        ];
+        const resultData = [...tuples.data.slice(0, i), newTuple, ...tuples.data.slice(i + 1)];
 
         return Type.list(resultData);
       }
@@ -583,11 +489,7 @@ const Erlang_Lists = {
   // Start keytake/3
   "keytake/3": (key, index, tuples) => {
     if (!Type.isInteger(index) || index.value < 1n) {
-      Interpreter.raiseFunctionClauseError("lists", "keytake", 3, [
-        key,
-        index,
-        tuples,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "keytake", 3, [key, index, tuples]);
     }
 
     if (!Type.isList(tuples)) {
@@ -599,9 +501,7 @@ const Erlang_Lists = {
       ]);
     }
 
-    const properLength = tuples.isProper
-      ? tuples.data.length
-      : tuples.data.length - 1;
+    const properLength = tuples.isProper ? tuples.data.length : tuples.data.length - 1;
 
     for (let i = 0; i < properLength; i++) {
       const tuple = tuples.data[i];
@@ -611,18 +511,14 @@ const Erlang_Lists = {
         tuple.data.length >= index.value &&
         Interpreter.isEqual(tuple.data[Number(index.value) - 1], key)
       ) {
-        const restData = [
-          ...tuples.data.slice(0, i),
-          ...tuples.data.slice(i + 1),
-        ];
+        const restData = [...tuples.data.slice(0, i), ...tuples.data.slice(i + 1)];
 
         let rest;
 
         if (tuples.isProper) {
           rest = Type.list(restData);
         } else {
-          rest =
-            restData.length === 1 ? restData[0] : Type.improperList(restData);
+          rest = restData.length === 1 ? restData[0] : Type.improperList(restData);
         }
 
         return Type.tuple([Type.atom("value"), tuple, rest]);
@@ -655,9 +551,7 @@ const Erlang_Lists = {
       Interpreter.raiseCaseClauseError(list);
     }
 
-    const properLength = list.isProper
-      ? list.data.length
-      : list.data.length - 1;
+    const properLength = list.isProper ? list.data.length : list.data.length - 1;
 
     const mapped = [];
 
@@ -667,10 +561,7 @@ const Erlang_Lists = {
 
     // The server maps the proper prefix before failing on the tail.
     if (!list.isProper) {
-      Interpreter.raiseFunctionClauseError("lists", "map_1", 2, [
-        fun,
-        list.data.at(-1),
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "map_1", 2, [fun, list.data.at(-1)]);
     }
 
     return Type.list(mapped);
@@ -681,35 +572,22 @@ const Erlang_Lists = {
   // Start mapfoldl/3
   "mapfoldl/3": (fun, initialAcc, list) => {
     if (!Type.isAnonymousFunction(fun) || fun.arity !== 2) {
-      Interpreter.raiseFunctionClauseError("lists", "mapfoldl", 3, [
-        fun,
-        initialAcc,
-        list,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "mapfoldl", 3, [fun, initialAcc, list]);
     }
 
     if (!Type.isList(list)) {
-      Interpreter.raiseFunctionClauseError("lists", "mapfoldl_1", 3, [
-        fun,
-        initialAcc,
-        list,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "mapfoldl_1", 3, [fun, initialAcc, list]);
     }
 
     const isProperList = Type.isProperList(list);
 
-    const elementsCount = isProperList
-      ? list.data.length
-      : Math.max(list.data.length - 1, 0);
+    const elementsCount = isProperList ? list.data.length : Math.max(list.data.length - 1, 0);
 
     let acc = initialAcc;
     const mappedElements = [];
 
     for (let i = 0; i < elementsCount; ++i) {
-      const result = Interpreter.callAnonymousFunction(fun, [
-        list.data[i],
-        acc,
-      ]);
+      const result = Interpreter.callAnonymousFunction(fun, [list.data[i], acc]);
 
       if (!Type.isTuple(result) || result.data.length !== 2) {
         Interpreter.raiseMatchError(result);
@@ -720,11 +598,7 @@ const Erlang_Lists = {
     }
 
     if (!isProperList) {
-      Interpreter.raiseFunctionClauseError("lists", "mapfoldl_1", 3, [
-        fun,
-        acc,
-        list.data.at(-1),
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "mapfoldl_1", 3, [fun, acc, list.data.at(-1)]);
     }
 
     return Type.tuple([Type.list(mappedElements), acc]);
@@ -738,9 +612,7 @@ const Erlang_Lists = {
       Interpreter.raiseFunctionClauseError("lists", "max", 1, [list]);
     }
 
-    const properLength = list.isProper
-      ? list.data.length
-      : list.data.length - 1;
+    const properLength = list.isProper ? list.data.length : list.data.length - 1;
 
     let max = list.data[0];
 
@@ -753,10 +625,7 @@ const Erlang_Lists = {
     // The server threads the running maximum through max/2, so an improper
     // list fails there with the tail and the maximum found so far.
     if (!list.isProper) {
-      Interpreter.raiseFunctionClauseError("lists", "max", 2, [
-        list.data.at(-1),
-        max,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "max", 2, [list.data.at(-1), max]);
     }
 
     return max;
@@ -801,9 +670,7 @@ const Erlang_Lists = {
       Interpreter.raiseFunctionClauseError("lists", "min", 1, [list]);
     }
 
-    const properLength = list.isProper
-      ? list.data.length
-      : list.data.length - 1;
+    const properLength = list.isProper ? list.data.length : list.data.length - 1;
 
     let min = list.data[0];
 
@@ -816,10 +683,7 @@ const Erlang_Lists = {
     // The server threads the running minimum through min/2, so an improper
     // list fails there with the tail and the minimum found so far.
     if (!list.isProper) {
-      Interpreter.raiseFunctionClauseError("lists", "min", 2, [
-        list.data.at(-1),
-        min,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "min", 2, [list.data.at(-1), min]);
     }
 
     return min;
@@ -830,10 +694,7 @@ const Erlang_Lists = {
   // Start prefix/2
   "prefix/2": (list1, list2) => {
     if (!Type.isList(list1) || !Type.isList(list2)) {
-      Interpreter.raiseFunctionClauseError("lists", "prefix", 2, [
-        list1,
-        list2,
-      ]);
+      Interpreter.raiseFunctionClauseError("lists", "prefix", 2, [list1, list2]);
     }
 
     const length1 = list1.data.length;
@@ -859,10 +720,7 @@ const Erlang_Lists = {
         (length1 === index + 1 && Type.isImproperList(list1)) ||
         (length2 === index + 1 && Type.isImproperList(list2))
       ) {
-        Interpreter.raiseFunctionClauseError("lists", "prefix", 2, [
-          tail(list1),
-          tail(list2),
-        ]);
+        Interpreter.raiseFunctionClauseError("lists", "prefix", 2, [tail(list1), tail(list2)]);
       } // Next element matches, so the first list could be a prefix of the second list
       else if (
         length1 > index &&
@@ -890,18 +748,13 @@ const Erlang_Lists = {
     // a non-list or an improper list with fewer than two proper elements
     // fails there, while a longer improper list fails in the reverse/2 BIF
     // with the reversal state accumulated so far.
-    if (
-      !Type.isList(list) ||
-      (!Type.isProperList(list) && list.data.length === 2)
-    ) {
+    if (!Type.isList(list) || (!Type.isProperList(list) && list.data.length === 2)) {
       Interpreter.raiseFunctionClauseError("lists", "reverse", 1, [list]);
     }
 
     if (!Type.isProperList(list)) {
       const rest =
-        list.data.length === 3
-          ? list.data.at(-1)
-          : Type.improperList(list.data.slice(2));
+        list.data.length === 3 ? list.data.at(-1) : Type.improperList(list.data.slice(2));
 
       Interpreter.raiseBifError("badarg", "lists", "reverse", [
         rest,
@@ -924,9 +777,7 @@ const Erlang_Lists = {
       return tail;
     }
 
-    const data = list.data
-      .toReversed()
-      .concat(Type.isList(tail) ? tail.data : [tail]);
+    const data = list.data.toReversed().concat(Type.isList(tail) ? tail.data : [tail]);
 
     return Type.isProperList(tail) ? Type.list(data) : Type.improperList(data);
   },
@@ -935,11 +786,7 @@ const Erlang_Lists = {
 
   // Start seq/2
   "seq/2": (from, to) => {
-    if (
-      !Type.isInteger(from) ||
-      !Type.isInteger(to) ||
-      from.value > to.value + 1n
-    ) {
+    if (!Type.isInteger(from) || !Type.isInteger(to) || from.value > to.value + 1n) {
       Interpreter.raiseFunctionClauseError("lists", "seq", 2, [from, to]);
     }
 
@@ -951,18 +798,10 @@ const Erlang_Lists = {
   // Start seq/3
   "seq/3": (fromTerm, toTerm, incrTerm) => {
     const raiseBadarg = () => {
-      Interpreter.raiseBifError("badarg", "lists", "seq", [
-        fromTerm,
-        toTerm,
-        incrTerm,
-      ]);
+      Interpreter.raiseBifError("badarg", "lists", "seq", [fromTerm, toTerm, incrTerm]);
     };
 
-    if (
-      !Type.isInteger(fromTerm) ||
-      !Type.isInteger(toTerm) ||
-      !Type.isInteger(incrTerm)
-    ) {
+    if (!Type.isInteger(fromTerm) || !Type.isInteger(toTerm) || !Type.isInteger(incrTerm)) {
       raiseBadarg();
     }
 
@@ -977,10 +816,7 @@ const Erlang_Lists = {
 
     // Erlang guard: (incr > 0 andalso from - incr =< to)
     // orelse (incr < 0 andalso from - incr >= to)
-    if (!(
-      (incr > 0n && from - incr <= to) ||
-      (incr < 0n && from - incr >= to)
-    )) {
+    if (!((incr > 0n && from - incr <= to) || (incr < 0n && from - incr >= to))) {
       raiseBadarg();
     }
 
@@ -1022,8 +858,7 @@ const Erlang_Lists = {
         const x = list.data[0];
         const y = list.data[1];
 
-        const splitFun =
-          Interpreter.compareTerms(x, y) <= 0 ? "split_1" : "split_2";
+        const splitFun = Interpreter.compareTerms(x, y) <= 0 ? "split_1" : "split_2";
 
         Interpreter.raiseFunctionClauseError("lists", splitFun, 5, [
           x,
@@ -1070,9 +905,7 @@ const Erlang_Lists = {
         const x = list.data[0];
         const y = list.data[1];
 
-        const fsplitFun = Type.isTrue(
-          Interpreter.callAnonymousFunction(fun, [x, y]),
-        )
+        const fsplitFun = Type.isTrue(Interpreter.callAnonymousFunction(fun, [x, y]))
           ? "fsplit_1"
           : "fsplit_2";
 

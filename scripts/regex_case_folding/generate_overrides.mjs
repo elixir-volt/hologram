@@ -44,9 +44,7 @@ for (let codePoint = 0; codePoint <= MAX_CODE_POINT; codePoint++) {
 }
 
 for (const foldingClass of overrideClasses) {
-  console.log(
-    `  [${foldingClass.map(hex).join(", ")}], // ${foldingClass.map(show).join(" ")}`,
-  );
+  console.log(`  [${foldingClass.map(hex).join(", ")}], // ${foldingClass.map(show).join(" ")}`);
 }
 
 console.error(`Override classes: ${overrideClasses.length}`);

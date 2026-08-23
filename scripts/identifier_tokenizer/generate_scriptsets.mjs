@@ -26,9 +26,7 @@ const outputFile = __dirname + "/scriptsets_javascript.txt";
 
 const maxCodepoint = 0x10ffff;
 
-console.log(
-  `Generating script signatures for codepoints 0 to ${maxCodepoint}...`,
-);
+console.log(`Generating script signatures for codepoints 0 to ${maxCodepoint}...`);
 
 // Anchor order must match generate_scriptsets.exs.
 const anchorSets = [
@@ -65,18 +63,13 @@ const baseScripts = [
 ];
 
 const scriptRegexes = new Map(
-  baseScripts.map((script) => [
-    script,
-    new RegExp(`^\\p{scx=${script}}$`, "u"),
-  ]),
+  baseScripts.map((script) => [script, new RegExp(`^\\p{scx=${script}}$`, "u")]),
 );
 
 const commonRegex = /^[\p{scx=Zyyy}\p{scx=Zinh}]$/u;
 
 const augmentedScripts = (char) => {
-  const scripts = new Set(
-    baseScripts.filter((script) => scriptRegexes.get(script).test(char)),
-  );
+  const scripts = new Set(baseScripts.filter((script) => scriptRegexes.get(script).test(char)));
 
   if (scripts.has("Hani") || scripts.has("Hira") || scripts.has("Kana")) {
     scripts.add("Jpan");
@@ -106,9 +99,7 @@ for (let codepoint = 0; codepoint <= maxCodepoint; codepoint++) {
     const scripts = augmentedScripts(char);
 
     signature = anchorSets
-      .map((anchorSet) =>
-        anchorSet.some((script) => scripts.has(script)) ? "1" : "0",
-      )
+      .map((anchorSet) => (anchorSet.some((script) => scripts.has(script)) ? "1" : "0"))
       .join("");
   }
 

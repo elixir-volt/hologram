@@ -8,6 +8,34 @@ defmodule Hologram.Realtime.Gossip do
   # Nothing here waits. A reply is a message the asking store merges whenever it lands,
   # so a store is never held up by peers that are slow or absent.
 
+  @doc false
+  @spec __using__(keyword) :: Macro.t()
+  defmacro __using__(opts) do
+    gossip = __MODULE__
+    gossip_topic = Keyword.fetch!(opts, :topic)
+
+    quote do
+      @doc false
+      @spec handle_info(:sweep_expired | {:nodedown, node} | {:nodeup, node}, state) ::
+              {:noreply, state}
+            when node: node, state: any
+      @impl GenServer
+      def handle_info(:sweep_expired, state) do
+        unquote(gossip).handle_sweep(state, &delete_expired/0, &schedule_sweep/0)
+      end
+
+      @impl GenServer
+      def handle_info({:nodedown, _node}, state) do
+        unquote(gossip).handle_nodedown(state)
+      end
+
+      @impl GenServer
+      def handle_info({:nodeup, node}, state) do
+        unquote(gossip).handle_nodeup(node, unquote(gossip_topic), state)
+      end
+    end
+  end
+
   @doc """
   Asks every currently connected node for what it holds, and returns immediately.
 
@@ -47,6 +75,26 @@ defmodule Hologram.Realtime.Gossip do
       gossip_topic,
       {:sync_request, self()}
     )
+  end
+
+  @doc false
+  @spec handle_sweep(state, (-> any), (-> any)) :: {:noreply, state} when state: any
+  def handle_sweep(state, delete_expired, schedule_sweep) do
+    delete_expired.()
+    schedule_sweep.()
+
+    {:noreply, state}
+  end
+
+  @doc false
+  @spec handle_nodedown(state) :: {:noreply, state} when state: any
+  def handle_nodedown(state), do: {:noreply, state}
+
+  @doc false
+  @spec handle_nodeup(node, String.t(), state) :: {:noreply, state} when state: any
+  def handle_nodeup(node, gossip_topic, state) do
+    request_sync_from(node, gossip_topic)
+    {:noreply, state}
   end
 
   @doc """

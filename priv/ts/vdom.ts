@@ -1,11 +1,6 @@
 "use strict";
 
-import {
-  attributesModule,
-  eventListenersModule,
-  init,
-  vnode as rawVnode,
-} from "./vendor/snabbdom/build/index.js";
+import {attributesModule, eventListenersModule, init, vnode as rawVnode} from "snabbdom";
 
 const patch = init([attributesModule, eventListenersModule]);
 
@@ -102,17 +97,15 @@ export default class Vdom {
 
     const newBody = newVirtualDocument.children.find($.#isBodyVnode);
 
-    patchedVirtualDocument.children = oldVirtualDocument.children.map(
-      (child) => {
-        if ($.#isHeadVnode(child)) {
-          return patch(oldHead, newHead);
-        } else if ($.#isBodyVnode(child)) {
-          return patch(oldBody, newBody);
-        } else {
-          return child;
-        }
-      },
-    );
+    patchedVirtualDocument.children = oldVirtualDocument.children.map((child) => {
+      if ($.#isHeadVnode(child)) {
+        return patch(oldHead, newHead);
+      } else if ($.#isBodyVnode(child)) {
+        return patch(oldBody, newBody);
+      } else {
+        return child;
+      }
+    });
 
     return patchedVirtualDocument;
   }
@@ -177,13 +170,7 @@ export default class Vdom {
     // Text is adopted whatever it says: the patch rewrites text in place, which keeps the node,
     // so differing content is not a reason to rebuild.
     if (renderedVnode.sel === undefined) {
-      return rawVnode(
-        undefined,
-        undefined,
-        undefined,
-        domNode.textContent,
-        domNode,
-      );
+      return rawVnode(undefined, undefined, undefined, domNode.textContent, domNode);
     }
 
     if (renderedVnode.sel === "!") {
@@ -211,19 +198,11 @@ export default class Vdom {
     // DOM nodes past the rendered children - third-party insertions or divergence - are mirrored
     // as themselves, so the patch removes them.
     while (cursor.index < domNode.childNodes.length) {
-      mirroredChildren.push(
-        $.#vnodeOfDomNode(domNode.childNodes[cursor.index]),
-      );
+      mirroredChildren.push($.#vnodeOfDomNode(domNode.childNodes[cursor.index]));
       cursor.index += 1;
     }
 
-    return rawVnode(
-      renderedVnode.sel,
-      data,
-      mirroredChildren,
-      undefined,
-      domNode,
-    );
+    return rawVnode(renderedVnode.sel, data, mirroredChildren, undefined, domNode);
   }
 
   // Whether a rendered vnode can stand for a DOM node, which is what makes adopting it safe.
@@ -235,10 +214,7 @@ export default class Vdom {
   // identity rather than content.
   static #correspondsTo(renderedVnode, domNode) {
     if (renderedVnode.sel === undefined) {
-      return (
-        !Array.isArray(renderedVnode.children) &&
-        domNode.nodeType === Node.TEXT_NODE
-      );
+      return !Array.isArray(renderedVnode.children) && domNode.nodeType === Node.TEXT_NODE;
     }
 
     if (renderedVnode.sel === "!") {
@@ -288,8 +264,7 @@ export default class Vdom {
   static #isResourceKey(key) {
     return (
       typeof key === "string" &&
-      (key.startsWith("__hologramLink__:") ||
-        key.startsWith("__hologramScript__:"))
+      (key.startsWith("__hologramLink__:") || key.startsWith("__hologramScript__:"))
     );
   }
 
@@ -321,13 +296,7 @@ export default class Vdom {
   // to be empty makes the patch append content the node already has.
   static #vnodeOfDomNode(domNode) {
     if (domNode.nodeType === Node.TEXT_NODE) {
-      return rawVnode(
-        undefined,
-        undefined,
-        undefined,
-        domNode.textContent,
-        domNode,
-      );
+      return rawVnode(undefined, undefined, undefined, domNode.textContent, domNode);
     }
 
     if (domNode.nodeType === Node.COMMENT_NODE) {
@@ -343,18 +312,10 @@ export default class Vdom {
     }
 
     const children = $.finalizeChildren(
-      Array.from(domNode.childNodes).map((childNode) =>
-        $.#vnodeOfDomNode(childNode),
-      ),
+      Array.from(domNode.childNodes).map((childNode) => $.#vnodeOfDomNode(childNode)),
     );
 
-    return rawVnode(
-      domNode.tagName.toLowerCase(),
-      data,
-      children,
-      undefined,
-      domNode,
-    );
+    return rawVnode(domNode.tagName.toLowerCase(), data, children, undefined, domNode);
   }
 }
 

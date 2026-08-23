@@ -8,10 +8,7 @@ import Type from "../type.ts";
 const Elixir_String = {
   "contains?/2": (subject, patternOrPatterns) => {
     if (!Type.isBinary(subject)) {
-      Interpreter.raiseFunctionClauseError("String", "contains?", 2, [
-        subject,
-        patternOrPatterns,
-      ]);
+      Interpreter.raiseFunctionClauseError("String", "contains?", 2, [subject, patternOrPatterns]);
     }
 
     const subjectText = Bitstring.toText(subject);
@@ -37,10 +34,7 @@ const Elixir_String = {
         // The server searches with binary:match/2, so an invalid pattern
         // reports that identity with the whole pattern list.
         if (!Type.isBinary(pattern)) {
-          Interpreter.raiseBifError("badarg", "binary", "match", [
-            subject,
-            patternOrPatterns,
-          ]);
+          Interpreter.raiseBifError("badarg", "binary", "match", [subject, patternOrPatterns]);
         }
 
         const patternText = Bitstring.toText(pattern);
@@ -61,10 +55,7 @@ const Elixir_String = {
 
     // The server searches with binary:match/2, so an invalid pattern
     // reports that identity.
-    Interpreter.raiseBifError("badarg", "binary", "match", [
-      subject,
-      patternOrPatterns,
-    ]);
+    Interpreter.raiseBifError("badarg", "binary", "match", [subject, patternOrPatterns]);
   },
 
   // Deps: [String.downcase/2]
@@ -84,10 +75,7 @@ const Elixir_String = {
         modeValue !== "greek" &&
         modeValue !== "turkic")
     ) {
-      Interpreter.raiseFunctionClauseError("String", "downcase", 2, [
-        string,
-        mode,
-      ]);
+      Interpreter.raiseFunctionClauseError("String", "downcase", 2, [string, mode]);
     }
 
     if (modeValue !== "default") {
@@ -154,10 +142,7 @@ const Elixir_String = {
         modeValue !== "greek" &&
         modeValue !== "turkic")
     ) {
-      Interpreter.raiseFunctionClauseError("String", "upcase", 2, [
-        string,
-        mode,
-      ]);
+      Interpreter.raiseFunctionClauseError("String", "upcase", 2, [string, mode]);
     }
 
     if (modeValue !== "default") {

@@ -1,5 +1,13 @@
 "use strict";
 
+if (typeof globalThis.before === "undefined") {
+  globalThis.before = globalThis.beforeEach;
+}
+
+if (typeof globalThis.after === "undefined") {
+  globalThis.after = globalThis.afterEach;
+}
+
 if (typeof globalThis.global === "undefined") {
   globalThis.global = globalThis;
 }

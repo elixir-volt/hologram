@@ -4,9 +4,6 @@ defmodule Hologram.MixProject do
 
   @version "0.11.0"
 
-  # Copied from Hologram.Commons.SystemUtils
-  @windows_exec_suffixes [".bat", ".cmd", ".exe"]
-
   defp aliases do
     [
       f: [
@@ -17,9 +14,9 @@ defmodule Hologram.MixProject do
         "cmd cd test/umbrella && mix format"
       ],
       "format.js":
-        "cmd assets/node_modules/.bin/prettier '*.yml' '.github/**' 'assets/*.json' 'benchmarks/javascript/**' 'scripts/**' 'test/javascript/**' --config 'assets/.prettierrc.json' -u --write",
+        "cmd assets/node_modules/.bin/prettier '*.yml' '.github/**' 'assets/*.json' --config 'assets/.prettierrc.json' -u --write",
       "format.js.check":
-        "cmd assets/node_modules/.bin/prettier '*.yml' '.github/**' 'assets/*.json' 'benchmarks/javascript/**' 'scripts/**' 'test/javascript/**' --check --config 'assets/.prettierrc.json' --no-error-on-unmatched-pattern -u",
+        "cmd assets/node_modules/.bin/prettier '*.yml' '.github/**' 'assets/*.json' --check --config 'assets/.prettierrc.json' --no-error-on-unmatched-pattern -u",
       setup: [
         "deps.get",
         "cmd --cd assets npm install",
@@ -81,7 +78,7 @@ defmodule Hologram.MixProject do
       {:recode, "~> 0.7", only: :dev, runtime: false},
       {:sobelow, "~> 0.12", only: [:dev, :test], runtime: false},
       {:telemetry, "~> 1.0"},
-      {:volt, "~> 0.17.10", runtime: false},
+      {:volt, github: "elixir-volt/volt", ref: "3380315", runtime: false},
       {:uuid, "~> 1.0"},
       {:wallaby, "~> 0.30", only: [:dev, :test], runtime: false},
       {:websock_adapter, "~> 0.5"}
@@ -131,7 +128,7 @@ defmodule Hologram.MixProject do
       description:
         "Full stack isomorphic Elixir web framework that can be used on top of Phoenix.",
       dialyzer: [
-        plt_add_apps: [:ex_unit, :iex, :mix, :wallaby],
+        plt_add_apps: [:ex_unit, :iex, :mix, :oxc, :volt, :wallaby],
         plt_core_path: Path.join(["priv", "plts", "core.plt"]),
         plt_local_path: Path.join(["priv", "plts", "project.plt"])
       ],
@@ -177,112 +174,9 @@ defmodule Hologram.MixProject do
     ]
   end
 
-  # Copied from Hologram.Commons.SystemUtils
-  # Executes the given command cross-platform.
-  # Accepts either a bare command name (resolved via PATH) or an executable file path.
-  # On Windows, .cmd/.bat wrappers must be executed via "cmd /c".
-  # sobelow_skip ["CI.System"]
-  # credo:disable-for-lines:11 Credo.Check.Design.DuplicatedCode
-  defp cmd_cross_platform(command_name_or_path, args, opts) do
-    windows? = match?({:win32, _name}, :os.type())
-
-    resolved_command_path = resolve_command_path!(command_name_or_path, windows?)
-
-    if windows? and String.match?(resolved_command_path, ~r/\.(cmd|bat)$/i) do
-      System.cmd("cmd", ["/c", resolved_command_path | args], opts)
-    else
-      System.cmd(resolved_command_path, args, opts)
-    end
-  end
-
   defp dep? do
     __MODULE__.module_info()[:compile][:source]
     |> to_string()
     |> String.ends_with?("/deps/hologram/mix.exs")
-  end
-
-  # Copied from Hologram.Commons.SystemUtils
-  defp find_windows_wrapper(explicit_command_path) do
-    @windows_exec_suffixes
-    |> Enum.map(&(explicit_command_path <> &1))
-    |> Enum.find(&File.exists?/1)
-  end
-
-  # Copied from Hologram.Commons.SystemUtils
-  defp has_windows_exec_ext?(path) do
-    ext =
-      path
-      |> Path.extname()
-      |> String.downcase()
-
-    ext in @windows_exec_suffixes
-  end
-
-  # Copied from Hologram.Commons.SystemUtils
-  defp resolve_command_path!(command_name_or_path, windows?) do
-    has_separator? = String.contains?(command_name_or_path, ["/", "\\"])
-
-    if has_separator? do
-      resolve_explicit_command_path!(command_name_or_path, windows?)
-    else
-      case System.find_executable(command_name_or_path) do
-        nil ->
-          raise RuntimeError,
-            message: "executable not found in PATH: #{command_name_or_path}"
-
-        resolved_command_path ->
-          resolved_command_path
-      end
-    end
-  end
-
-  # Copied from Hologram.Commons.SystemUtils
-  defp resolve_explicit_command_path!(explicit_command_path, true) do
-    if has_windows_exec_ext?(explicit_command_path) and File.exists?(explicit_command_path) do
-      explicit_command_path
-    else
-      resolve_windows_executable_path!(explicit_command_path)
-    end
-  end
-
-  # Copied from Hologram.Commons.SystemUtils
-  defp resolve_explicit_command_path!(explicit_command_path, false) do
-    if File.exists?(explicit_command_path) do
-      explicit_command_path
-    else
-      raise RuntimeError, message: "executable not found at #{explicit_command_path}"
-    end
-  end
-
-  # Copied from Hologram.Commons.SystemUtils
-  defp resolve_windows_executable_path!(explicit_command_path) do
-    if resolved_path = find_windows_wrapper(explicit_command_path) do
-      resolved_path
-    else
-      if File.exists?(explicit_command_path) do
-        explicit_command_path
-      else
-        raise RuntimeError, message: "executable not found at #{explicit_command_path}"
-      end
-    end
-  end
-
-  defp test_js(args) do
-    cmd =
-      if Enum.empty?(args) do
-        ["test"]
-      else
-        ["run", "test-file", "../#{hd(args)}"]
-      end
-
-    opts = [cd: "assets", into: IO.stream(:stdio, :line)]
-
-    cmd_cross_platform("npm", ["install"], opts)
-
-    {_exit_msg, exit_status} = cmd_cross_platform("npm", cmd, opts)
-
-    if exit_status > 0 do
-      Mix.raise("JavaScript tests failed!")
-    end
   end
 end

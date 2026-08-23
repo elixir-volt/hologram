@@ -82,10 +82,7 @@ const Erlang_Re = {
 
       if (Type.isBitstring(pattern)) {
         if (!Type.isBinary(pattern)) {
-          Interpreter.raiseBifError("badarg", "re", "compile", [
-            pattern,
-            options,
-          ]);
+          Interpreter.raiseBifError("badarg", "re", "compile", [pattern, options]);
         }
 
         Bitstring.maybeSetBytesFromText(pattern);
@@ -96,13 +93,7 @@ const Erlang_Re = {
         // The server raise carries no error_info here - the frame comes
         // from OTP's ucompile wrapper, not from a BIF.
         if (patternText === null) {
-          Interpreter.raiseBifError(
-            "badarg",
-            "re",
-            "compile",
-            [pattern, options],
-            null,
-          );
+          Interpreter.raiseBifError("badarg", "re", "compile", [pattern, options], null);
         }
       }
 
@@ -125,10 +116,7 @@ const Erlang_Re = {
         if (error.struct) {
           // Re-raise with this function's own identity - the BEAM reports
           // the BIF's frame, not the conversion's.
-          Interpreter.raiseBifError("badarg", "re", "compile", [
-            pattern,
-            options,
-          ]);
+          Interpreter.raiseBifError("badarg", "re", "compile", [pattern, options]);
         }
 
         throw error;
@@ -181,9 +169,7 @@ const Erlang_Re = {
 
       if (binary.bytes.length < magic.length) return false;
 
-      return [...magic].every(
-        (char, index) => binary.bytes[index] === char.charCodeAt(0),
-      );
+      return [...magic].every((char, index) => binary.bytes[index] === char.charCodeAt(0));
     };
 
     if (!Type.isRecordTuple(exportedPattern, "re_exported_pattern", 5)) {
@@ -207,9 +193,7 @@ const Erlang_Re = {
     if (!Type.isProperList(options)) raiseNotExported();
 
     const compileOptions = Type.list(
-      options.data.filter(
-        (option) => !(Type.isAtom(option) && option.value === "export"),
-      ),
+      options.data.filter((option) => !(Type.isAtom(option) && option.value === "export")),
     );
 
     let result;
@@ -234,14 +218,10 @@ const Erlang_Re = {
   // Start inspect/2
   "inspect/2": (compiledPattern, item) => {
     const raiseBadarg = () => {
-      Interpreter.raiseBifError("badarg", "re", "inspect", [
-        compiledPattern,
-        item,
-      ]);
+      Interpreter.raiseBifError("badarg", "re", "inspect", [compiledPattern, item]);
     };
 
-    const registryEntry =
-      ERTS.regexPatternRegistry.lookupByTerm(compiledPattern);
+    const registryEntry = ERTS.regexPatternRegistry.lookupByTerm(compiledPattern);
 
     if (registryEntry === null) {
       raiseBadarg();
@@ -286,13 +266,7 @@ const Erlang_Re = {
 
   // Start run/3
   "run/3": (subject, pattern, options) => {
-    const CAPTURE_KIND_ATOMS = new Set([
-      "all",
-      "all_but_first",
-      "all_names",
-      "first",
-      "none",
-    ]);
+    const CAPTURE_KIND_ATOMS = new Set(["all", "all_but_first", "all_names", "first", "none"]);
 
     const CAPTURE_TYPE_ATOMS = new Set(["binary", "index", "list"]);
 
@@ -339,10 +313,7 @@ const Erlang_Re = {
         if (captureOption.data.length === 3) {
           const typeTerm = captureOption.data[2];
 
-          if (
-            !Type.isAtom(typeTerm) ||
-            !CAPTURE_TYPE_ATOMS.has(typeTerm.value)
-          ) {
+          if (!Type.isAtom(typeTerm) || !CAPTURE_TYPE_ATOMS.has(typeTerm.value)) {
             raiseArgumentError();
           }
 
@@ -436,10 +407,7 @@ const Erlang_Re = {
             continue;
           }
 
-          if (
-            Type.isAtom(option) &&
-            Object.hasOwn(RUN_FLAG_KEYS, option.value)
-          ) {
+          if (Type.isAtom(option) && Object.hasOwn(RUN_FLAG_KEYS, option.value)) {
             runFlags[RUN_FLAG_KEYS[option.value]] = true;
             continue;
           }
@@ -484,15 +452,12 @@ const Erlang_Re = {
             }
 
             // The last limit option of each kind wins
-            limitOptions[LIMIT_TUPLE_KEYS[option.data[0].value]] = Number(
-              option.data[1].value,
-            );
+            limitOptions[LIMIT_TUPLE_KEYS[option.data[0].value]] = Number(option.data[1].value);
 
             continue;
           }
 
-          const isRunOnly =
-            Type.isAtom(option) && RUN_ONLY_ATOMS.has(option.value);
+          const isRunOnly = Type.isAtom(option) && RUN_ONLY_ATOMS.has(option.value);
 
           if (isRunOnly) {
             notImplementedOption ??= option;
@@ -535,11 +500,7 @@ const Erlang_Re = {
     // and no badopt cause applies, so the formatter derives no bullets and
     // the message stays the plain "argument error".
     const raiseArgumentError = () => {
-      Interpreter.raiseBifError("badarg", "re", "run", [
-        subject,
-        pattern,
-        options,
-      ]);
+      Interpreter.raiseBifError("badarg", "re", "run", [subject, pattern, options]);
     };
 
     // Char data conversion failures mirror the server's split: a binary
@@ -572,15 +533,9 @@ const Erlang_Re = {
 
       if (offsetOption !== null) {
         if (entry.unicode) {
-          startPosition = ERTS.regex.byteOffsetToUtf16Index(
-            subjectText,
-            offsetOption,
-          );
+          startPosition = ERTS.regex.byteOffsetToUtf16Index(subjectText, offsetOption);
 
-          if (
-            ERTS.regex.utf16IndexToByteOffset(subjectText, startPosition) !==
-            offsetOption
-          ) {
+          if (ERTS.regex.utf16IndexToByteOffset(subjectText, startPosition) !== offsetOption) {
             const subjectByteLength = ERTS.regex.utf16IndexToByteOffset(
               subjectText,
               subjectText.length,
@@ -643,9 +598,7 @@ const Erlang_Re = {
 
             return entry.unicode
               ? Type.bitstring(slice)
-              : Bitstring.fromBytes(
-                  [...slice].map((char) => char.charCodeAt(0)),
-                );
+              : Bitstring.fromBytes([...slice].map((char) => char.charCodeAt(0)));
           }
 
           case "index": {
@@ -664,9 +617,7 @@ const Erlang_Re = {
 
             const slice = subjectText.slice(capture.start, capture.end);
 
-            return Type.list(
-              [...slice].map((char) => Type.integer(char.codePointAt(0))),
-            );
+            return Type.list([...slice].map((char) => Type.integer(char.codePointAt(0))));
           }
         }
       };
@@ -701,9 +652,7 @@ const Erlang_Re = {
         };
 
         const captureForTarget = (target) =>
-          "number" in target
-            ? captureForNumber(target.number)
-            : captureForName(target.name);
+          "number" in target ? captureForNumber(target.number) : captureForName(target.name);
 
         let captures;
 
@@ -712,19 +661,12 @@ const Erlang_Re = {
           case "all_but_first":
             captures = [];
 
-            for (
-              let number = captureKind === "all" ? 0 : 1;
-              number <= groupMap.count;
-              number++
-            ) {
+            for (let number = captureKind === "all" ? 0 : 1; number <= groupMap.count; number++) {
               captures.push(captureForNumber(number));
             }
 
             // Trailing unset groups are not reported
-            while (
-              captures.length > 0 &&
-              captures[captures.length - 1] === null
-            ) {
+            while (captures.length > 0 && captures[captures.length - 1] === null) {
               captures.pop();
             }
             break;
@@ -797,15 +739,10 @@ const Erlang_Re = {
       if (patternBinary !== null) {
         Bitstring.maybeSetBytesFromText(patternBinary);
 
-        const result = ERTS.regex.compileBytes(
-          patternBinary.bytes,
-          acc.engineOpts,
-        );
+        const result = ERTS.regex.compileBytes(patternBinary.bytes, acc.engineOpts);
 
         if (result.error) {
-          if (
-            result.error.message === "using UTF is disabled by the application"
-          ) {
+          if (result.error.message === "using UTF is disabled by the application") {
             patternRaisesArgumentError = true;
           } else {
             patternInvalid = true;
@@ -853,10 +790,7 @@ const Erlang_Re = {
 
     // Compile options, including the dual newline and bsr options, don't
     // apply to an already compiled pattern
-    if (
-      registryEntry !== null &&
-      (compileOnlyOptionUsed || dualOptionUsed || acc.unicodeOption)
-    ) {
+    if (registryEntry !== null && (compileOnlyOptionUsed || dualOptionUsed || acc.unicodeOption)) {
       raiseArgumentError();
     }
 
@@ -885,11 +819,7 @@ const Erlang_Re = {
       // pattern with default options, like the server's must_be_regexp
       // probe does.
       if (result.error) {
-        Interpreter.raiseBifError("badarg", "re", "run", [
-          subject,
-          pattern,
-          options,
-        ]);
+        Interpreter.raiseBifError("badarg", "re", "run", [subject, pattern, options]);
       }
 
       entry = buildPatternEntry(result);
@@ -943,17 +873,9 @@ const Erlang_Re = {
     let matchResults;
 
     if (isGlobal) {
-      matchResults = ERTS.regex.matchGlobal(
-        entry.compiled,
-        subjectText,
-        engineRunOpts,
-      );
+      matchResults = ERTS.regex.matchGlobal(entry.compiled, subjectText, engineRunOpts);
     } else {
-      const matchResult = ERTS.regex.match(
-        entry.compiled,
-        subjectText,
-        engineRunOpts,
-      );
+      const matchResult = ERTS.regex.match(entry.compiled, subjectText, engineRunOpts);
 
       matchResults = matchResult === null ? [] : [matchResult];
     }

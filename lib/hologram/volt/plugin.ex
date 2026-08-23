@@ -9,10 +9,12 @@ defmodule Hologram.Volt.Plugin do
 
   @behaviour Volt.Plugin
 
+  alias Hologram.Volt.FunctionSource
   alias Volt.JS.Extensions
 
   @runtime_prefix "hologram:runtime/"
   @runtime_source {:hologram, "ts"}
+  @serializer_test Path.expand("test/javascript/serializer_test.mjs")
 
   @impl Volt.Plugin
   def name, do: "hologram"
@@ -25,6 +27,15 @@ defmodule Hologram.Volt.Plugin do
   end
 
   def resolve(_specifier, _importer), do: nil
+
+  @impl Volt.Plugin
+  def load(@serializer_test = path) do
+    path
+    |> File.read!()
+    |> FunctionSource.preserve(path)
+  end
+
+  def load(_path), do: nil
 
   defp resolve_runtime_module(base, specifier) do
     path =

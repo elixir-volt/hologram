@@ -29,24 +29,15 @@ const Erlang_Maps = {
   // Start fold/3
   "fold/3": (fun, initialAcc, map) => {
     if (!Type.isAnonymousFunction(fun) || fun.arity !== 3) {
-      Interpreter.raiseBifError("badarg", "maps", "fold", [
-        fun,
-        initialAcc,
-        map,
-      ]);
+      Interpreter.raiseBifError("badarg", "maps", "fold", [fun, initialAcc, map]);
     }
 
     if (!Type.isMap(map)) {
-      Interpreter.raiseBifError(["badmap", map], "maps", "fold", [
-        fun,
-        initialAcc,
-        map,
-      ]);
+      Interpreter.raiseBifError(["badmap", map], "maps", "fold", [fun, initialAcc, map]);
     }
 
     return Object.values(map.data).reduce(
-      (acc, [key, value]) =>
-        Interpreter.callAnonymousFunction(fun, [key, value, acc]),
+      (acc, [key, value]) => Interpreter.callAnonymousFunction(fun, [key, value, acc]),
       initialAcc,
     );
   },
@@ -85,10 +76,7 @@ const Erlang_Maps = {
   // Start get/2
   "get/2": (key, map) => {
     if (!Type.isMap(map)) {
-      Interpreter.raiseBifError(["badmap", map], "erlang", "map_get", [
-        key,
-        map,
-      ]);
+      Interpreter.raiseBifError(["badmap", map], "erlang", "map_get", [key, map]);
     }
 
     const encodedKey = Type.encodeMapKey(key);
@@ -122,17 +110,11 @@ const Erlang_Maps = {
   // Start intersect/2
   "intersect/2": (map1, map2) => {
     if (!Type.isMap(map1)) {
-      Interpreter.raiseBifError(["badmap", map1], "maps", "intersect", [
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError(["badmap", map1], "maps", "intersect", [map1, map2]);
     }
 
     if (!Type.isMap(map2)) {
-      Interpreter.raiseBifError(["badmap", map2], "maps", "intersect", [
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError(["badmap", map2], "maps", "intersect", [map1, map2]);
     }
 
     const result = Type.map();
@@ -151,27 +133,15 @@ const Erlang_Maps = {
   // Start intersect_with/3
   "intersect_with/3": (fun, map1, map2) => {
     if (!Type.isAnonymousFunction(fun) || fun.arity !== 3) {
-      Interpreter.raiseBifError("badarg", "maps", "intersect_with", [
-        fun,
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError("badarg", "maps", "intersect_with", [fun, map1, map2]);
     }
 
     if (!Type.isMap(map1)) {
-      Interpreter.raiseBifError(["badmap", map1], "maps", "intersect_with", [
-        fun,
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError(["badmap", map1], "maps", "intersect_with", [fun, map1, map2]);
     }
 
     if (!Type.isMap(map2)) {
-      Interpreter.raiseBifError(["badmap", map2], "maps", "intersect_with", [
-        fun,
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError(["badmap", map2], "maps", "intersect_with", [fun, map1, map2]);
     }
 
     const result = Type.map();
@@ -180,11 +150,7 @@ const Erlang_Maps = {
       if (encodedKey in map2.data) {
         result.data[encodedKey] = [
           key,
-          Interpreter.callAnonymousFunction(fun, [
-            key,
-            value,
-            map2.data[encodedKey][1],
-          ]),
+          Interpreter.callAnonymousFunction(fun, [key, value, map2.data[encodedKey][1]]),
         ];
       }
     }
@@ -225,10 +191,7 @@ const Erlang_Maps = {
   // Start is_key/2
   "is_key/2": (key, map) => {
     if (!Type.isMap(map)) {
-      Interpreter.raiseBifError(["badmap", map], "erlang", "is_map_key", [
-        key,
-        map,
-      ]);
+      Interpreter.raiseBifError(["badmap", map], "erlang", "is_map_key", [key, map]);
     }
 
     return Type.boolean(Type.encodeMapKey(key) in map.data);
@@ -266,10 +229,7 @@ const Erlang_Maps = {
     }
 
     if (!Type.isMap(mapOrIterator)) {
-      Interpreter.raiseBifError(["badmap", mapOrIterator], "maps", "map", [
-        fun,
-        mapOrIterator,
-      ]);
+      Interpreter.raiseBifError(["badmap", mapOrIterator], "maps", "map", [fun, mapOrIterator]);
     }
 
     return Type.map(
@@ -285,17 +245,11 @@ const Erlang_Maps = {
   // Start merge/2
   "merge/2": (map1, map2) => {
     if (!Type.isMap(map1)) {
-      Interpreter.raiseBifError(["badmap", map1], "maps", "merge", [
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError(["badmap", map1], "maps", "merge", [map1, map2]);
     }
 
     if (!Type.isMap(map2)) {
-      Interpreter.raiseBifError(["badmap", map2], "maps", "merge", [
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError(["badmap", map2], "maps", "merge", [map1, map2]);
     }
 
     return {type: "map", data: {...map1.data, ...map2.data}};
@@ -306,27 +260,15 @@ const Erlang_Maps = {
   // Start merge_with/3
   "merge_with/3": (combiner, map1, map2) => {
     if (!Type.isAnonymousFunction(combiner) || combiner.arity !== 3) {
-      Interpreter.raiseBifError("badarg", "maps", "merge_with", [
-        combiner,
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError("badarg", "maps", "merge_with", [combiner, map1, map2]);
     }
 
     if (!Type.isMap(map1)) {
-      Interpreter.raiseBifError(["badmap", map1], "maps", "merge_with", [
-        combiner,
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError(["badmap", map1], "maps", "merge_with", [combiner, map1, map2]);
     }
 
     if (!Type.isMap(map2)) {
-      Interpreter.raiseBifError(["badmap", map2], "maps", "merge_with", [
-        combiner,
-        map1,
-        map2,
-      ]);
+      Interpreter.raiseBifError(["badmap", map2], "maps", "merge_with", [combiner, map1, map2]);
     }
 
     const result = Type.cloneMap(map1);
@@ -370,10 +312,7 @@ const Erlang_Maps = {
     if (Type.isImproperList(iterator)) {
       return Object.values(iterator.data[1].data)
         .reverse()
-        .reduce(
-          (acc, [key, value]) => Type.tuple([key, value, acc]),
-          Type.atom("none"),
-        );
+        .reduce((acc, [key, value]) => Type.tuple([key, value, acc]), Type.atom("none"));
     }
 
     return Type.atom("none");
@@ -384,11 +323,7 @@ const Erlang_Maps = {
   // Start put/3
   "put/3": (key, value, map) => {
     if (!Type.isMap(map)) {
-      Interpreter.raiseBifError(["badmap", map], "maps", "put", [
-        key,
-        value,
-        map,
-      ]);
+      Interpreter.raiseBifError(["badmap", map], "maps", "put", [key, value, map]);
     }
 
     const newMap = Type.cloneMap(map);
@@ -436,14 +371,10 @@ const Erlang_Maps = {
   // Start to_list/1
   "to_list/1": (mapOrIterator) => {
     if (!Type.isMap(mapOrIterator)) {
-      Interpreter.raiseBifError(["badmap", mapOrIterator], "maps", "to_list", [
-        mapOrIterator,
-      ]);
+      Interpreter.raiseBifError(["badmap", mapOrIterator], "maps", "to_list", [mapOrIterator]);
     }
 
-    return Type.list(
-      Object.values(mapOrIterator.data).map((item) => Type.tuple(item)),
-    );
+    return Type.list(Object.values(mapOrIterator.data).map((item) => Type.tuple(item)));
   },
   // End to_list/1
   // Deps: []
@@ -451,19 +382,11 @@ const Erlang_Maps = {
   // Start update/3
   "update/3": (key, value, map) => {
     if (!Type.isMap(map)) {
-      Interpreter.raiseBifError(["badmap", map], "maps", "update", [
-        key,
-        value,
-        map,
-      ]);
+      Interpreter.raiseBifError(["badmap", map], "maps", "update", [key, value, map]);
     }
 
     if (Type.isFalse(Erlang_Maps["is_key/2"](key, map))) {
-      Interpreter.raiseBifError(["badkey", key], "maps", "update", [
-        key,
-        value,
-        map,
-      ]);
+      Interpreter.raiseBifError(["badkey", key], "maps", "update", [key, value, map]);
     }
 
     return Erlang_Maps["put/3"](key, value, map);

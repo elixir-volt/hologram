@@ -7778,7 +7778,7 @@ defmodule Hologram.Compiler.TransformerTest do
                ],
                else_clauses: [],
                body: %IR.Block{expressions: [%IR.AtomType{value: :ok}]},
-               line: 5
+               line: 6
              }
     end
 

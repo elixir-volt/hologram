@@ -79,11 +79,9 @@ const Erlang_Erl_Stdlib_Errors = {
     const mustBePattern = Erlang_Erl_Stdlib_Errors["_must_be_pattern/1"];
     const mustBePosition = Erlang_Erl_Stdlib_Errors["_must_be_position/1"];
 
-    const mustBeNonNegInteger =
-      Erlang_Erl_Stdlib_Errors["_must_be_non_neg_integer/1"];
+    const mustBeNonNegInteger = Erlang_Erl_Stdlib_Errors["_must_be_non_neg_integer/1"];
 
-    const mustBeReplacement =
-      Erlang_Erl_Stdlib_Errors["_must_be_binary_replacement/1"];
+    const mustBeReplacement = Erlang_Erl_Stdlib_Errors["_must_be_binary_replacement/1"];
 
     const args = Type.isList(argsOrArity) ? argsOrArity.data : null;
 
@@ -160,9 +158,7 @@ const Erlang_Erl_Stdlib_Errors = {
       case "first":
       case "last":
         if (args?.length === 1) {
-          return [
-            isEmptyBinary(args[0]) ? "empty_binary" : mustBeBinary(args[0]),
-          ];
+          return [isEmptyBinary(args[0]) ? "empty_binary" : mustBeBinary(args[0])];
         }
         break;
 
@@ -190,11 +186,7 @@ const Erlang_Erl_Stdlib_Errors = {
 
       case "replace":
         if (args?.length === 3) {
-          return [
-            mustBeBinary(args[0]),
-            mustBePattern(args[1]),
-            mustBeReplacement(args[2]),
-          ];
+          return [mustBeBinary(args[0]), mustBePattern(args[1]), mustBeReplacement(args[2])];
         }
 
         if (args?.length === 4) {
@@ -235,12 +227,11 @@ const Erlang_Erl_Stdlib_Errors = {
         break;
     }
 
-    Interpreter.raiseFunctionClauseError(
-      "erl_stdlib_errors",
-      "format_binary_error",
-      3,
-      [fun, argsOrArity, cause],
-    );
+    Interpreter.raiseFunctionClauseError("erl_stdlib_errors", "format_binary_error", 3, [
+      fun,
+      argsOrArity,
+      cause,
+    ]);
   },
   // End _format_binary_error/3
   // Deps: [:erl_stdlib_errors._must_be_binary/1, :erl_stdlib_errors._must_be_binary_replacement/1, :erl_stdlib_errors._must_be_non_neg_integer/1, :erl_stdlib_errors._must_be_pattern/1, :erl_stdlib_errors._must_be_position/1]
@@ -270,12 +261,10 @@ const Erlang_Erl_Stdlib_Errors = {
   // Start _format_lists_error/2
   "_format_lists_error/2": (fun, argsOrArity) => {
     const raiseFunctionClause = () => {
-      Interpreter.raiseFunctionClauseError(
-        "erl_stdlib_errors",
-        "format_lists_error",
-        2,
-        [fun, argsOrArity],
-      );
+      Interpreter.raiseFunctionClauseError("erl_stdlib_errors", "format_lists_error", 2, [
+        fun,
+        argsOrArity,
+      ]);
     };
 
     const mustBeInteger = (term) => (Type.isInteger(term) ? "" : "not_integer");
@@ -329,11 +318,7 @@ const Erlang_Erl_Stdlib_Errors = {
 
         const [first, last, inc] = args;
 
-        const intErrors = [
-          mustBeInteger(first),
-          mustBeInteger(last),
-          mustBeInteger(inc),
-        ];
+        const intErrors = [mustBeInteger(first), mustBeInteger(last), mustBeInteger(inc)];
 
         if (intErrors.some((error) => error !== "")) {
           return intErrors;
@@ -366,16 +351,13 @@ const Erlang_Erl_Stdlib_Errors = {
   // Start _format_maps_error/2
   "_format_maps_error/2": (fun, argsOrArity) => {
     const raiseFunctionClause = () => {
-      Interpreter.raiseFunctionClauseError(
-        "erl_stdlib_errors",
-        "format_maps_error",
-        2,
-        [fun, argsOrArity],
-      );
+      Interpreter.raiseFunctionClauseError("erl_stdlib_errors", "format_maps_error", 2, [
+        fun,
+        argsOrArity,
+      ]);
     };
 
-    const mustBeFun = (arity) => (term) =>
-      Erlang_Erl_Stdlib_Errors["_must_be_fun/2"](term, arity);
+    const mustBeFun = (arity) => (term) => Erlang_Erl_Stdlib_Errors["_must_be_fun/2"](term, arity);
 
     const mustBeList = Erlang_Erl_Stdlib_Errors["_must_be_list/1"];
     const mustBeMap = Erlang_Erl_Stdlib_Errors["_must_be_map/1"];
@@ -436,9 +418,7 @@ const Erlang_Erl_Stdlib_Errors = {
       raiseFunctionClause();
     }
 
-    return spec.map((entry, index) =>
-      typeof entry === "function" ? entry(args[index]) : entry,
-    );
+    return spec.map((entry, index) => (typeof entry === "function" ? entry(args[index]) : entry));
   },
   // End _format_maps_error/2
   // Deps: [:erl_stdlib_errors._must_be_fun/2, :erl_stdlib_errors._must_be_list/1, :erl_stdlib_errors._must_be_map/1, :erl_stdlib_errors._must_be_map_or_iter/1]
@@ -456,25 +436,13 @@ const Erlang_Erl_Stdlib_Errors = {
 
     const args = Type.isList(argsOrArity) ? argsOrArity.data : null;
 
-    const domainErrorFuns = [
-      "acos",
-      "acosh",
-      "asin",
-      "atanh",
-      "log",
-      "log2",
-      "log10",
-      "sqrt",
-    ];
+    const domainErrorFuns = ["acos", "acosh", "asin", "atanh", "log", "log2", "log10", "sqrt"];
 
     if (domainErrorFuns.includes(fun.value)) {
       if (args?.length !== 1) {
-        Interpreter.raiseFunctionClauseError(
-          "erl_stdlib_errors",
-          "maybe_domain_error",
-          1,
-          [argsOrArity],
-        );
+        Interpreter.raiseFunctionClauseError("erl_stdlib_errors", "maybe_domain_error", 1, [
+          argsOrArity,
+        ]);
       }
 
       const fragment = mustBeNumber(args[0]);
@@ -490,12 +458,10 @@ const Erlang_Erl_Stdlib_Errors = {
       return [mustBeNumber(args[0]), mustBeNumber(args[1])];
     }
 
-    Interpreter.raiseFunctionClauseError(
-      "erl_stdlib_errors",
-      "format_math_error",
-      2,
-      [fun, argsOrArity],
-    );
+    Interpreter.raiseFunctionClauseError("erl_stdlib_errors", "format_math_error", 2, [
+      fun,
+      argsOrArity,
+    ]);
   },
   // End _format_math_error/2
   // Deps: [:erl_stdlib_errors._must_be_number/1]
@@ -523,9 +489,7 @@ const Erlang_Erl_Stdlib_Errors = {
         if (args?.length === 2) {
           const reError = reCompileError(args[0]);
 
-          return cause.value === "badopt"
-            ? [reError, "bad_options"]
-            : [reError];
+          return cause.value === "badopt" ? [reError, "bad_options"] : [reError];
         }
         break;
 
@@ -546,9 +510,7 @@ const Erlang_Erl_Stdlib_Errors = {
         // derivation, so a raise here would derive its own message and
         // recurse.
         const reError =
-          ERTS.regexPatternRegistry.lookupByTerm(args[0]) === null
-            ? "not_compiled_regexp"
-            : "";
+          ERTS.regexPatternRegistry.lookupByTerm(args[0]) === null ? "not_compiled_regexp" : "";
 
         if (reError === "" || !Type.isAtom(args[1])) {
           return [reError, "not a valid item"];
@@ -570,12 +532,11 @@ const Erlang_Erl_Stdlib_Errors = {
         break;
     }
 
-    Interpreter.raiseFunctionClauseError(
-      "erl_stdlib_errors",
-      "format_re_error",
-      3,
-      [fun, argsOrArity, cause],
-    );
+    Interpreter.raiseFunctionClauseError("erl_stdlib_errors", "format_re_error", 3, [
+      fun,
+      argsOrArity,
+      cause,
+    ]);
   },
   // End _format_re_error/3
   // Deps: [:erl_stdlib_errors._must_be_iodata/1, :erl_stdlib_errors._must_be_regexp/1, :erl_stdlib_errors._re_compile_error/1]
@@ -621,11 +582,7 @@ const Erlang_Erl_Stdlib_Errors = {
       }
 
       if (args?.length === 3) {
-        return [
-          unicodeCharData(args[0]),
-          unicodeEncoding(args[1]),
-          unicodeEncoding(args[2]),
-        ];
+        return [unicodeCharData(args[0]), unicodeEncoding(args[1]), unicodeEncoding(args[2])];
       }
     }
 
@@ -633,12 +590,10 @@ const Erlang_Erl_Stdlib_Errors = {
       return ["bad_char_data"];
     }
 
-    Interpreter.raiseFunctionClauseError(
-      "erl_stdlib_errors",
-      "format_unicode_error",
-      2,
-      [fun, argsOrArity],
-    );
+    Interpreter.raiseFunctionClauseError("erl_stdlib_errors", "format_unicode_error", 2, [
+      fun,
+      argsOrArity,
+    ]);
   },
   // End _format_unicode_error/2
   // Deps: [:erl_stdlib_errors._unicode_char_data/1, :erl_stdlib_errors._unicode_encoding/1]
@@ -714,9 +669,7 @@ const Erlang_Erl_Stdlib_Errors = {
       return "";
     }
 
-    return Type.isAnonymousFunction(term) && term.arity === 1
-      ? ""
-      : "bad_replacement";
+    return Type.isAnonymousFunction(term) && term.arity === 1 ? "" : "bad_replacement";
   },
   // End _must_be_binary_replacement/1
   // Deps: []
@@ -724,9 +677,7 @@ const Erlang_Erl_Stdlib_Errors = {
   // Mirrors OTP's private must_be_fun/2.
   // Start _must_be_fun/2
   "_must_be_fun/2": (term, arity) =>
-    Type.isAnonymousFunction(term) && term.arity === arity
-      ? ""
-      : `not_fun_${arity}`,
+    Type.isAnonymousFunction(term) && term.arity === arity ? "" : `not_fun_${arity}`,
   // End _must_be_fun/2
   // Deps: []
 
@@ -895,19 +846,16 @@ const Erlang_Erl_Stdlib_Errors = {
     const frame = ERTS.callStack.unboxTopFrame(stacktrace);
 
     if (frame === null) {
-      Interpreter.raiseFunctionClauseError(
-        "erl_stdlib_errors",
-        "format_error",
-        2,
-        [reason, stacktrace],
-      );
+      Interpreter.raiseFunctionClauseError("erl_stdlib_errors", "format_error", 2, [
+        reason,
+        stacktrace,
+      ]);
     }
 
     // Mirrors OTP's cause lookup: the frame's error_info map may carry a
     // cause entry that refines the formatter's diagnosis, defaulting to
     // :none.
-    const causeEntry =
-      frame.errorInfo?.data[Type.encodeMapKey(Type.atom("cause"))];
+    const causeEntry = frame.errorInfo?.data[Type.encodeMapKey(Type.atom("cause"))];
 
     const cause = causeEntry ? causeEntry[1] : Type.atom("none");
 
@@ -962,11 +910,7 @@ const Erlang_Erl_Stdlib_Errors = {
         fragments = [];
     }
 
-    return Erlang_Erl_Stdlib_Errors["_format_error_map/3"](
-      fragments,
-      1,
-      Type.map(),
-    );
+    return Erlang_Erl_Stdlib_Errors["_format_error_map/3"](fragments, 1, Type.map());
   },
   // End format_error/2
   // Deps: [:erl_stdlib_errors._format_binary_error/3, :erl_stdlib_errors._format_error_map/3, :erl_stdlib_errors._format_lists_error/2, :erl_stdlib_errors._format_maps_error/2, :erl_stdlib_errors._format_math_error/2, :erl_stdlib_errors._format_re_error/3, :erl_stdlib_errors._format_unicode_error/2]

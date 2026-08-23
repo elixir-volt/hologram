@@ -65,8 +65,7 @@ const Erlang_Erl_Erts_Errors = {
   "_format_erlang_error/3": (fun, argsOrArity, _cause) => {
     const args = Type.isList(argsOrArity) ? argsOrArity.data : null;
 
-    const mustBeBinary = (term, error = "") =>
-      Type.isBinary(term) ? error : "not_binary";
+    const mustBeBinary = (term, error = "") => (Type.isBinary(term) ? error : "not_binary");
 
     const mustBeList = (term, error = "") => {
       if (!Type.isList(term)) {
@@ -77,14 +76,11 @@ const Erlang_Erl_Erts_Errors = {
     };
 
     const mustBeBase = (term) =>
-      Type.isInteger(term) && term.value >= 2n && term.value <= 36n
-        ? ""
-        : "bad_base";
+      Type.isInteger(term) && term.value >= 2n && term.value <= 36n ? "" : "bad_base";
 
     // Mirrors OTP's list_to_something/2, which probes the term with
     // length/1.
-    const listToSomething = (term, error) =>
-      Type.isProperList(term) ? [error] : ["not_list"];
+    const listToSomething = (term, error) => (Type.isProperList(term) ? [error] : ["not_list"]);
 
     // Mirrors OTP's is_flat_char_list/1: a proper list of encodable
     // codepoints.
@@ -113,8 +109,7 @@ const Erlang_Erl_Erts_Errors = {
     // Mirrors OTP's must_be_time_unit/1, which probes the term with a
     // convert_time_unit call - the client uses the non-raising validity
     // check instead.
-    const mustBeTimeUnit = (term) =>
-      Erlang["_is_valid_time_unit/1"](term) ? "" : "bad_time_unit";
+    const mustBeTimeUnit = (term) => (Erlang["_is_valid_time_unit/1"](term) ? "" : "bad_time_unit");
 
     // Mirrors OTP's element clause, shared by the delete_element,
     // insert_element, and setelement delegations.
@@ -147,9 +142,7 @@ const Erlang_Erl_Erts_Errors = {
           return ["not_binary"];
         }
 
-        return Bitstring.toText(bin) !== false
-          ? [defaultError]
-          : ["bad_unicode"];
+        return Bitstring.toText(bin) !== false ? [defaultError] : ["bad_unicode"];
       }
 
       return [mustBeBinary(bin), "bad_encode_option"];
@@ -193,13 +186,9 @@ const Erlang_Erl_Erts_Errors = {
         }
 
         const isKnownEncoding =
-          Type.isAtom(encoding) &&
-          ["latin1", "unicode", "utf8"].includes(encoding.value);
+          Type.isAtom(encoding) && ["latin1", "unicode", "utf8"].includes(encoding.value);
 
-        return [
-          atomError,
-          isKnownEncoding ? "" : "is an invalid encoding option",
-        ];
+        return [atomError, isKnownEncoding ? "" : "is an invalid encoding option"];
       }
 
       case "atom_to_list":
@@ -219,11 +208,7 @@ const Erlang_Erl_Erts_Errors = {
 
       case "binary_to_existing_atom": {
         if (args?.length === 1) {
-          return doBinaryToAtom(
-            args[0],
-            Type.atom("utf8"),
-            "non_existing_atom",
-          );
+          return doBinaryToAtom(args[0], Type.atom("utf8"), "non_existing_atom");
         }
 
         if (args?.length !== 2) {
@@ -266,11 +251,7 @@ const Erlang_Erl_Erts_Errors = {
 
         const [bin, pos, len] = args;
 
-        const errors = [
-          mustBeBinary(bin),
-          mustBeNonNegInt(pos),
-          mustBeInt(len),
-        ];
+        const errors = [mustBeBinary(bin), mustBeNonNegInt(pos), mustBeInt(len)];
 
         if (errors.some((error) => error !== "")) {
           return errors;
@@ -309,11 +290,7 @@ const Erlang_Erl_Erts_Errors = {
           return [];
         }
 
-        return [
-          mustBeInt(args[0]),
-          mustBeTimeUnit(args[1]),
-          mustBeTimeUnit(args[2]),
-        ];
+        return [mustBeInt(args[0]), mustBeTimeUnit(args[1]), mustBeTimeUnit(args[2])];
       }
 
       case "delete_element":
@@ -334,9 +311,7 @@ const Erlang_Erl_Erts_Errors = {
           return [];
         }
 
-        return Type.isAnonymousFunction(args[0])
-          ? ["", "invalid item"]
-          : ["not_fun"];
+        return Type.isAnonymousFunction(args[0]) ? ["", "invalid item"] : ["not_fun"];
       }
 
       case "function_exported":
@@ -345,11 +320,7 @@ const Erlang_Erl_Erts_Errors = {
           return [];
         }
 
-        return [
-          mustBeAtom(args[0]),
-          mustBeAtom(args[1]),
-          mustBeNonNegInt(args[2]),
-        ];
+        return [mustBeAtom(args[0]), mustBeAtom(args[1]), mustBeNonNegInt(args[2])];
       }
 
       case "hd":
@@ -385,9 +356,7 @@ const Erlang_Erl_Erts_Errors = {
         // list is blamed only when the float argument is fine.
         return [
           floatError,
-          floatError === "" && optionsError === ""
-            ? "invalid option in list"
-            : optionsError,
+          floatError === "" && optionsError === "" ? "invalid option in list" : optionsError,
         ];
       }
 
@@ -401,10 +370,7 @@ const Erlang_Erl_Erts_Errors = {
           return [];
         }
 
-        return [
-          Type.isInteger(args[0]) ? "" : "not_integer",
-          mustBeBase(args[1]),
-        ];
+        return [Type.isInteger(args[0]) ? "" : "not_integer", mustBeBase(args[1])];
       }
 
       case "is_map_key":
@@ -550,12 +516,7 @@ const Erlang_Erl_Erts_Errors = {
   // the ERTS facade and passes this module's expand_error/1 to it.
   // Start _format_error_map/3
   "_format_error_map/3": (fragments, argumentNumber, map) =>
-    ERTS.formatErrorMap(
-      fragments,
-      argumentNumber,
-      map,
-      Erlang_Erl_Erts_Errors["_expand_error/1"],
-    ),
+    ERTS.formatErrorMap(fragments, argumentNumber, map, Erlang_Erl_Erts_Errors["_expand_error/1"]),
   // End _format_error_map/3
   // Deps: [:erl_erts_errors._expand_error/1]
 
@@ -572,47 +533,35 @@ const Erlang_Erl_Erts_Errors = {
     const frame = ERTS.callStack.unboxTopFrame(stacktrace);
 
     if (frame === null) {
-      Interpreter.raiseFunctionClauseError(
-        "erl_erts_errors",
-        "format_bs_fail",
-        2,
-        [reason, stacktrace],
-      );
+      Interpreter.raiseFunctionClauseError("erl_erts_errors", "format_bs_fail", 2, [
+        reason,
+        stacktrace,
+      ]);
     }
 
     const errorInfoMap = frame.errorInfo;
 
-    const cause =
-      errorInfoMap?.data[Type.encodeMapKey(Type.atom("cause"))]?.[1];
+    const cause = errorInfoMap?.data[Type.encodeMapKey(Type.atom("cause"))]?.[1];
 
-    if (
-      cause === undefined ||
-      !Type.isTuple(cause) ||
-      cause.data.length !== 4
-    ) {
+    if (cause === undefined || !Type.isTuple(cause) || cause.data.length !== 4) {
       return Type.map();
     }
 
     const [segment, type, errorTag, value] = cause.data;
 
     const overrideEntry =
-      errorInfoMap.data[
-        Type.encodeMapKey(Type.atom("override_segment_position"))
-      ];
+      errorInfoMap.data[Type.encodeMapKey(Type.atom("override_segment_position"))];
 
     const segmentPosition = overrideEntry ? overrideEntry[1] : segment;
 
-    const prettyPrinterEntry =
-      errorInfoMap.data[Type.encodeMapKey(Type.atom("pretty_printer"))];
+    const prettyPrinterEntry = errorInfoMap.data[Type.encodeMapKey(Type.atom("pretty_printer"))];
 
     const prettyPrint = (term) => {
       if (prettyPrinterEntry === undefined) {
         return Interpreter.inspect(term);
       }
 
-      return Bitstring.toText(
-        Interpreter.callAnonymousFunction(prettyPrinterEntry[1], [term]),
-      );
+      return Bitstring.toText(Interpreter.callAnonymousFunction(prettyPrinterEntry[1], [term]));
     };
 
     const formatDetail = () => {
@@ -677,19 +626,16 @@ const Erlang_Erl_Erts_Errors = {
     const frame = ERTS.callStack.unboxTopFrame(stacktrace);
 
     if (frame === null) {
-      Interpreter.raiseFunctionClauseError(
-        "erl_erts_errors",
-        "format_error",
-        2,
-        [reason, stacktrace],
-      );
+      Interpreter.raiseFunctionClauseError("erl_erts_errors", "format_error", 2, [
+        reason,
+        stacktrace,
+      ]);
     }
 
     // Mirrors OTP's cause lookup: the frame's error_info map may carry a
     // cause entry that refines the formatter's diagnosis, defaulting to
     // :none.
-    const causeEntry =
-      frame.errorInfo?.data[Type.encodeMapKey(Type.atom("cause"))];
+    const causeEntry = frame.errorInfo?.data[Type.encodeMapKey(Type.atom("cause"))];
 
     const cause = causeEntry ? causeEntry[1] : Type.atom("none");
 
@@ -697,8 +643,7 @@ const Erlang_Erl_Erts_Errors = {
 
     // Mirrors OTP's system_limit clause: the reason's explanation is clear
     // enough, so the arguments get no detailed fragments.
-    const isSystemLimit =
-      Type.isAtom(reason) && reason.value === "system_limit";
+    const isSystemLimit = Type.isAtom(reason) && reason.value === "system_limit";
 
     if (!isSystemLimit && frame.module.value === "erlang") {
       fragments = Erlang_Erl_Erts_Errors["_format_erlang_error/3"](
@@ -708,11 +653,7 @@ const Erlang_Erl_Erts_Errors = {
       );
     }
 
-    return Erlang_Erl_Erts_Errors["_format_error_map/3"](
-      fragments,
-      1,
-      Type.map(),
-    );
+    return Erlang_Erl_Erts_Errors["_format_error_map/3"](fragments, 1, Type.map());
   },
   // End format_error/2
   // Deps: [:erl_erts_errors._format_erlang_error/3, :erl_erts_errors._format_error_map/3]

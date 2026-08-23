@@ -27,9 +27,7 @@ const Elixir_FunctionClauseError = {
     const module = struct.data["atom(module)"][1];
     const arity = struct.data["atom(arity)"][1];
 
-    const mfa = Bitstring.toText(
-      Elixir_Exception["format_mfa/3"](module, functionTerm, arity),
-    );
+    const mfa = Bitstring.toText(Elixir_Exception["format_mfa/3"](module, functionTerm, arity));
 
     const args = struct.data["atom(args)"][1];
 
@@ -42,16 +40,13 @@ const Elixir_FunctionClauseError = {
     const clauses = struct.data["atom(clauses)"][1];
 
     const argsText = args.data.reduce(
-      (acc, arg, index) =>
-        `${acc}\n    # ${index + 1}\n    ${indent(Interpreter.inspect(arg))}\n`,
+      (acc, arg, index) => `${acc}\n    # ${index + 1}\n    ${indent(Interpreter.inspect(arg))}\n`,
       `\n\nThe following arguments were given to ${mfa}:\n`,
     );
 
     const clausesText = renderClauses(clauses, kind, functionName);
 
-    return Type.bitstring(
-      `no function clause matching in ${mfa}${argsText}${clausesText}`,
-    );
+    return Type.bitstring(`no function clause matching in ${mfa}${argsText}${clausesText}`);
   },
 };
 
@@ -72,10 +67,7 @@ function renderClause(clause, kind, functionName) {
   const [params, guards] = clause.data;
   const paramsText = params.data.map(renderNode).join(", ");
 
-  const guardsText = guards.data.reduce(
-    (acc, guard) => `${acc} when ${renderGuard(guard, 0)}`,
-    "",
-  );
+  const guardsText = guards.data.reduce((acc, guard) => `${acc} when ${renderGuard(guard, 0)}`, "");
 
   return `    ${kind.value} ${functionName}(${paramsText})${guardsText}\n`;
 }

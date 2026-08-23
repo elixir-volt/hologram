@@ -11,6 +11,8 @@ export const sinon = {
   ...nativeSinon,
   useFakeTimers: (config) =>
     nativeSinon.useFakeTimers(
-      config === undefined ? defaultFakeTimers : config,
+      config === undefined
+        ? defaultFakeTimers
+        : {...defaultFakeTimers, ...config},
     ),
 };

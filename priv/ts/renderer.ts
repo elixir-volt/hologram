@@ -18,7 +18,7 @@ import Type from "./type.ts";
 import Utils from "./utils.ts";
 import Vdom from "./vdom.ts";
 
-import {h as vnode} from "./vendor/snabbdom/build/index.js";
+import {h as vnode} from "snabbdom";
 import vnodeToHtml from "snabbdom-to-html";
 
 export default class Renderer {
@@ -158,11 +158,7 @@ export default class Renderer {
 
     // The document's own children, the one children list with no element to own it.
     const pageVdom = Vdom.finalizeChildren(
-      Renderer.#renderPageInsideLayout(
-        pageModuleProxy,
-        pageParams,
-        pageComponentStruct,
-      ),
+      Renderer.#renderPageInsideLayout(pageModuleProxy, pageParams, pageComponentStruct),
     );
 
     return Renderer.#pageVnodeFromChildren(pageVdom);
@@ -216,16 +212,9 @@ export default class Renderer {
   // dropped, so reconcile detaches its scroll listener.
   static resolveReachBindings() {
     return $.reachBindings
-      .filter(
-        ({vnode, slotKey, once}) =>
-          !(once && Once.hasFired(vnode.elm, slotKey)),
-      )
+      .filter(({vnode, slotKey, once}) => !(once && Once.hasFired(vnode.elm, slotKey)))
       .map(({vnode, edge, handler, within}) => {
-        const {key, attach} = EventListeners.scrollEdge(
-          vnode.elm,
-          edge,
-          within,
-        );
+        const {key, attach} = EventListeners.scrollEdge(vnode.elm, edge, within);
 
         return {target: vnode.elm, key, attach, handler};
       });
@@ -238,10 +227,7 @@ export default class Renderer {
   // whose once modifier has fired is dropped, so reconcile disconnects its observer.
   static resolveResizeBindings() {
     return $.resizeBindings
-      .filter(
-        ({vnode, slotKey, once}) =>
-          !(once && Once.hasFired(vnode.elm, slotKey)),
-      )
+      .filter(({vnode, slotKey, once}) => !(once && Once.hasFired(vnode.elm, slotKey)))
       .map(({vnode, handler}) => {
         const element = vnode.elm;
         const {key, attach} = EventListeners.resizeObserver(element);
@@ -313,9 +299,7 @@ export default class Renderer {
       return false;
     }
 
-    return Type.isTrue(
-      Erlang_Maps["is_key/2"](Type.atom("allow_default"), modifiersDom),
-    );
+    return Type.isTrue(Erlang_Maps["is_key/2"](Type.atom("allow_default"), modifiersDom));
   }
 
   // Builds one event binding from a "$"-prefixed attribute, shared by element and window bindings.
@@ -323,13 +307,7 @@ export default class Renderer {
   // debounce/throttle), or null when the attribute is not an event binding. slotKey identifies the
   // binding for debounce/throttle windows - the attribute index for elements, the binding index for
   // window bindings, which all share the same currentTarget.
-  static #buildEventBinding(
-    attrDom,
-    slotKey,
-    tagName,
-    attrsVdom,
-    defaultTarget,
-  ) {
+  static #buildEventBinding(attrDom, slotKey, tagName, attrsVdom, defaultTarget) {
     const attributeName = $.#eventAttributeName(attrDom);
 
     if (attributeName === null || !attributeName.startsWith("$")) {
@@ -370,18 +348,9 @@ export default class Renderer {
 
     const normalizedEventName = $.#normalizeEventName(originalEventName);
 
-    const effectiveDomEventName = $.#mapEventName(
-      normalizedEventName,
-      tagName,
-      attrsVdom,
-    );
+    const effectiveDomEventName = $.#mapEventName(normalizedEventName, tagName, attrsVdom);
 
-    const handler = $.#buildEventHandler(
-      attrDom,
-      slotKey,
-      effectiveDomEventName,
-      defaultTarget,
-    );
+    const handler = $.#buildEventHandler(attrDom, slotKey, effectiveDomEventName, defaultTarget);
 
     return {eventName: effectiveDomEventName, handler};
   }
@@ -464,9 +433,7 @@ export default class Renderer {
   // Based on build_layout_props_dom/2
   // Deps: [:maps.from_list/1, :maps.merge/2]
   static #buildLayoutPropsDom(pageModuleProxy, pageState) {
-    const propsFromPage = Erlang_Maps["from_list/1"](
-      pageModuleProxy["__layout_props__/0"](),
-    );
+    const propsFromPage = Erlang_Maps["from_list/1"](pageModuleProxy["__layout_props__/0"]());
 
     const propsWithCid = Erlang_Maps["merge/2"](
       propsFromPage,
@@ -573,19 +540,10 @@ export default class Renderer {
     attrsDom.data.forEach((attrDom) => {
       const slotKey = $.listenerBindings.length;
 
-      const binding = $.#buildEventBinding(
-        attrDom,
-        slotKey,
-        null,
-        {},
-        defaultTarget,
-      );
+      const binding = $.#buildEventBinding(attrDom, slotKey, null, {}, defaultTarget);
 
       if (binding !== null) {
-        const {key, attach} = EventListeners.domEvent(
-          target,
-          binding.eventName,
-        );
+        const {key, attach} = EventListeners.domEvent(target, binding.eventName);
 
         $.listenerBindings.push({
           target,
@@ -684,10 +642,7 @@ export default class Renderer {
   }
 
   static #contextKey(opts) {
-    return Interpreter.accessKeywordListElement(
-      opts,
-      Type.atom("from_context"),
-    );
+    return Interpreter.accessKeywordListElement(opts, Type.atom("from_context"));
   }
 
   // Returns the debounce window in milliseconds from a modifiers map, or null when there is no
@@ -698,11 +653,7 @@ export default class Renderer {
       return null;
     }
 
-    const debounce = Erlang_Maps["get/3"](
-      Type.atom("debounce"),
-      modifiersDom,
-      null,
-    );
+    const debounce = Erlang_Maps["get/3"](Type.atom("debounce"), modifiersDom, null);
 
     return debounce === null ? null : Number(debounce.value);
   }
@@ -721,8 +672,7 @@ export default class Renderer {
     });
 
     return attrs.filter(
-      ([name], index) =>
-        name.startsWith("$") || lastIndexByName.get(name) === index,
+      ([name], index) => name.startsWith("$") || lastIndexByName.get(name) === index,
     );
   }
 
@@ -750,9 +700,7 @@ export default class Renderer {
   // They walk the unexpanded attribute list on purpose: their positional slot keys (debounce and
   // throttle windows, once state) must not shift when a spread's entry count changes.
   static #eventAttributeName(attrDom) {
-    return Type.isRecordTuple(attrDom, "spread", 2)
-      ? null
-      : Bitstring.toText(attrDom.data[0]);
+    return Type.isRecordTuple(attrDom, "spread", 2) ? null : Bitstring.toText(attrDom.data[0]);
   }
 
   // Based on expand_attribute/1
@@ -768,8 +716,8 @@ export default class Renderer {
       return [[Bitstring.toText(attrDom.data[0]), attrDom.data[1]]];
     }
 
-    return $.#expandSpreadAttributes(attrDom.data[1].data[0], null).sort(
-      ([nameA], [nameB]) => (nameA < nameB ? -1 : nameA > nameB ? 1 : 0),
+    return $.#expandSpreadAttributes(attrDom.data[1].data[0], null).sort(([nameA], [nameB]) =>
+      nameA < nameB ? -1 : nameA > nameB ? 1 : 0,
     );
   }
 
@@ -780,13 +728,9 @@ export default class Renderer {
   // positionally, last one wins. A tag with no spread is left alone, so that duplicate names written
   // literally keep behaving as they did.
   static #expandAttributeSpreads(attrsDom) {
-    const hasSpread = attrsDom.data.some((attrDom) =>
-      Type.isRecordTuple(attrDom, "spread", 2),
-    );
+    const hasSpread = attrsDom.data.some((attrDom) => Type.isRecordTuple(attrDom, "spread", 2));
 
-    const expanded = attrsDom.data.flatMap((attrDom) =>
-      $.#expandAttribute(attrDom),
-    );
+    const expanded = attrsDom.data.flatMap((attrDom) => $.#expandAttribute(attrDom));
 
     return hasSpread ? $.#dedupeAttributes(expanded) : expanded;
   }
@@ -807,13 +751,9 @@ export default class Renderer {
   //
   // Returns an array of prop tuples rather than a boxed list, since the caller iterates it anyway.
   static #expandPropSpreads(propsDom) {
-    const hasSpread = propsDom.data.some((propDom) =>
-      Type.isRecordTuple(propDom, "spread", 2),
-    );
+    const hasSpread = propsDom.data.some((propDom) => Type.isRecordTuple(propDom, "spread", 2));
 
-    return hasSpread
-      ? propsDom.data.flatMap((propDom) => $.#expandProp(propDom))
-      : propsDom.data;
+    return hasSpread ? propsDom.data.flatMap((propDom) => $.#expandProp(propDom)) : propsDom.data;
   }
 
   // Based on expand_slots/2 (including fallback case)
@@ -841,24 +781,14 @@ export default class Renderer {
   static #expandSlotsInComponentNode(dom, slots) {
     const [nodeType, moduleAlias, propsDom, childrenDom] = dom.data;
 
-    return Type.tuple([
-      nodeType,
-      moduleAlias,
-      propsDom,
-      Renderer.#expandSlots(childrenDom, slots),
-    ]);
+    return Type.tuple([nodeType, moduleAlias, propsDom, Renderer.#expandSlots(childrenDom, slots)]);
   }
 
   // Based on expand_slots/3 (dynamic tag case)
   static #expandSlotsInDynamicTagNode(dom, slots) {
     const [nodeType, value, attrsDom, childrenDom] = dom.data;
 
-    return Type.tuple([
-      nodeType,
-      value,
-      attrsDom,
-      Renderer.#expandSlots(childrenDom, slots),
-    ]);
+    return Type.tuple([nodeType, value, attrsDom, Renderer.#expandSlots(childrenDom, slots)]);
   }
 
   // Based on expand_slots/3 (element cases)
@@ -866,20 +796,12 @@ export default class Renderer {
     const [nodeType, tagName, attrsDom, childrenDom] = dom.data;
 
     if (Interpreter.isStrictlyEqual(tagName, Type.bitstring("slot"))) {
-      const slotDom = Interpreter.accessKeywordListElement(
-        slots,
-        Type.atom("default"),
-      );
+      const slotDom = Interpreter.accessKeywordListElement(slots, Type.atom("default"));
 
       return slotDom ? slotDom : Type.nil();
     }
 
-    return Type.tuple([
-      nodeType,
-      tagName,
-      attrsDom,
-      Renderer.#expandSlots(childrenDom, slots),
-    ]);
+    return Type.tuple([nodeType, tagName, attrsDom, Renderer.#expandSlots(childrenDom, slots)]);
   }
 
   // Based on expand_slots/3 (list case)
@@ -902,12 +824,7 @@ export default class Renderer {
       return $.#expandSpreadAttributes(value, name);
     }
 
-    return [
-      [
-        name,
-        Type.list([Type.tuple([Type.atom("expression"), Type.tuple([value])])]),
-      ],
-    ];
+    return [[name, Type.list([Type.tuple([Type.atom("expression"), Type.tuple([value])])])]];
   }
 
   // Based on expand_spread_attributes/2
@@ -926,9 +843,7 @@ export default class Renderer {
 
       return Type.tuple([
         Type.bitstring(name),
-        Type.list([
-          Type.tuple([Type.atom("expression"), Type.tuple([entryValue])]),
-        ]),
+        Type.list([Type.tuple([Type.atom("expression"), Type.tuple([entryValue])])]),
       ]);
     });
   }
@@ -940,10 +855,7 @@ export default class Renderer {
 
     if (
       valueDom.data.length === 1 &&
-      Interpreter.isStrictlyEqual(
-        valueDom.data[0].data[0],
-        Type.atom("expression"),
-      )
+      Interpreter.isStrictlyEqual(valueDom.data[0].data[0], Type.atom("expression"))
     ) {
       if (valueDom.data[0].data[1].data.length === 1) {
         evaluatedValue = valueDom.data[0].data[1].data[0];
@@ -958,9 +870,7 @@ export default class Renderer {
   }
 
   static #evaluateTemplate(moduleProxy, vars) {
-    return Interpreter.callAnonymousFunction(moduleProxy["template/0"](), [
-      vars,
-    ]);
+    return Interpreter.callAnonymousFunction(moduleProxy["template/0"](), [vars]);
   }
 
   // Decides whether a live event satisfies an attribute's modifier filters. Modifiers are a
@@ -968,15 +878,9 @@ export default class Renderer {
   // kind does not gate dispatch.
   // Deps: [:maps.get/3]
   static #eventMatchesModifiers(modifiersDom, event) {
-    const keyFilters = Erlang_Maps["get/3"](
-      Type.atom("key"),
-      modifiersDom,
-      Type.list(),
-    );
+    const keyFilters = Erlang_Maps["get/3"](Type.atom("key"), modifiersDom, Type.list());
 
-    return keyFilters.data.every((keyFilter) =>
-      KeyboardEvent.matchesKeyFilter(keyFilter, event),
-    );
+    return keyFilters.data.every((keyFilter) => KeyboardEvent.matchesKeyFilter(keyFilter, event));
   }
 
   // Based on filter_allowed_props/2
@@ -989,9 +893,7 @@ export default class Renderer {
     const allowedPropNames = registeredPropNames.concat(Type.bitstring("cid"));
 
     return propDoms.filter((propDom) =>
-      allowedPropNames.some((name) =>
-        Interpreter.isStrictlyEqual(name, propDom.data[0]),
-      ),
+      allowedPropNames.some((name) => Interpreter.isStrictlyEqual(name, propDom.data[0])),
     );
   }
 
@@ -1001,9 +903,7 @@ export default class Renderer {
   // Deps: [:lists.keyfind/3]
   static #getConstrainedProps(moduleProxy) {
     if (!("__constrainedProps__" in moduleProxy)) {
-      moduleProxy.__constrainedProps__ = Renderer.#getPropDefinitions(
-        moduleProxy,
-      )
+      moduleProxy.__constrainedProps__ = Renderer.#getPropDefinitions(moduleProxy)
         .data.map((prop) => {
           const opts = prop.data[2];
 
@@ -1013,14 +913,9 @@ export default class Renderer {
             opts,
           );
 
-          const valuesEntry = Erlang_Lists["keyfind/3"](
-            Type.atom("values"),
-            Type.integer(1),
-            opts,
-          );
+          const valuesEntry = Erlang_Lists["keyfind/3"](Type.atom("values"), Type.integer(1), opts);
 
-          const required =
-            !Type.isFalse(requiredEntry) && Type.isTrue(requiredEntry.data[1]);
+          const required = !Type.isFalse(requiredEntry) && Type.isTrue(requiredEntry.data[1]);
 
           const values = Type.isFalse(valuesEntry) ? null : valuesEntry.data[1];
 
@@ -1050,33 +945,22 @@ export default class Renderer {
   // Based on inject_default_prop_values/2
   // Deps: [:lists.keyfind/3, :lists.keymember/3, :maps.is_key/2]
   static #injectDefaultPropValues(props, moduleProxy) {
-    return Renderer.#getPropDefinitions(moduleProxy).data.reduce(
-      (acc, prop) => {
-        if (
-          Type.isFalse(Erlang_Maps["is_key/2"](prop.data[0], acc)) &&
-          Type.isTrue(
-            Erlang_Lists["keymember/3"](
-              Type.atom("default"),
-              Type.integer(1),
-              prop.data[2],
-            ),
-          )
-        ) {
-          // Optimized (mutates map)
-          acc.data[Type.encodeMapKey(prop.data[0])] = [
-            prop.data[0],
-            Erlang_Lists["keyfind/3"](
-              Type.atom("default"),
-              Type.integer(1),
-              prop.data[2],
-            ).data[1],
-          ];
-        }
+    return Renderer.#getPropDefinitions(moduleProxy).data.reduce((acc, prop) => {
+      if (
+        Type.isFalse(Erlang_Maps["is_key/2"](prop.data[0], acc)) &&
+        Type.isTrue(
+          Erlang_Lists["keymember/3"](Type.atom("default"), Type.integer(1), prop.data[2]),
+        )
+      ) {
+        // Optimized (mutates map)
+        acc.data[Type.encodeMapKey(prop.data[0])] = [
+          prop.data[0],
+          Erlang_Lists["keyfind/3"](Type.atom("default"), Type.integer(1), prop.data[2]).data[1],
+        ];
+      }
 
-        return acc;
-      },
-      Utils.shallowCloneObject(props),
-    );
+      return acc;
+    }, Utils.shallowCloneObject(props));
   }
 
   // Based on inject_props_from_context/3
@@ -1085,23 +969,15 @@ export default class Renderer {
     const propsFromContextTuples = Renderer.#getPropDefinitions(moduleProxy)
       .data.filter((prop) => {
         const contextKey = Renderer.#contextKey(prop.data[2]);
-        return (
-          contextKey !== null &&
-          Type.isTrue(Erlang_Maps["is_key/2"](contextKey, context))
-        );
+        return contextKey !== null && Type.isTrue(Erlang_Maps["is_key/2"](contextKey, context));
       })
       .map((prop) => {
         const contextKey = Renderer.#contextKey(prop.data[2]);
 
-        return Type.tuple([
-          prop.data[0],
-          Erlang_Maps["get/2"](contextKey, context),
-        ]);
+        return Type.tuple([prop.data[0], Erlang_Maps["get/2"](contextKey, context)]);
       });
 
-    const propsFromContext = Erlang_Maps["from_list/1"](
-      Type.list(propsFromContextTuples),
-    );
+    const propsFromContext = Erlang_Maps["from_list/1"](Type.list(propsFromContextTuples));
 
     return Erlang_Maps["merge/2"](propsFromTemplate, propsFromContext);
   }
@@ -1131,9 +1007,7 @@ export default class Renderer {
   }
 
   static #isNestedSpreadValue(value) {
-    return (
-      (Type.isMap(value) && !Type.isStruct(value)) || Type.isKeywordList(value)
-    );
+    return (Type.isMap(value) && !Type.isStruct(value)) || Type.isKeywordList(value);
   }
 
   static #mapEventName(eventName, tagName, attrsVdom) {
@@ -1170,10 +1044,7 @@ export default class Renderer {
       if ("init/2" in moduleProxy) {
         const emptyComponentStruct = Type.componentStruct();
 
-        const componentStruct = moduleProxy["init/2"](
-          props,
-          emptyComponentStruct,
-        );
+        const componentStruct = moduleProxy["init/2"](props, emptyComponentStruct);
 
         ComponentRegistry.putEntry(
           cid,
@@ -1183,10 +1054,7 @@ export default class Renderer {
           ]),
         );
 
-        componentState = Erlang_Maps["get/2"](
-          Type.atom("state"),
-          componentStruct,
-        );
+        componentState = Erlang_Maps["get/2"](Type.atom("state"), componentStruct);
 
         componentEmittedContext = Erlang_Maps["get/2"](
           Type.atom("emitted_context"),
@@ -1202,8 +1070,7 @@ export default class Renderer {
         throw new HologramInterpreterError(message);
       }
     } else {
-      componentEmittedContext =
-        ComponentRegistry.getComponentEmittedContext(cid);
+      componentEmittedContext = ComponentRegistry.getComponentEmittedContext(cid);
     }
 
     return [componentState, componentEmittedContext];
@@ -1211,28 +1078,17 @@ export default class Renderer {
 
   // Deps: [:maps.get/2, :maps.get/3, :maps.put/3]
   static #maybeQueueActionFromClientInit(componentStruct, cid) {
-    const nextAction = Erlang_Maps["get/2"](
-      Type.atom("next_action"),
-      componentStruct,
-    );
+    const nextAction = Erlang_Maps["get/2"](Type.atom("next_action"), componentStruct);
 
     if (!Type.isNil(nextAction)) {
       ComponentRegistry.clearNextAction(cid);
 
       let actionWithTarget = nextAction;
 
-      const existingTarget = Erlang_Maps["get/3"](
-        Type.atom("target"),
-        nextAction,
-        Type.nil(),
-      );
+      const existingTarget = Erlang_Maps["get/3"](Type.atom("target"), nextAction, Type.nil());
 
       if (Type.isNil(existingTarget)) {
-        actionWithTarget = Erlang_Maps["put/3"](
-          Type.atom("target"),
-          cid,
-          nextAction,
-        );
+        actionWithTarget = Erlang_Maps["put/3"](Type.atom("target"), cid, nextAction);
       }
 
       InitActionQueue.enqueue(actionWithTarget);
@@ -1249,11 +1105,7 @@ export default class Renderer {
         return acc;
       }
 
-      if (
-        typeof node === "string" &&
-        acc.length > 0 &&
-        typeof acc[acc.length - 1] === "string"
-      ) {
+      if (typeof node === "string" && acc.length > 0 && typeof acc[acc.length - 1] === "string") {
         acc[acc.length - 1] = acc[acc.length - 1] + node;
       } else {
         acc.push(node);
@@ -1270,10 +1122,7 @@ export default class Renderer {
   // Based on normalize_prop_name/1
   // Deps: [:erlang.binary_to_atom/1]
   static #normalizePropName(propDom) {
-    return Type.tuple([
-      Erlang["binary_to_atom/1"](propDom.data[0]),
-      propDom.data[1],
-    ]);
+    return Type.tuple([Erlang["binary_to_atom/1"](propDom.data[0]), propDom.data[1]]);
   }
 
   // Returns true when the modifiers map carries a once modifier, which fires the binding a single
@@ -1284,9 +1133,7 @@ export default class Renderer {
       return false;
     }
 
-    return Type.isTrue(
-      Erlang_Maps["is_key/2"](Type.atom("once"), modifiersDom),
-    );
+    return Type.isTrue(Erlang_Maps["is_key/2"](Type.atom("once"), modifiersDom));
   }
 
   // The single vnode a document is patched from, given the children a render produced.
@@ -1298,9 +1145,7 @@ export default class Renderer {
     const htmlVnode = children.find((childVnode) => childVnode.sel === "html");
 
     if (typeof htmlVnode === "undefined") {
-      return vnode("html", {attrs: {}, on: {}}, [
-        vnode("body", {attrs: {}, on: {}}, children),
-      ]);
+      return vnode("html", {attrs: {}, on: {}}, [vnode("body", {attrs: {}, on: {}}, children)]);
     }
 
     return htmlVnode;
@@ -1314,9 +1159,7 @@ export default class Renderer {
       return false;
     }
 
-    return Type.isTrue(
-      Erlang_Maps["is_key/2"](Type.atom("prevent_default"), modifiersDom),
-    );
+    return Type.isTrue(Erlang_Maps["is_key/2"](Type.atom("prevent_default"), modifiersDom));
   }
 
   // Based on raise_invalid_spread_value/1
@@ -1331,12 +1174,7 @@ export default class Renderer {
   // WARNING: must match render_tree_attribute/1: an empty value list is a boolean attribute, a
   // nil or false expression value removes the attribute, and everything else collapses to one
   // unescaped string.
-  static #renderAttribute(
-    name,
-    valueDom,
-    isControlledValueAttr,
-    isControlledCheckedAttr,
-  ) {
+  static #renderAttribute(name, valueDom, isControlledValueAttr, isControlledCheckedAttr) {
     // Handle empty attribute: []
     if (valueDom.data.length === 0) {
       return [name, true];
@@ -1395,8 +1233,7 @@ export default class Renderer {
     );
 
     // Check if this is a form element with special handling of checked and value attributes
-    const isFormInput =
-      tagName === "input" || tagName === "textarea" || tagName === "select";
+    const isFormInput = tagName === "input" || tagName === "textarea" || tagName === "select";
 
     let inputType;
     if (isFormInput) {
@@ -1445,14 +1282,7 @@ export default class Renderer {
   }
 
   // Based on render_tree/3 (component case)
-  static #renderComponent(
-    dom,
-    context,
-    slots,
-    defaultTarget,
-    parentTagName,
-    parentModule,
-  ) {
+  static #renderComponent(dom, context, slots, defaultTarget, parentTagName, parentModule) {
     const moduleProxy = Interpreter.moduleProxy(dom.data[1]);
     const propsDom = dom.data[2];
     let childrenDom = dom.data[3];
@@ -1519,9 +1349,7 @@ export default class Renderer {
     }
 
     if (!Type.isAtom(value)) {
-      Interpreter.raiseArgumentError(
-        Renderer.#invalidDynamicTagValueMessage(value),
-      );
+      Interpreter.raiseArgumentError(Renderer.#invalidDynamicTagValueMessage(value));
     }
 
     Renderer.#validateDynamicTagModule(value);
@@ -1577,8 +1405,10 @@ export default class Renderer {
 
     const attrsDom = dom.data[2];
 
-    const {attrs: attrsVdom, props: propsVdom} =
-      Renderer.#renderAttributesAndProps(attrsDom, currentTagName);
+    const {attrs: attrsVdom, props: propsVdom} = Renderer.#renderAttributesAndProps(
+      attrsDom,
+      currentTagName,
+    );
 
     const eventListenersVdom = Renderer.#renderEventListeners(
       attrsDom,
@@ -1619,8 +1449,7 @@ export default class Renderer {
         currentTagName === "select") &&
       attrsVdom["data-hologram-form-input-value"] !== undefined
     ) {
-      const hologramFormInputValue =
-        attrsVdom["data-hologram-form-input-value"];
+      const hologramFormInputValue = attrsVdom["data-hologram-form-input-value"];
       delete attrsVdom["data-hologram-form-input-value"];
       data.hologramFormInputValue = hologramFormInputValue;
 
@@ -1637,17 +1466,13 @@ export default class Renderer {
       currentTagName === "input" &&
       attrsVdom["data-hologram-form-input-checked"] !== undefined
     ) {
-      const hologramFormInputChecked =
-        attrsVdom["data-hologram-form-input-checked"];
+      const hologramFormInputChecked = attrsVdom["data-hologram-form-input-checked"];
       delete attrsVdom["data-hologram-form-input-checked"];
       data.hologramFormInputChecked = hologramFormInputChecked;
 
       data.hook = {
         create: (_emptyVnode, newVnode) => {
-          Renderer.#updateFormInputChecked(
-            newVnode.elm,
-            hologramFormInputChecked,
-          );
+          Renderer.#updateFormInputChecked(newVnode.elm, hologramFormInputChecked);
         },
         update: (_oldVnode, newVnode) => {
           const newChecked = newVnode.data.hologramFormInputChecked;
@@ -1656,17 +1481,9 @@ export default class Renderer {
       };
     }
 
-    if (
-      currentTagName === "link" &&
-      typeof attrsVdom.href === "string" &&
-      attrsVdom.href
-    ) {
+    if (currentTagName === "link" && typeof attrsVdom.href === "string" && attrsVdom.href) {
       data.key = `__hologramLink__:${attrsVdom.href}`;
-    } else if (
-      currentTagName === "script" &&
-      typeof attrsVdom.src === "string" &&
-      attrsVdom.src
-    ) {
+    } else if (currentTagName === "script" && typeof attrsVdom.src === "string" && attrsVdom.src) {
       data.key = `__hologramScript__:${attrsVdom.src}`;
     } else if (currentTagName === "script" && childrenVdom[0]) {
       // Make sure the script is executed if the code changes.
@@ -1689,11 +1506,7 @@ export default class Renderer {
 
     const elementVnode = vnode(currentTagName, data, childrenVdom);
 
-    Renderer.#collectClickOutsideBindings(
-      attrsDom,
-      elementVnode,
-      defaultTarget,
-    );
+    Renderer.#collectClickOutsideBindings(attrsDom, elementVnode, defaultTarget);
 
     Renderer.#collectReachBindings(attrsDom, elementVnode, defaultTarget);
 
@@ -1710,13 +1523,7 @@ export default class Renderer {
     // Slot key = the attribute's position: stable across re-renders (attributes are never removed,
     // only nilled in place) and independent of the action spec's evaluated params.
     const handlersByEvent = attrsDom.data.reduce((acc, attrDom, attrIndex) => {
-      const binding = $.#buildEventBinding(
-        attrDom,
-        attrIndex,
-        tagName,
-        attrsVdom,
-        defaultTarget,
-      );
+      const binding = $.#buildEventBinding(attrDom, attrIndex, tagName, attrsVdom, defaultTarget);
 
       if (binding === null) {
         return acc;
@@ -1777,30 +1584,20 @@ export default class Renderer {
 
   // Based on render_page_inside_layout/3
   // Deps: [:maps.get/2, :maps.merge/2]
-  static #renderPageInsideLayout(
-    pageModuleProxy,
-    pageParams,
-    pageComponentStruct,
-  ) {
+  static #renderPageInsideLayout(pageModuleProxy, pageParams, pageComponentStruct) {
     const pageEmittedContext = Erlang_Maps["get/2"](
       Type.atom("emitted_context"),
       pageComponentStruct,
     );
 
-    const pageState = Erlang_Maps["get/2"](
-      Type.atom("state"),
-      pageComponentStruct,
-    );
+    const pageState = Erlang_Maps["get/2"](Type.atom("state"), pageComponentStruct);
 
     const vars = Erlang_Maps["merge/2"](pageParams, pageState);
     const pageDom = Renderer.#evaluateTemplate(pageModuleProxy, vars);
 
     const layoutModule = pageModuleProxy["__layout_module__/0"]();
 
-    const layoutPropsDom = Renderer.#buildLayoutPropsDom(
-      pageModuleProxy,
-      pageState,
-    );
+    const layoutPropsDom = Renderer.#buildLayoutPropsDom(pageModuleProxy, pageState);
 
     const pageNodes = Type.tuple([Type.atom("page"), pageDom]);
 
@@ -1883,17 +1680,8 @@ export default class Renderer {
   }
 
   // Based on render_tree/3 (slot case)
-  static #renderSlotElement(
-    slots,
-    context,
-    defaultTarget,
-    parentTagName,
-    slotsParentModule,
-  ) {
-    const slotDom = Interpreter.accessKeywordListElement(
-      slots,
-      Type.atom("default"),
-    );
+  static #renderSlotElement(slots, context, defaultTarget, parentTagName, slotsParentModule) {
+    const slotDom = Interpreter.accessKeywordListElement(slots, Type.atom("default"));
 
     return Renderer.renderDom(
       slotDom,
@@ -1918,14 +1706,14 @@ export default class Renderer {
   ) {
     const cid = Erlang_Maps["get/2"](Type.atom("cid"), props);
 
-    const [componentState, componentEmittedContext] =
-      Renderer.#maybeInitComponent(cid, moduleProxy, props);
+    const [componentState, componentEmittedContext] = Renderer.#maybeInitComponent(
+      cid,
+      moduleProxy,
+      props,
+    );
 
     const vars = Erlang_Maps["merge/2"](props, componentState);
-    const mergedContext = Erlang_Maps["merge/2"](
-      context,
-      componentEmittedContext,
-    );
+    const mergedContext = Erlang_Maps["merge/2"](context, componentEmittedContext);
 
     return Renderer.#renderTemplate(
       moduleProxy,
@@ -1984,9 +1772,7 @@ export default class Renderer {
       return false;
     }
 
-    return Type.isTrue(
-      Erlang_Maps["is_key/2"](Type.atom("stop_propagation"), modifiersDom),
-    );
+    return Type.isTrue(Erlang_Maps["is_key/2"](Type.atom("stop_propagation"), modifiersDom));
   }
 
   // Returns the throttle window in milliseconds from a modifiers map, or null when there is no
@@ -1997,11 +1783,7 @@ export default class Renderer {
       return null;
     }
 
-    const throttle = Erlang_Maps["get/3"](
-      Type.atom("throttle"),
-      modifiersDom,
-      null,
-    );
+    const throttle = Erlang_Maps["get/3"](Type.atom("throttle"), modifiersDom, null);
 
     return throttle === null ? null : Number(throttle.value);
   }
@@ -2044,8 +1826,7 @@ export default class Renderer {
     }
 
     Interpreter.raiseArgumentError(
-      Renderer.#invalidDynamicTagValueMessage(module) +
-        ", which is not a component module",
+      Renderer.#invalidDynamicTagValueMessage(module) + ", which is not a component module",
     );
   }
 
@@ -2119,11 +1900,7 @@ export default class Renderer {
       return undefined;
     }
 
-    const within = Erlang_Maps["get/3"](
-      Type.atom("within"),
-      modifiersDom,
-      null,
-    );
+    const within = Erlang_Maps["get/3"](Type.atom("within"), modifiersDom, null);
 
     return within === null ? undefined : Bitstring.toText(within);
   }

@@ -119,8 +119,8 @@ console.log("Pass 3: script signatures...");
 
 // Anchor order must match generate_scriptsets.exs.
 const anchors = [
-  0x61, 0x03b1, 0x0430, 0x05d0, 0x0627, 0x0905, 0x4e00, 0x3042, 0x30a2, 0xac00,
-  0x0e01, 0x10d0, 0x0531,
+  0x61, 0x03b1, 0x0430, 0x05d0, 0x0627, 0x0905, 0x4e00, 0x3042, 0x30a2, 0xac00, 0x0e01, 0x10d0,
+  0x0531,
 ];
 
 for (const line of readLines(__dirname + "/scriptsets_elixir.txt")) {
@@ -136,8 +136,7 @@ for (const line of readLines(__dirname + "/scriptsets_elixir.txt")) {
     const result = tokenize([anchors[index], codepoint]);
     const [tag, , rest] = result.data;
 
-    const combines =
-      tag.value !== "error" && rest !== undefined && rest.data.length === 0;
+    const combines = tag.value !== "error" && rest !== undefined && rest.data.length === 0;
 
     const expected = signature[index] === "1";
 

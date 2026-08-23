@@ -110,9 +110,7 @@ const ENCODED_RANGES =
 `;
 
 const updatedSource =
-  moduleSource.slice(0, startIndex) +
-  generatedSection +
-  moduleSource.slice(endIndex);
+  moduleSource.slice(0, startIndex) + generatedSection + moduleSource.slice(endIndex);
 
 fs.writeFileSync(moduleFile, updatedSource);
 

@@ -12,9 +12,7 @@ const Erlang_Code = {
   // Start ensure_loaded/1
   "ensure_loaded/1": (module) => {
     if (!Type.isAtom(module)) {
-      Interpreter.raiseFunctionClauseError("code", "ensure_loaded", 1, [
-        module,
-      ]);
+      Interpreter.raiseFunctionClauseError("code", "ensure_loaded", 1, [module]);
     }
 
     return typeof Interpreter.moduleProxy(module) === "undefined"

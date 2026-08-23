@@ -19,11 +19,7 @@ const Elixir_IO = {
 
   "inspect/3": (device, term, opts) => {
     if (!Type.isAtom(device) && !Type.isPid(device)) {
-      Interpreter.raiseFunctionClauseError("IO", "inspect", 3, [
-        device,
-        term,
-        opts,
-      ]);
+      Interpreter.raiseFunctionClauseError("IO", "inspect", 3, [device, term, opts]);
     }
 
     if (Type.isPid(device) || (device.value !== "stdio" && device.value !== "stderr")) {

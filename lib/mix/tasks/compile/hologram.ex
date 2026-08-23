@@ -78,17 +78,11 @@ defmodule Mix.Tasks.Compile.Hologram do
   end
 
   defp build_default_opts do
-    assets_dir = Path.join(Reflection.hologram_dep_dir(), "assets")
     build_dir = Reflection.build_dir()
-    node_modules_path = Path.join(assets_dir, "node_modules")
 
     [
-      assets_dir: assets_dir,
       build_dir: build_dir,
-      esbuild_bin_path: Path.join([node_modules_path, ".bin", "esbuild"]),
-      js_dir: Path.join(assets_dir, "js"),
-      node_modules_path: node_modules_path,
-      static_dir: Path.join(Reflection.otp_app_static_dir(), "hologram"),
+      static_dir: Path.join([Reflection.otp_app_dir(), "priv", "static", "hologram"]),
       tmp_dir: Path.join(build_dir, "tmp")
     ]
   end
@@ -102,14 +96,11 @@ defmodule Mix.Tasks.Compile.Hologram do
     try do
       Logger.info("Hologram: compiler started")
 
-      assets_dir = opts[:assets_dir]
       build_dir = opts[:build_dir]
 
       File.mkdir_p!(build_dir)
       File.mkdir_p!(opts[:static_dir])
       File.mkdir_p!(opts[:tmp_dir])
-
-      Compiler.maybe_install_js_deps(assets_dir, build_dir)
 
       {old_module_digest_plt, module_digest_plt_dump_path} =
         Compiler.maybe_load_module_digest_plt(build_dir, supervisor: sup)

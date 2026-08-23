@@ -18,8 +18,7 @@ const NEWLINE_VARIANTS = {
     dot: "[^\\x0a-\\x0d\\u0085\\u2028-\\u2029]",
     endBeforeFinal: "(?=(?:\\r\\n|[\\x0a-\\x0d\\u0085\\u2028-\\u2029])?$)",
     lineEndMultiline: "(?=[\\x0a-\\x0d\\u0085\\u2028-\\u2029]|$)",
-    lineStartMultiline:
-      "(?:^|(?<=[\\x0a-\\x0c\\u0085\\u2028-\\u2029])|(?<=\\x0d)(?!\\x0a))",
+    lineStartMultiline: "(?:^|(?<=[\\x0a-\\x0c\\u0085\\u2028-\\u2029])|(?<=\\x0d)(?!\\x0a))",
   },
   anycrlf: {
     dot: "[^\\r\\n]",
@@ -154,9 +153,7 @@ export default class RegexTranslator {
   // Emits a set as class content, complementing it for negated set members,
   // because JS classes can't nest negation.
   static #setToClassContent(ranges, negated, context) {
-    const effectiveRanges = negated
-      ? $.#complementRanges(ranges, context.maxCodePoint)
-      : ranges;
+    const effectiveRanges = negated ? $.#complementRanges(ranges, context.maxCodePoint) : ranges;
 
     return $.#rangesToClassContent(effectiveRanges);
   }
@@ -193,9 +190,7 @@ export default class RegexTranslator {
         return "\\b";
 
       default:
-        throw new Error(
-          `unsupported anchor for native translation: ${node.kind}`,
-        );
+        throw new Error(`unsupported anchor for native translation: ${node.kind}`);
     }
   }
 
@@ -222,11 +217,7 @@ export default class RegexTranslator {
           break;
 
         case "posixClass":
-          members += $.#setToClassContent(
-            POSIX_SETS[item.name],
-            item.negated,
-            context,
-          );
+          members += $.#setToClassContent(POSIX_SETS[item.name], item.negated, context);
           break;
 
         case "range":
@@ -234,18 +225,12 @@ export default class RegexTranslator {
           break;
 
         case "shorthand":
-          members += $.#setToClassContent(
-            SHORTHAND_SETS[item.letter],
-            item.negated,
-            context,
-          );
+          members += $.#setToClassContent(SHORTHAND_SETS[item.letter], item.negated, context);
           break;
 
         default:
           // TODO: shrink as remaining translator rewrites are implemented
-          throw new Error(
-            `unsupported class member for native translation: ${item.type}`,
-          );
+          throw new Error(`unsupported class member for native translation: ${item.type}`);
       }
     }
 
@@ -286,9 +271,7 @@ export default class RegexTranslator {
   static #translateNode(node, context) {
     switch (node.type) {
       case "alternation":
-        return node.branches
-          .map((branch) => $.#translateNode(branch, context))
-          .join("|");
+        return node.branches.map((branch) => $.#translateNode(branch, context)).join("|");
 
       case "anchor":
         return $.#translateAnchor(node, context);
@@ -315,9 +298,7 @@ export default class RegexTranslator {
       // its own line terminator set, so dot is always translated to an
       // explicit class
       case "dot":
-        return context.dotall
-          ? "[\\s\\S]"
-          : NEWLINE_VARIANTS[context.newline].dot;
+        return context.dotall ? "[\\s\\S]" : NEWLINE_VARIANTS[context.newline].dot;
 
       case "group": {
         const jsNumber = ++context.state.jsGroupCount;
@@ -326,9 +307,7 @@ export default class RegexTranslator {
 
         const content = $.#translateNode(node.content, context);
 
-        return node.name !== null
-          ? `(?<${node.name}>${content})`
-          : `(${content})`;
+        return node.name !== null ? `(?<${node.name}>${content})` : `(${content})`;
       }
 
       case "literal":
@@ -386,9 +365,7 @@ export default class RegexTranslator {
 
       default:
         // TODO: shrink as remaining translator rewrites are implemented
-        throw new Error(
-          `unsupported AST node for native translation: ${node.type}`,
-        );
+        throw new Error(`unsupported AST node for native translation: ${node.type}`);
     }
   }
 

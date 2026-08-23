@@ -62,9 +62,7 @@ function formatFileLine(file, line, column) {
 
 function formatLocation(location) {
   const value = (key) =>
-    location.data.find(
-      (entry) => Type.isTuple(entry) && entry.data[0].value === key,
-    )?.data[1];
+    location.data.find((entry) => Type.isTuple(entry) && entry.data[0].value === key)?.data[1];
 
   const file = value("file");
   const line = value("line");
@@ -88,8 +86,7 @@ function formatMfa(moduleTerm, functionTerm, arityOrArgs) {
     const parentName = Interpreter.inspectAtomAs("remote_call", parent.name);
 
     return (
-      `anonymous fn${formatArity(arityOrArgs)} in ` +
-      `${moduleText}.${parentName}/${parent.arity}`
+      `anonymous fn${formatArity(arityOrArgs)} in ` + `${moduleText}.${parentName}/${parent.arity}`
     );
   }
 
@@ -106,9 +103,7 @@ export default class Stacktrace {
     // An Elixir module is keyed by its name without the Elixir prefix, an
     // Erlang one by the atom it is - the way each is keyed when its metadata is
     // emitted.
-    const key = Type.isAlias(moduleTerm)
-      ? Interpreter.moduleExName(moduleTerm)
-      : moduleTerm.value;
+    const key = Type.isAlias(moduleTerm) ? Interpreter.moduleExName(moduleTerm) : moduleTerm.value;
 
     return ERTS.moduleMetadata[key]?.app ?? null;
   }

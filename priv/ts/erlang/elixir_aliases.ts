@@ -34,9 +34,7 @@ const Erlang_Elixir_Aliases = {
         return acc;
       }
 
-      let str = Type.isAtom(segment)
-        ? segment.value
-        : Bitstring.toText(segment);
+      let str = Type.isAtom(segment) ? segment.value : Bitstring.toText(segment);
 
       if (str.startsWith("Elixir.")) {
         str = str.substring(7);

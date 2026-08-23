@@ -5,7 +5,7 @@ import Vdom from "hologram:runtime/vdom";
 import {benchmark} from "../../../support/helpers.mjs";
 import {defineRuntimeGlobals} from "../../../../../test/javascript/support/helpers.mjs";
 
-import {h} from "../../../../../assets/js/vendor/snabbdom/build/index.js";
+import {h} from "snabbdom";
 
 defineRuntimeGlobals();
 

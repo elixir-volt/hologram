@@ -182,13 +182,7 @@ export default class Hologram {
         Hologram.#processActionResult(resolved, name, target, startTime, epoch),
       );
     } else {
-      Hologram.#processActionResult(
-        resultComponentStruct,
-        name,
-        target,
-        startTime,
-        epoch,
-      );
+      Hologram.#processActionResult(resultComponentStruct, name, target, startTime, epoch);
     }
   }
 
@@ -199,10 +193,7 @@ export default class Hologram {
     const toParam = Hologram.#getToParam(action);
     const pagePath = Hologram.#buildPagePath(toParam);
 
-    const mapKey = Hologram.#buildPrefetchedPagesMapKey(
-      eventTargetNode,
-      pagePath,
-    );
+    const mapKey = Hologram.#buildPrefetchedPagesMapKey(eventTargetNode, pagePath);
 
     const mapValue = Hologram.prefetchedPages.get(mapKey);
 
@@ -228,15 +219,9 @@ export default class Hologram {
     const toParam = Hologram.#getToParam(action);
     const pagePath = Hologram.#buildPagePath(toParam);
 
-    const mapKey = Hologram.#buildPrefetchedPagesMapKey(
-      eventTargetNode,
-      pagePath,
-    );
+    const mapKey = Hologram.#buildPrefetchedPagesMapKey(eventTargetNode, pagePath);
 
-    if (
-      !Hologram.prefetchedPages.has(mapKey) ||
-      Hologram.#isPrefetchPageTimedOut(mapKey)
-    ) {
+    if (!Hologram.prefetchedPages.has(mapKey) || Hologram.#isPrefetchPageTimedOut(mapKey)) {
       Hologram.prefetchedPages.set(mapKey, {
         isNavigateConfirmed: false,
         isPage: true,
@@ -346,29 +331,18 @@ export default class Hologram {
     const epoch = $.domEpoch;
 
     return () => {
-      const operation = Operation.fromSpecDom(
-        operationSpecDom,
-        defaultTarget,
-        eventParam,
-      );
+      const operation = Operation.fromSpecDom(operationSpecDom, defaultTarget, eventParam);
 
       if (Operation.isAction(operation)) {
         switch (Hologram.#getActionName(operation)) {
           case "__load_prefetched_page__":
-            return Hologram.executeLoadPrefetchedPageAction(
-              operation,
-              eventTarget,
-            );
+            return Hologram.executeLoadPrefetchedPageAction(operation, eventTarget);
 
           case "__prefetch_page__":
             return Hologram.executePrefetchPageAction(operation, eventTarget);
 
           default: {
-            const delay = Erlang_Maps["get/3"](
-              Type.atom("delay"),
-              operation,
-              Type.integer(0),
-            );
+            const delay = Erlang_Maps["get/3"](Type.atom("delay"), operation, Type.integer(0));
 
             // Settling directly keeps an undelayed dispatch synchronous on a stable page, which
             // is what lets a raising action reach the "error" event the feature tests read.
@@ -458,16 +432,8 @@ export default class Hologram {
 
         let actionWithTarget = nextAction;
 
-        if (
-          Type.isNil(
-            Erlang_Maps["get/3"](Type.atom("target"), nextAction, Type.nil()),
-          )
-        ) {
-          actionWithTarget = Erlang_Maps["put/3"](
-            Type.atom("target"),
-            cid,
-            nextAction,
-          );
+        if (Type.isNil(Erlang_Maps["get/3"](Type.atom("target"), nextAction, Type.nil()))) {
+          actionWithTarget = Erlang_Maps["put/3"](Type.atom("target"), cid, nextAction);
         }
 
         InitActionQueue.enqueue(actionWithTarget);
@@ -486,19 +452,13 @@ export default class Hologram {
   static render() {
     const startTime = performance.now();
 
-    const newVirtualDocument = Renderer.renderPage(
-      Hologram.#pageModule,
-      Hologram.#pageParams,
-    );
+    const newVirtualDocument = Renderer.renderPage(Hologram.#pageModule, Hologram.#pageParams);
 
     // On a full document load there is no previous render to diff against, only the page the
     // server sent, so the old side is built by mirroring this render onto it. The patch then
     // adopts those nodes instead of recreating the whole page.
     if (Hologram.virtualDocument === null) {
-      Hologram.virtualDocument = Vdom.mirror(
-        newVirtualDocument,
-        document.documentElement,
-      );
+      Hologram.virtualDocument = Vdom.mirror(newVirtualDocument, document.documentElement);
     }
 
     Hologram.virtualDocument = Vdom.patchVirtualDocument(
@@ -559,11 +519,7 @@ export default class Hologram {
   // markup - server-pushed actions, command responses, and the queues the mount drains. A caller
   // whose action came from the DOM passes the displayed page's epoch instead.
   static scheduleAction(action, epoch = $.registryEpoch) {
-    const delay = Erlang_Maps["get/3"](
-      Type.atom("delay"),
-      action,
-      Type.integer(0),
-    );
+    const delay = Erlang_Maps["get/3"](Type.atom("delay"), action, Type.integer(0));
 
     setTimeout(() => {
       Hologram.#settleAction(action, epoch);
@@ -571,9 +527,7 @@ export default class Hologram {
   }
 
   static #buildPagePath(toParam) {
-    return Bitstring.toText(
-      Elixir_Hologram_Router_Helpers["page_path/1"](toParam),
-    );
+    return Bitstring.toText(Elixir_Hologram_Router_Helpers["page_path/1"](toParam));
   }
 
   static #buildPrefetchedPagesMapKey(eventTargetNode, pagePath) {
@@ -861,14 +815,10 @@ export default class Hologram {
   static #dropPageBundleScript(virtualDocument, pageBundlePath) {
     const key = `__hologramScript__:${pageBundlePath}`;
 
-    const headVnode = virtualDocument.children.find(
-      (childVnode) => childVnode?.sel === "head",
-    );
+    const headVnode = virtualDocument.children.find((childVnode) => childVnode?.sel === "head");
 
     if (headVnode) {
-      headVnode.children = headVnode.children.filter(
-        (childVnode) => childVnode?.key !== key,
-      );
+      headVnode.children = headVnode.children.filter((childVnode) => childVnode?.key !== key);
     }
   }
 
@@ -965,8 +915,7 @@ export default class Hologram {
       const serializedSnapshot = sessionStorage.getItem(snapshotKey);
 
       if (serializedSnapshot) {
-        const deserializedSnapshot =
-          Deserializer.deserialize(serializedSnapshot);
+        const deserializedSnapshot = Deserializer.deserialize(serializedSnapshot);
 
         // Cache the deserialized snapshot in memory for faster subsequent access
         $.#pageSnapshots.set(snapshotKey, deserializedSnapshot);
@@ -1020,8 +969,7 @@ export default class Hologram {
         $.#deadEpochs.add(epoch);
 
         throw new HologramRuntimeError(
-          "Failed to fetch page bundle path for: " +
-            Interpreter.inspect(Hologram.#pageModule),
+          "Failed to fetch page bundle path for: " + Interpreter.inspect(Hologram.#pageModule),
         );
       },
     );
@@ -1058,18 +1006,12 @@ export default class Hologram {
 
     // Losing focus definitively ends any burst of events from an element, so its pending
     // debounced dispatches fire now instead of waiting out the rest of their windows.
-    document.addEventListener("focusout", (event) =>
-      Debouncer.flush(event.target),
-    );
+    document.addEventListener("focusout", (event) => Debouncer.flush(event.target));
 
     // Submit is a commit point: everything entered into the form is logically before it, so the
     // form's pending debounced dispatches run first. Capture phase guarantees the flush precedes
     // the form's own bound handler reading the event payload and dispatching.
-    document.addEventListener(
-      "submit",
-      (event) => Debouncer.flushWithin(event.target),
-      true,
-    );
+    document.addEventListener("submit", (event) => Debouncer.flushWithin(event.target), true);
 
     // Check if there's already a history state (e.g., when navigating back from external page)
     if (history.state) {
@@ -1118,24 +1060,15 @@ export default class Hologram {
   static #isPageReload() {
     // New Performance API
     if ("getEntriesByType" in performance) {
-      return (
-        !$.#isInitiated &&
-        performance.getEntriesByType("navigation")[0].type === "reload"
-      );
+      return !$.#isInitiated && performance.getEntriesByType("navigation")[0].type === "reload";
     }
 
     // Old Performance API
-    return (
-      !$.#isInitiated &&
-      performance.navigation.type === PerformanceNavigation.TYPE_RELOAD
-    );
+    return !$.#isInitiated && performance.navigation.type === PerformanceNavigation.TYPE_RELOAD;
   }
 
   static #isPrefetchPageTimedOut(mapKey) {
-    return (
-      Date.now() - Hologram.prefetchedPages.get(mapKey).timestamp >
-      Config.fetchPageTimeoutMs
-    );
+    return Date.now() - Hologram.prefetchedPages.get(mapKey).timestamp > Config.fetchPageTimeoutMs;
   }
 
   // What the page was mounted with, left behind by the script the server wrote into the page.
@@ -1226,10 +1159,7 @@ export default class Hologram {
     if (mountData) {
       Hologram.queueSelfEchoes(mountData.selfEchoes);
 
-      App.subscriptionReceiptRegistry.merge(
-        mountData.subReceiptAdds,
-        mountData.subReceiptDrops,
-      );
+      App.subscriptionReceiptRegistry.merge(mountData.subReceiptAdds, mountData.subReceiptDrops);
     }
 
     window.requestAnimationFrame(() => {
@@ -1260,10 +1190,7 @@ export default class Hologram {
   }
 
   static #onReady(callback) {
-    if (
-      document.readyState === "interactive" ||
-      document.readyState === "complete"
-    ) {
+    if (document.readyState === "interactive" || document.readyState === "complete") {
       callback();
     } else {
       document.addEventListener("DOMContentLoaded", function listener() {
@@ -1301,8 +1228,7 @@ export default class Hologram {
 
     return Client.fetchPage(
       toParam,
-      (nextPayload) =>
-        Hologram.loadNewPage(payload.to, nextPayload, hopCount + 1),
+      (nextPayload) => Hologram.loadNewPage(payload.to, nextPayload, hopCount + 1),
       () => Hologram.leaveApp(payload.to),
     );
   }
@@ -1336,9 +1262,7 @@ export default class Hologram {
     // for the mount, while everything armed before this line belongs to the page being left.
     $.domEpoch = Math.max($.domEpoch, $.registryEpoch) + 1;
 
-    const pageModule = Interpreter.evaluateJavaScriptExpression(
-      payload.pageModule,
-    );
+    const pageModule = Interpreter.evaluateJavaScriptExpression(payload.pageModule);
 
     const isPageModuleRegistered = $.#isPageModuleRegistered(pageModule);
 
@@ -1366,35 +1290,16 @@ export default class Hologram {
   }
 
   // Deps: [:maps.get/2, :maps.put/3]
-  static #processActionResult(
-    resultComponentStruct,
-    name,
-    target,
-    startTime,
-    epoch,
-  ) {
-    let nextAction = Erlang_Maps["get/2"](
-      Type.atom("next_action"),
-      resultComponentStruct,
-    );
+  static #processActionResult(resultComponentStruct, name, target, startTime, epoch) {
+    let nextAction = Erlang_Maps["get/2"](Type.atom("next_action"), resultComponentStruct);
 
-    const nextPage = Erlang_Maps["get/2"](
-      Type.atom("next_page"),
-      resultComponentStruct,
-    );
+    const nextPage = Erlang_Maps["get/2"](Type.atom("next_page"), resultComponentStruct);
 
-    let nextCommand = Erlang_Maps["get/2"](
-      Type.atom("next_command"),
-      resultComponentStruct,
-    );
+    let nextCommand = Erlang_Maps["get/2"](Type.atom("next_command"), resultComponentStruct);
 
     if (!Type.isNil(nextCommand)) {
       if (Type.isNil(Erlang_Maps["get/2"](Type.atom("target"), nextCommand))) {
-        nextCommand = Erlang_Maps["put/3"](
-          Type.atom("target"),
-          target,
-          nextCommand,
-        );
+        nextCommand = Erlang_Maps["put/3"](Type.atom("target"), target, nextCommand);
       }
 
       Client.sendCommand(nextCommand);
@@ -1429,11 +1334,7 @@ export default class Hologram {
 
     if (!Type.isNil(nextAction)) {
       if (Type.isNil(Erlang_Maps["get/2"](Type.atom("target"), nextAction))) {
-        nextAction = Erlang_Maps["put/3"](
-          Type.atom("target"),
-          target,
-          nextAction,
-        );
+        nextAction = Erlang_Maps["put/3"](Type.atom("target"), target, nextAction);
       }
 
       // A next action belongs to whatever page its parent belonged to, so it inherits the
@@ -1566,9 +1467,7 @@ export default class Hologram {
       pageModule: Hologram.#pageModule,
       pageParams: Hologram.#pageParams,
       scrollPosition: [window.scrollX, window.scrollY],
-      subscriptionReceipts: Array.from(
-        App.subscriptionReceiptRegistry.entries.entries(),
-      ),
+      subscriptionReceipts: Array.from(App.subscriptionReceiptRegistry.entries.entries()),
     };
 
     const snapshotKey = $.#pageSnapshotKey($.#historyId);
@@ -1583,10 +1482,7 @@ export default class Hologram {
       try {
         sessionStorage.setItem(snapshotKey, serializedPageSnapshot);
       } catch (error) {
-        console.error(
-          "Failed to save page snapshot to session storage:",
-          error,
-        );
+        console.error("Failed to save page snapshot to session storage:", error);
       }
 
       return;
@@ -1609,10 +1505,7 @@ export default class Hologram {
       try {
         sessionStorage.setItem(snapshotKey, serializedPageSnapshot);
       } catch (sessionStorageError) {
-        console.error(
-          "Failed to save page snapshot to session storage:",
-          sessionStorageError,
-        );
+        console.error("Failed to save page snapshot to session storage:", sessionStorageError);
       }
     }
   }

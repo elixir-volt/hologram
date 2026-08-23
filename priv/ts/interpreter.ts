@@ -71,11 +71,7 @@ export default class Interpreter {
 
   // Deps: [:lists.keyfind/3]
   static accessKeywordListElement(keywordList, key, defaultValue = null) {
-    const keyfindRes = Erlang_Lists["keyfind/3"](
-      key,
-      Type.integer(1),
-      keywordList,
-    );
+    const keyfindRes = Erlang_Lists["keyfind/3"](key, Type.integer(1), keywordList);
 
     return Type.isTuple(keyfindRes) ? keyfindRes.data[1] : defaultValue;
   }
@@ -109,11 +105,7 @@ export default class Interpreter {
   // the raw trace, the way rescue clauses see it.
   // Deps: [Exception.blame/3]
   static blameError(reason, stacktrace = Type.list()) {
-    const result = Elixir_Exception["blame/3"](
-      Type.atom("error"),
-      reason,
-      stacktrace,
-    );
+    const result = Elixir_Exception["blame/3"](Type.atom("error"), reason, stacktrace);
 
     return result.data[0];
   }
@@ -172,8 +164,7 @@ export default class Interpreter {
     // A capture of a named function pushes no frame of its own - the call
     // delegates to the named function, whose own dispatch wrapper pushes the
     // frame, matching the BEAM where such a capture IS the named function.
-    let popsFrameOnExit =
-      globalThis.Hologram.config.stacktraces && fun.capturedModule === null;
+    let popsFrameOnExit = globalThis.Hologram.config.stacktraces && fun.capturedModule === null;
 
     let frame = null;
 
@@ -234,9 +225,7 @@ export default class Interpreter {
       }
 
       Interpreter.raiseFunctionClauseError(
-        fun.context.module
-          ? Interpreter.moduleExName(fun.context.module)
-          : null,
+        fun.context.module ? Interpreter.moduleExName(fun.context.module) : null,
         fun.name,
         fun.arity,
         argsArray,
@@ -261,12 +250,7 @@ export default class Interpreter {
     const functionArityStr = `${functionName.value}/${arity}`;
 
     if (typeof moduleProxy === "undefined") {
-      Interpreter.raiseUndefinedFunctionError(
-        module,
-        functionName.value,
-        arity,
-        false,
-      );
+      Interpreter.raiseUndefinedFunctionError(module, functionName.value, arity, false);
     }
 
     if (
@@ -274,11 +258,7 @@ export default class Interpreter {
       !moduleProxy.__exports__.has(functionArityStr) &&
       !Interpreter.isEqual(module, context.module)
     ) {
-      Interpreter.raiseUndefinedFunctionError(
-        module,
-        functionName.value,
-        arity,
-      );
+      Interpreter.raiseUndefinedFunctionError(module, functionName.value, arity);
     }
 
     return moduleProxy[functionArityStr](...args.data);
@@ -334,11 +314,7 @@ export default class Interpreter {
       case "atom":
       case "float":
       case "integer":
-        return term1.value == term2.value
-          ? 0
-          : term1.value < term2.value
-            ? -1
-            : 1;
+        return term1.value == term2.value ? 0 : term1.value < term2.value ? -1 : 1;
 
       case "bitstring":
         return Bitstring.compare(term1, term2);
@@ -372,20 +348,11 @@ export default class Interpreter {
 
   // SYNC/ASYNC PAIR: When modifying this function, also update comprehension().
   // Deps: [Enum.into/2, Enum.to_list/1]
-  static async asyncComprehension(
-    qualifiers,
-    collectable,
-    unique,
-    mapper,
-    context,
-  ) {
+  static async asyncComprehension(qualifiers, collectable, unique, mapper, context) {
     let items = [];
 
-    await Interpreter.#asyncWalkComprehension(
-      qualifiers,
-      0,
-      context,
-      async (leafContext) => items.push(await mapper(leafContext)),
+    await Interpreter.#asyncWalkComprehension(qualifiers, 0, context, async (leafContext) =>
+      items.push(await mapper(leafContext)),
     );
 
     if (unique) {
@@ -414,27 +381,17 @@ export default class Interpreter {
 
   // SYNC/ASYNC PAIR: When modifying this function, also update comprehensionReduce().
   // Deps: [Enum.to_list/1]
-  static async asyncComprehensionReduce(
-    qualifiers,
-    initialValue,
-    clauses,
-    context,
-  ) {
+  static async asyncComprehensionReduce(qualifiers, initialValue, clauses, context) {
     let acc = initialValue;
 
-    await Interpreter.#asyncWalkComprehension(
-      qualifiers,
-      0,
-      context,
-      async (leafContext) => {
-        acc = await Interpreter.#asyncEvaluateMatchingClause(
-          acc,
-          clauses,
-          leafContext,
-          Interpreter.raiseCaseClauseError,
-        );
-      },
-    );
+    await Interpreter.#asyncWalkComprehension(qualifiers, 0, context, async (leafContext) => {
+      acc = await Interpreter.#asyncEvaluateMatchingClause(
+        acc,
+        clauses,
+        leafContext,
+        Interpreter.raiseCaseClauseError,
+      );
+    });
 
     return acc;
   }
@@ -478,26 +435,19 @@ export default class Interpreter {
     }
   }
 
-  static defineElixirFunction(
-    moduleExName,
-    functionName,
-    arity,
-    visibility,
-    clauses,
-  ) {
+  static defineElixirFunction(moduleExName, functionName, arity, visibility, clauses) {
     const moduleJsName = Interpreter.moduleJsName("Elixir." + moduleExName);
 
     Interpreter.maybeInitModuleProxy(moduleExName, moduleJsName);
 
-    globalThis[moduleJsName][`${functionName}/${arity}`] =
-      Interpreter.#buildElixirFunction(
-        moduleExName,
-        functionName,
-        arity,
-        visibility,
-        clauses,
-        ERTS.moduleMetadata[moduleExName]?.file ?? null,
-      );
+    globalThis[moduleJsName][`${functionName}/${arity}`] = Interpreter.#buildElixirFunction(
+      moduleExName,
+      functionName,
+      arity,
+      visibility,
+      clauses,
+      ERTS.moduleMetadata[moduleExName]?.file ?? null,
+    );
 
     if (visibility === "public") {
       globalThis[moduleJsName].__exports__.add(`${functionName}/${arity}`);
@@ -510,14 +460,13 @@ export default class Interpreter {
 
     Interpreter.maybeInitModuleProxy(moduleExName, moduleJsName, "erlang");
 
-    globalThis[moduleJsName][functionArityStr] =
-      Interpreter.#buildFrameTrackingWrapper(
-        moduleExName,
-        functionName,
-        arity,
-        null,
-        jsFunction,
-      );
+    globalThis[moduleJsName][functionArityStr] = Interpreter.#buildFrameTrackingWrapper(
+      moduleExName,
+      functionName,
+      arity,
+      null,
+      jsFunction,
+    );
 
     globalThis[moduleJsName].__exports__.add(functionArityStr);
   }
@@ -526,24 +475,13 @@ export default class Interpreter {
   // raise sites can report attempted clauses. Ported functions have no encoded
   // clauses of their own - only the JavaScript implementation - so the heads
   // arrive separately, without bodies.
-  static defineFunctionClauseHeads(
-    moduleExName,
-    functionName,
-    arity,
-    visibility,
-    clauseHeads,
-  ) {
+  static defineFunctionClauseHeads(moduleExName, functionName, arity, visibility, clauseHeads) {
     const key = `${moduleExName}.${functionName}/${arity}`;
 
     Interpreter.#functionClauseHeads[key] = {visibility, clauses: clauseHeads};
   }
 
-  static defineManuallyPortedFunction(
-    moduleExName,
-    functionArityStr,
-    visibility,
-    fun,
-  ) {
+  static defineManuallyPortedFunction(moduleExName, functionArityStr, visibility, fun) {
     const moduleJsName = Interpreter.moduleJsName("Elixir." + moduleExName);
 
     // The arity separator is the last slash - operator function names such as
@@ -554,14 +492,13 @@ export default class Interpreter {
 
     Interpreter.maybeInitModuleProxy(moduleExName, moduleJsName);
 
-    globalThis[moduleJsName][functionArityStr] =
-      Interpreter.#buildFrameTrackingWrapper(
-        moduleExName,
-        functionName,
-        arity,
-        null,
-        fun,
-      );
+    globalThis[moduleJsName][functionArityStr] = Interpreter.#buildFrameTrackingWrapper(
+      moduleExName,
+      functionName,
+      arity,
+      null,
+      fun,
+    );
 
     if (visibility === "public") {
       globalThis[moduleJsName].__exports__.add(functionArityStr);
@@ -599,11 +536,7 @@ export default class Interpreter {
     const context = Interpreter.buildContext();
 
     // See why not to use eval() with esbuild and in general: https://esbuild.github.io/content-types/#direct-eval
-    return new Function("context", "Type", "Interpreter", code)(
-      context,
-      Type,
-      Interpreter,
-    );
+    return new Function("context", "Type", "Interpreter", code)(context, Type, Interpreter);
   }
 
   static evaluateJavaScriptExpression(expr) {
@@ -740,11 +673,7 @@ export default class Interpreter {
     }
 
     return Bitstring.toText(
-      Elixir_Macro["inspect_atom/3"](
-        Type.atom(sourceFormat),
-        Type.atom(name),
-        Type.list(),
-      ),
+      Elixir_Macro["inspect_atom/3"](Type.atom(sourceFormat), Type.atom(name), Type.list()),
     );
   }
 
@@ -837,23 +766,13 @@ export default class Interpreter {
     if (left.type === "match_pattern") {
       // The term has to hold against both sides, so a side that doesn't hold
       // fails the whole match, even where failing is answered rather than raised.
-      const result = Interpreter.matchOperator(
-        right,
-        left.right,
-        context,
-        raiseMatchError,
-      );
+      const result = Interpreter.matchOperator(right, left.right, context, raiseMatchError);
 
       if (result === false) {
         return false;
       }
 
-      return Interpreter.matchOperator(
-        right,
-        left.left,
-        context,
-        raiseMatchError,
-      );
+      return Interpreter.matchOperator(right, left.left, context, raiseMatchError);
     }
 
     if (Type.isMatchPlaceholder(left)) {
@@ -865,30 +784,15 @@ export default class Interpreter {
     }
 
     if (Type.isVariablePattern(left)) {
-      return Interpreter.#matchVariablePattern(
-        right,
-        left,
-        context,
-        raiseMatchError,
-      );
+      return Interpreter.#matchVariablePattern(right, left, context, raiseMatchError);
     }
 
     if (Type.isConsPattern(left)) {
-      return Interpreter.#matchConsPattern(
-        right,
-        left,
-        context,
-        raiseMatchError,
-      );
+      return Interpreter.#matchConsPattern(right, left, context, raiseMatchError);
     }
 
     if (Type.isBitstringPattern(left)) {
-      return Interpreter.#matchBitstringPattern(
-        right,
-        left,
-        context,
-        raiseMatchError,
-      );
+      return Interpreter.#matchBitstringPattern(right, left, context, raiseMatchError);
     }
 
     if (left.type !== right.type) {
@@ -896,12 +800,7 @@ export default class Interpreter {
     }
 
     if (Type.isList(left) || Type.isTuple(left)) {
-      return Interpreter.#matchListOrTuple(
-        right,
-        left,
-        context,
-        raiseMatchError,
-      );
+      return Interpreter.#matchListOrTuple(right, left, context, raiseMatchError);
     }
 
     if (Type.isMap(left)) {
@@ -915,11 +814,7 @@ export default class Interpreter {
     return right;
   }
 
-  static maybeInitModuleProxy(
-    moduleExName,
-    moduleJsName,
-    moduleType = "elixir",
-  ) {
+  static maybeInitModuleProxy(moduleExName, moduleJsName, moduleType = "elixir") {
     if (!globalThis[moduleJsName]) {
       const handler = {
         get(target, functionArityStr) {
@@ -929,11 +824,7 @@ export default class Interpreter {
 
           const [functionName, arity] = functionArityStr.split("/");
 
-          Interpreter.raiseUndefinedFunctionError(
-            target.__exModule__,
-            functionName,
-            Number(arity),
-          );
+          Interpreter.raiseUndefinedFunctionError(target.__exModule__, functionName, Number(arity));
         },
       };
 
@@ -942,9 +833,7 @@ export default class Interpreter {
       globalThis[moduleJsName] = moduleProxy;
 
       moduleProxy.__exModule__ =
-        moduleType === "erlang"
-          ? Type.atom(moduleExName)
-          : Type.alias(moduleExName);
+        moduleType === "erlang" ? Type.atom(moduleExName) : Type.alias(moduleExName);
 
       moduleProxy.__exports__ = new Set();
       moduleProxy.__jsBindings__ = new Map();
@@ -984,11 +873,7 @@ export default class Interpreter {
   // the raising frame's args and error_info.
   // Deps: [Exception.normalize/3]
   static normalizeError(reason, stacktrace = Type.list()) {
-    return Elixir_Exception["normalize/3"](
-      Type.atom("error"),
-      reason,
-      stacktrace,
-    );
+    return Elixir_Exception["normalize/3"](Type.atom("error"), reason, stacktrace);
   }
 
   static raiseArgumentError(message) {
@@ -1003,15 +888,11 @@ export default class Interpreter {
   }
 
   static raiseBadFunctionError(term) {
-    Interpreter.#raiseFieldBearingError("BadFunctionError", [
-      [Type.atom("term"), term],
-    ]);
+    Interpreter.#raiseFieldBearingError("BadFunctionError", [[Type.atom("term"), term]]);
   }
 
   static raiseBadMapError(term) {
-    Interpreter.#raiseFieldBearingError("BadMapError", [
-      [Type.atom("term"), term],
-    ]);
+    Interpreter.#raiseFieldBearingError("BadMapError", [[Type.atom("term"), term]]);
   }
 
   // Raises the reason attributed the way OTP BIFs report it: the raising
@@ -1077,12 +958,7 @@ export default class Interpreter {
     const errorInfo = Type.map([
       [
         Type.atom("cause"),
-        Type.tuple([
-          Type.integer(index),
-          Type.atom(segmentType),
-          Type.atom(errorTag),
-          value,
-        ]),
+        Type.tuple([Type.integer(index), Type.atom(segmentType), Type.atom(errorTag), value]),
       ],
       [Type.atom("function"), Type.atom("format_bs_fail")],
       [Type.atom("module"), Type.atom("erl_erts_errors")],
@@ -1112,9 +988,7 @@ export default class Interpreter {
   }
 
   static raiseCaseClauseError(term) {
-    Interpreter.#raiseFieldBearingError("CaseClauseError", [
-      [Type.atom("term"), term],
-    ]);
+    Interpreter.#raiseFieldBearingError("CaseClauseError", [[Type.atom("term"), term]]);
   }
 
   static raiseCompileError(message) {
@@ -1151,25 +1025,16 @@ export default class Interpreter {
   // different identity (e.g. :sets.union/2 reporting :sets.size/1). A
   // capitalized module names an Elixir module and becomes an alias, like in
   // CallStack.boxFrame().
-  static raiseFunctionClauseError(
-    module,
-    functionName,
-    arity,
-    args = null,
-    clauseHeads = null,
-  ) {
+  static raiseFunctionClauseError(module, functionName, arity, args = null, clauseHeads = null) {
     const moduleTerm = Interpreter.#boxFrameIdentity(module);
     const functionTerm = Interpreter.#boxFrameIdentity(functionName);
 
     const heads =
       args === null
         ? null
-        : (clauseHeads ??
-          Interpreter.functionClauseHeads(module, functionName, arity));
+        : (clauseHeads ?? Interpreter.functionClauseHeads(module, functionName, arity));
 
-    const clauses = heads
-      ? Interpreter.#blameClauseHeads(heads.clauses, args)
-      : null;
+    const clauses = heads ? Interpreter.#blameClauseHeads(heads.clauses, args) : null;
 
     const kind = heads?.visibility === "private" ? "defp" : "def";
 
@@ -1189,8 +1054,7 @@ export default class Interpreter {
     // A raise from the function's own dispatch keeps its file and line - the
     // BEAM reports those for an Elixir-implemented function, and only the args
     // take the arity's place. A port reporting another identity has neither.
-    const keepsLocation =
-      ownFrame?.module === module && ownFrame?.function === functionName;
+    const keepsLocation = ownFrame?.module === module && ownFrame?.function === functionName;
 
     const raisingFrame = {
       module,
@@ -1214,30 +1078,19 @@ export default class Interpreter {
   }
 
   static raiseMatchError(term) {
-    Interpreter.#raiseFieldBearingError("MatchError", [
-      [Type.atom("term"), term],
-    ]);
+    Interpreter.#raiseFieldBearingError("MatchError", [[Type.atom("term"), term]]);
   }
 
   static raiseTryClauseError(term) {
-    Interpreter.#raiseFieldBearingError("TryClauseError", [
-      [Type.atom("term"), term],
-    ]);
+    Interpreter.#raiseFieldBearingError("TryClauseError", [[Type.atom("term"), term]]);
   }
 
   // Raises the way the BEAM reports a call to a function that isn't there. The
   // reason is stated rather than left for the struct's message/1 callback to
   // work out, since the callback asks the module whether it exports
   // module_info/0, which a client module proxy never does.
-  static raiseUndefinedFunctionError(
-    module,
-    functionName,
-    arity,
-    isModuleAvailable = true,
-  ) {
-    const reason = isModuleAvailable
-      ? "function not exported"
-      : "module could not be loaded";
+  static raiseUndefinedFunctionError(module, functionName, arity, isModuleAvailable = true) {
+    const reason = isModuleAvailable ? "function not exported" : "module could not be loaded";
 
     Interpreter.#raiseFieldBearingError("UndefinedFunctionError", [
       [Type.atom("arity"), Type.integer(arity)],
@@ -1249,9 +1102,7 @@ export default class Interpreter {
   }
 
   static raiseWithClauseError(term) {
-    Interpreter.#raiseFieldBearingError("WithClauseError", [
-      [Type.atom("term"), term],
-    ]);
+    Interpreter.#raiseFieldBearingError("WithClauseError", [[Type.atom("term"), term]]);
   }
 
   static registerJsBindings(bindingsMap) {
@@ -1288,14 +1139,7 @@ export default class Interpreter {
   }
 
   // SYNC/ASYNC PAIR: When modifying this function, also update asyncTry().
-  static try(
-    body,
-    rescueClauses,
-    catchClauses,
-    elseClauses,
-    afterBlock,
-    context,
-  ) {
+  static try(body, rescueClauses, catchClauses, elseClauses, afterBlock, context) {
     try {
       let bodyResult;
 
@@ -1308,21 +1152,13 @@ export default class Interpreter {
           throw error;
         }
 
-        const rescued = Interpreter.#evaluateRescueClauses(
-          rescueClauses,
-          error,
-          context,
-        );
+        const rescued = Interpreter.#evaluateRescueClauses(rescueClauses, error, context);
 
         if (rescued !== NO_MATCH) {
           return rescued;
         }
 
-        const caught = Interpreter.#evaluateCatchClauses(
-          catchClauses,
-          error,
-          context,
-        );
+        const caught = Interpreter.#evaluateCatchClauses(catchClauses, error, context);
 
         if (caught !== NO_MATCH) {
           return caught;
@@ -1355,14 +1191,7 @@ export default class Interpreter {
   }
 
   // SYNC/ASYNC PAIR: When modifying this function, also update try().
-  static async asyncTry(
-    body,
-    rescueClauses,
-    catchClauses,
-    elseClauses,
-    afterBlock,
-    context,
-  ) {
+  static async asyncTry(body, rescueClauses, catchClauses, elseClauses, afterBlock, context) {
     try {
       let bodyResult;
 
@@ -1385,11 +1214,7 @@ export default class Interpreter {
           return rescued;
         }
 
-        const caught = await Interpreter.#asyncEvaluateCatchClauses(
-          catchClauses,
-          error,
-          context,
-        );
+        const caught = await Interpreter.#asyncEvaluateCatchClauses(catchClauses, error, context);
 
         if (caught !== NO_MATCH) {
           return caught;
@@ -1451,11 +1276,7 @@ export default class Interpreter {
 
       // A match clause (`pattern <- expression`, optionally guarded) must match the
       // pattern and then satisfy its guards.
-      const isPatternMatched = Interpreter.isMatched(
-        clause.match,
-        value,
-        context,
-      );
+      const isPatternMatched = Interpreter.isMatched(clause.match, value, context);
 
       if (isPatternMatched) {
         Interpreter.updateVarsToMatchedValues(context);
@@ -1467,11 +1288,7 @@ export default class Interpreter {
       // A failed clause ends the pipeline: the unmatched value is routed to the else
       // clauses, which are evaluated in the original, pre-`with` context.
       if (!isClausePassed) {
-        return Interpreter.#withElse(
-          value,
-          elseClauses,
-          Interpreter.cloneContext(originalContext),
-        );
+        return Interpreter.#withElse(value, elseClauses, Interpreter.cloneContext(originalContext));
       }
     }
 
@@ -1492,11 +1309,7 @@ export default class Interpreter {
         continue;
       }
 
-      const isPatternMatched = Interpreter.isMatched(
-        clause.match,
-        value,
-        context,
-      );
+      const isPatternMatched = Interpreter.isMatched(clause.match, value, context);
 
       if (isPatternMatched) {
         Interpreter.updateVarsToMatchedValues(context);
@@ -1634,11 +1447,7 @@ export default class Interpreter {
     const patterns = clauseHead.params(context);
 
     const params = clauseHead.blame.params.map((source, index) => {
-      const matched = Interpreter.isMatched(
-        patterns[index],
-        args[index],
-        context,
-      );
+      const matched = Interpreter.isMatched(patterns[index], args[index], context);
 
       if (matched) {
         // What a param binds is visible to the params and guards after it,
@@ -1649,9 +1458,7 @@ export default class Interpreter {
       return Interpreter.#blameNode(matched, source);
     });
 
-    const guards = clauseHead.blame.guards.map((guard) =>
-      Interpreter.#blameGuard(guard, context),
-    );
+    const guards = clauseHead.blame.guards.map((guard) => Interpreter.#blameGuard(guard, context));
 
     return Type.tuple([Type.list(params), Type.list(guards)]);
   }
@@ -1664,9 +1471,7 @@ export default class Interpreter {
     }
 
     return Type.list(
-      clauseHeads.map((clauseHead) =>
-        Interpreter.#blameClauseHead(clauseHead, args),
-      ),
+      clauseHeads.map((clauseHead) => Interpreter.#blameClauseHead(clauseHead, args)),
     );
   }
 
@@ -1711,14 +1516,7 @@ export default class Interpreter {
     return /^[A-Z]/.test(name) ? Type.alias(name) : Type.atom(name);
   }
 
-  static #buildElixirFunction(
-    moduleExName,
-    functionName,
-    arity,
-    visibility,
-    clauses,
-    file,
-  ) {
+  static #buildElixirFunction(moduleExName, functionName, arity, visibility, clauses, file) {
     return Interpreter.#buildFrameTrackingWrapper(
       moduleExName,
       functionName,
@@ -1775,13 +1573,10 @@ export default class Interpreter {
           CallStack.peek().line = clauses[0]?.line ?? null;
         }
 
-        Interpreter.raiseFunctionClauseError(
-          moduleExName,
-          functionName,
-          arity,
-          [...arguments],
-          {visibility, clauses},
-        );
+        Interpreter.raiseFunctionClauseError(moduleExName, functionName, arity, [...arguments], {
+          visibility,
+          clauses,
+        });
       },
     );
   }
@@ -1789,13 +1584,7 @@ export default class Interpreter {
   // Wraps a function so each invocation pushes its frame onto the shadow call
   // stack and pops it when the invocation exits, on every exit path - return,
   // raise, or async settlement.
-  static #buildFrameTrackingWrapper(
-    module,
-    functionName,
-    arityOrArgs,
-    file,
-    fn,
-  ) {
+  static #buildFrameTrackingWrapper(module, functionName, arityOrArgs, file, fn) {
     return function () {
       // Frame tracking is flag-gated: with client stacktraces off, the only
       // frame an error carries is the raising one, attached at the raise site.
@@ -1840,13 +1629,9 @@ export default class Interpreter {
   // list's tail is its last stored item, and elements remaining in the
   // longer list form a nonempty list tail.
   static #compareLists(list1, list2) {
-    const elementCount1 = list1.isProper
-      ? list1.data.length
-      : list1.data.length - 1;
+    const elementCount1 = list1.isProper ? list1.data.length : list1.data.length - 1;
 
-    const elementCount2 = list2.isProper
-      ? list2.data.length
-      : list2.data.length - 1;
+    const elementCount2 = list2.isProper ? list2.data.length : list2.data.length - 1;
 
     const sharedCount = Math.min(elementCount1, elementCount2);
 
@@ -1907,10 +1692,7 @@ export default class Interpreter {
     }
 
     for (let i = 0; i < tuple1.data.length; ++i) {
-      const itemOrder = Interpreter.compareTerms(
-        tuple1.data[i],
-        tuple2.data[i],
-      );
+      const itemOrder = Interpreter.compareTerms(tuple1.data[i], tuple2.data[i]);
 
       if (itemOrder !== 0) {
         return itemOrder;
@@ -1932,8 +1714,7 @@ export default class Interpreter {
       const codePoint = match.codePointAt(0);
 
       return (
-        TEXT_ESCAPES[codePoint] ??
-        `\\u${codePoint.toString(16).toUpperCase().padStart(4, "0")}`
+        TEXT_ESCAPES[codePoint] ?? `\\u${codePoint.toString(16).toUpperCase().padStart(4, "0")}`
       );
     });
   }
@@ -2091,9 +1872,7 @@ export default class Interpreter {
     }
 
     if (termType === "list" || termType === "tuple") {
-      return term.data.some((item) =>
-        Interpreter.#hasUnresolvedVariablePattern(item),
-      );
+      return term.data.some((item) => Interpreter.#hasUnresolvedVariablePattern(item));
     }
 
     if (termType === "map") {
@@ -2216,9 +1995,7 @@ export default class Interpreter {
 
   static #inspectList(term, opts) {
     if (Interpreter.#isPrintableCharlist(term)) {
-      const text = term.data
-        .map(({value}) => String.fromCodePoint(Number(value)))
-        .join("");
+      const text = term.data.map(({value}) => String.fromCodePoint(Number(value))).join("");
 
       return `~c"${Interpreter.#escapeText(text)}"`;
     }
@@ -2228,11 +2005,7 @@ export default class Interpreter {
     }
 
     if (term.isProper) {
-      return (
-        "[" +
-        term.data.map((elem) => Interpreter.inspect(elem, opts)).join(", ") +
-        "]"
-      );
+      return "[" + term.data.map((elem) => Interpreter.inspect(elem, opts)).join(", ") + "]";
     }
 
     return (
@@ -2255,20 +2028,15 @@ export default class Interpreter {
     }
 
     const optCustomOptions =
-      Interpreter.accessKeywordListElement(opts, Type.atom("custom_options")) ||
-      Type.keywordList();
+      Interpreter.accessKeywordListElement(opts, Type.atom("custom_options")) || Type.keywordList();
 
     const optSortMaps =
-      Interpreter.accessKeywordListElement(
-        optCustomOptions,
-        Type.atom("sort_maps"),
-      ) || Type.boolean(false);
+      Interpreter.accessKeywordListElement(optCustomOptions, Type.atom("sort_maps")) ||
+      Type.boolean(false);
 
     if (Type.isTrue(optSortMaps)) {
       term = Type.map(
-        Erlang_Lists["sort/1"](Erlang_Maps["to_list/1"](term)).data.map(
-          (tuple) => tuple.data,
-        ),
+        Erlang_Lists["sort/1"](Erlang_Maps["to_list/1"](term)).data.map((tuple) => tuple.data),
       );
     }
 
@@ -2291,10 +2059,7 @@ export default class Interpreter {
       itemsStr = Object.values(term.data)
         .map(
           ([key, value]) =>
-            `${Interpreter.inspect(key, opts)} => ${Interpreter.inspect(
-              value,
-              opts,
-            )}`,
+            `${Interpreter.inspect(key, opts)} => ${Interpreter.inspect(value, opts)}`,
         )
         .join(", ");
     }
@@ -2308,27 +2073,19 @@ export default class Interpreter {
     const last = Erlang_Maps["get/2"](Type.atom("last"), term);
     const step = Erlang_Maps["get/2"](Type.atom("step"), term);
 
-    const stepStr =
-      step.value > 1 ? `//${Interpreter.inspect(step, opts)}` : "";
+    const stepStr = step.value > 1 ? `//${Interpreter.inspect(step, opts)}` : "";
 
     return `${Interpreter.inspect(first, opts)}..${Interpreter.inspect(last, opts)}${stepStr}`;
   }
 
   static #inspectReference(term, _opts) {
-    const localIncarnationId = NodeTable.getLocalIncarnationId(
-      term.node,
-      term.creation,
-    );
+    const localIncarnationId = NodeTable.getLocalIncarnationId(term.node, term.creation);
 
     return `#Reference<${localIncarnationId}.${term.idWords.toReversed().join(".")}>`;
   }
 
   static #inspectTuple(term, opts) {
-    return (
-      "{" +
-      term.data.map((elem) => Interpreter.inspect(elem, opts)).join(", ") +
-      "}"
-    );
+    return "{" + term.data.map((elem) => Interpreter.inspect(elem, opts)).join(", ") + "}";
   }
 
   // Mirrors List.ascii_printable?/1 on a proper, nonempty list: 7..13 are the
@@ -2440,12 +2197,7 @@ export default class Interpreter {
 
       if (segment.value.type === "variable_pattern") {
         const decodedChunk = Bitstring.decodeSegmentChunk(segment, chunk);
-        Interpreter.matchOperator(
-          decodedChunk,
-          segment.value,
-          context,
-          raiseMatchError,
-        );
+        Interpreter.matchOperator(decodedChunk, segment.value, context, raiseMatchError);
       } else if (segment.value.type === "match_placeholder") {
         // Match placeholder in bitstring patterns just consumes the chunk without binding
         // This is equivalent to _ in Elixir bitstring patterns
@@ -2492,10 +2244,7 @@ export default class Interpreter {
       return $.#handleMatchFail(right, raiseMatchError);
     }
 
-    if (
-      Type.isList(left.tail) &&
-      Type.isProperList(left.tail) !== Type.isProperList(right)
-    ) {
+    if (Type.isList(left.tail) && Type.isProperList(left.tail) !== Type.isProperList(right)) {
       return $.#handleMatchFail(right, raiseMatchError);
     }
 
@@ -2567,10 +2316,7 @@ export default class Interpreter {
     // A bare `rescue e ->` (empty modules) catches any exception; otherwise the
     // exception struct's module must be one of the listed modules.
     if (clause.modules.length > 0) {
-      const structModule = Erlang_Maps["get/2"](
-        Type.atom("__struct__"),
-        error.struct,
-      );
+      const structModule = Erlang_Maps["get/2"](Type.atom("__struct__"), error.struct);
 
       const isModuleMatched = clause.modules.some((module) =>
         Interpreter.isStrictlyEqual(module, structModule),
@@ -2594,9 +2340,7 @@ export default class Interpreter {
 
   static #matchVariablePattern(right, left, context, raiseMatchError) {
     if (context.vars.__matched__[left.name]) {
-      if (
-        !Interpreter.isStrictlyEqual(context.vars.__matched__[left.name], right)
-      ) {
+      if (!Interpreter.isStrictlyEqual(context.vars.__matched__[left.name], right)) {
         return $.#handleMatchFail(right, raiseMatchError);
       }
     } else {
@@ -2655,10 +2399,7 @@ export default class Interpreter {
         type: "bitstring",
       });
 
-      const prefixPattern = Type.bitstringPattern([
-        ...qualifier.match.segments,
-        restSegment,
-      ]);
+      const prefixPattern = Type.bitstringPattern([...qualifier.match.segments, restSegment]);
 
       let remaining = source;
 
@@ -2674,12 +2415,7 @@ export default class Interpreter {
 
         Interpreter.updateVarsToMatchedValues(contextClone);
 
-        Interpreter.#walkComprehension(
-          qualifiers,
-          index + 1,
-          contextClone,
-          onLeaf,
-        );
+        Interpreter.#walkComprehension(qualifiers, index + 1, contextClone, onLeaf);
       }
 
       return;
@@ -2700,12 +2436,7 @@ export default class Interpreter {
         continue;
       }
 
-      Interpreter.#walkComprehension(
-        qualifiers,
-        index + 1,
-        contextClone,
-        onLeaf,
-      );
+      Interpreter.#walkComprehension(qualifiers, index + 1, contextClone, onLeaf);
     }
   }
 
@@ -2721,12 +2452,7 @@ export default class Interpreter {
 
     if (qualifier.type === "filter") {
       if (Type.isTruthy(await qualifier.filter(context))) {
-        await Interpreter.#asyncWalkComprehension(
-          qualifiers,
-          index + 1,
-          context,
-          onLeaf,
-        );
+        await Interpreter.#asyncWalkComprehension(qualifiers, index + 1, context, onLeaf);
       }
 
       return;
@@ -2746,10 +2472,7 @@ export default class Interpreter {
         type: "bitstring",
       });
 
-      const prefixPattern = Type.bitstringPattern([
-        ...qualifier.match.segments,
-        restSegment,
-      ]);
+      const prefixPattern = Type.bitstringPattern([...qualifier.match.segments, restSegment]);
 
       let remaining = source;
 
@@ -2765,12 +2488,7 @@ export default class Interpreter {
 
         Interpreter.updateVarsToMatchedValues(contextClone);
 
-        await Interpreter.#asyncWalkComprehension(
-          qualifiers,
-          index + 1,
-          contextClone,
-          onLeaf,
-        );
+        await Interpreter.#asyncWalkComprehension(qualifiers, index + 1, contextClone, onLeaf);
       }
 
       return;
@@ -2791,12 +2509,7 @@ export default class Interpreter {
         continue;
       }
 
-      await Interpreter.#asyncWalkComprehension(
-        qualifiers,
-        index + 1,
-        contextClone,
-        onLeaf,
-      );
+      await Interpreter.#asyncWalkComprehension(qualifiers, index + 1, contextClone, onLeaf);
     }
   }
 

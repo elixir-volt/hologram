@@ -140,9 +140,7 @@ const scriptSetOf = (codePoint) => {
     return ALL;
   }
 
-  const scripts = new Set(
-    SCRIPTS.filter((script) => SCRIPT_REGEXES.get(script).test(char)),
-  );
+  const scripts = new Set(SCRIPTS.filter((script) => SCRIPT_REGEXES.get(script).test(char)));
 
   // UTS 39 augmentation: the CJK scripts also belong to the writing systems combining them.
   if (scripts.has("Hani") || scripts.has("Hira") || scripts.has("Kana")) {
@@ -193,10 +191,7 @@ const chunksSingle = (codePoints) => {
     }
 
     if (codePoint <= 127) {
-      if (
-        (codePoint >= 97 && codePoint <= 122) ||
-        (codePoint >= 65 && codePoint <= 90)
-      ) {
+      if ((codePoint >= 97 && codePoint <= 122) || (codePoint >= 65 && codePoint <= 90)) {
         chunkSet = intersect(chunkSet, LATIN);
       }
 
@@ -225,14 +220,7 @@ const moveToFront = (list, name) => {
 // {acc, restIndex, length, asciiLetters, scriptSet, special} or an error object. Except for the
 // normalize_start replacement, acc keeps the original codepoints - validate normalizes once at
 // the end, which lands on the same NFC form as the server's per-character replacement.
-const continueTokens = (
-  codePoints,
-  index,
-  acc,
-  asciiLetters,
-  scriptSet,
-  special,
-) => {
+const continueTokens = (codePoints, index, acc, asciiLetters, scriptSet, special) => {
   while (index < codePoints.length) {
     const head = codePoints[index];
 
@@ -384,9 +372,7 @@ const validate = (state, kind, terms, tail) => {
 const Elixir_String_Tokenizer = {
   "tokenize/1": (subject) => {
     if (!Type.isList(subject)) {
-      Interpreter.raiseFunctionClauseError("String.Tokenizer", "tokenize", 1, [
-        subject,
-      ]);
+      Interpreter.raiseFunctionClauseError("String.Tokenizer", "tokenize", 1, [subject]);
     }
 
     // An improper list keeps its tail as the last data element. The tokenizer
@@ -455,14 +441,7 @@ const Elixir_String_Tokenizer = {
       }
     }
 
-    const state = continueTokens(
-      codePoints,
-      1,
-      [firstCodePoint],
-      asciiLetters,
-      scriptSet,
-      special,
-    );
+    const state = continueTokens(codePoints, 1, [firstCodePoint], asciiLetters, scriptSet, special);
 
     return validate(state, kind, terms, tail);
   },

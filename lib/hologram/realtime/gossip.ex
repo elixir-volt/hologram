@@ -16,9 +16,7 @@ defmodule Hologram.Realtime.Gossip do
 
     quote do
       @doc false
-      @spec handle_info(:sweep_expired | {:nodedown, node} | {:nodeup, node}, state) ::
-              {:noreply, state}
-            when node: node, state: any
+      @spec handle_info(any, state) :: {:noreply, state} when state: any
       @impl GenServer
       def handle_info(:sweep_expired, state) do
         unquote(gossip).handle_sweep(state, &delete_expired/0, &schedule_sweep/0)

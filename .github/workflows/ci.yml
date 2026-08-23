@@ -223,6 +223,11 @@ jobs:
       - name: Run lib Elixir tests
         run: mix test --warnings-as-errors --exclude consistency --exclude js
 
+      # Step: Install Chromium for Volt browser tests.
+      - name: Install Playwright Chromium
+        if: ${{ env.IS_HIGHEST_MATRIX_COMBINATION == 'true' }}
+        run: cd assets && npx playwright install --with-deps chromium
+
       # Step: Execute JavaScript tests through Volt.
       - name: Run lib JavaScript tests
         if: ${{ env.IS_HIGHEST_MATRIX_COMBINATION == 'true' }}
@@ -232,10 +237,6 @@ jobs:
       - name: Run lib Elixir consistency tests
         if: ${{ env.IS_HIGHEST_MATRIX_COMBINATION == 'true' }}
         run: mix test --warnings-as-errors --only consistency
-
-      # Step: Execute lib JavaScript tests.
-      - name: Run lib JavaScript tests
-        run: mix test.js
 
   feature_tests:
     runs-on: ubuntu-latest

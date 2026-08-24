@@ -40,12 +40,18 @@ Benchee.run(
     runtime_entry_file_path =
       Compiler.create_runtime_entry_file(runtime_mfas, ir_plt, async_mfas, app_versions, opts)
 
+    runtime_js_binding_modules =
+      runtime_mfas
+      |> Compiler.list_js_import_modules()
+      |> MapSet.new()
+
     page_entry_files =
       Compiler.create_page_entry_files(
         Reflection.list_pages(),
         call_graph_for_pages,
         ir_plt,
         async_mfas,
+        runtime_js_binding_modules,
         opts
       )
 

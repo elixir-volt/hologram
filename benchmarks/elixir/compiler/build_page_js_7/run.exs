@@ -5,14 +5,17 @@ alias Hologram.Reflection
 
 Benchee.run(
   %{
-    "build_page_js/5" => fn {call_graph, ir_plt, async_mfas,
-                             server_callback_analysis_by_templatable} ->
+    "build_page_js/7" => fn {call_graph, ir_plt, async_mfas,
+                             server_callback_analysis_by_templatable, runtime_js_binding_modules,
+                             js_dir} ->
       Compiler.build_page_js(
         Page1,
         call_graph,
         ir_plt,
         async_mfas,
-        server_callback_analysis_by_templatable
+        server_callback_analysis_by_templatable,
+        runtime_js_binding_modules,
+        js_dir
       )
     end
   },
@@ -34,12 +37,20 @@ Benchee.run(
     server_callback_analysis_by_templatable =
       CallGraph.server_callback_analysis_by_templatable(graph, templatables)
 
-    {call_graph_for_pages, ir_plt, async_mfas, server_callback_analysis_by_templatable}
+    runtime_js_binding_modules =
+      runtime_mfas
+      |> Compiler.list_js_import_modules()
+      |> MapSet.new()
+
+    js_dir = Volt.Priv.path({:hologram, "ts"}, ".")
+
+    {call_graph_for_pages, ir_plt, async_mfas, server_callback_analysis_by_templatable,
+     runtime_js_binding_modules, js_dir}
   end,
   formatters: [
     Benchee.Formatters.Console,
     {Benchee.Formatters.Markdown,
-     description: "Hologram.Compiler.build_page_js/5", file: Path.join(__DIR__, "README.md")}
+     description: "Hologram.Compiler.build_page_js/7", file: Path.join(__DIR__, "README.md")}
   ],
   time: 10
 )

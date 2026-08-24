@@ -12,6 +12,7 @@ import MemoryStorage from "hologram:runtime/memory_storage";
 import PerformanceTimer from "hologram:runtime/performance_timer";
 import Type from "hologram:runtime/type";
 import Utils from "hologram:runtime/utils";
+$imports;
 
 function initializeRuntime() {
   const startTime = PerformanceTimer.start();

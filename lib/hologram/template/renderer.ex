@@ -28,6 +28,9 @@ defmodule Hologram.Template.Renderer do
   @typedoc """
   A rendered template as data: expressions evaluated, components flattened into the nodes their
   templates render, and slots expanded. `nil` is the tree of a tag that renders no node at all.
+
+  For how this vocabulary is put on the wire for a client-side navigation, and the alternatives it
+  was measured against, see: docs/navigation_payload_wire_format.md
   """
   @type tree :: tree_node | [tree_node] | nil
 
@@ -51,36 +54,48 @@ defmodule Hologram.Template.Renderer do
           }
   end
 
+  # TODO: revisit this shape when the vdom renderer and the template format are rewritten. It was
+  # chosen for a client that rebuilds boxed terms from it; a client that walks plain JavaScript
+  # literals wants a different one, and the object-attribute forms ruled out here become eligible
+  # once the consumer collapses attributes by name anyway.
+  # See: docs/navigation_payload_wire_format.md
   @doc """
-  Substitutes the given placeholder with the given JavaScript source inside every script
-  element's text across the given tree.
+  Encodes an evaluated tree as a JSON-encodable term, for a client that renders the page itself.
 
-  Placeholders are JavaScript expressions, meaningful only where JavaScript lives, so text
-  outside a script element is left alone - a placeholder string occurring in user-visible
-  content stays literal.
+  The tree is a render the server already performed: it holds only elements, text, comments and
+  the doctype, with every expression resolved. That is a closed vocabulary with no Elixir
+  semantics in it, so it needs neither `Hologram.Compiler.Encoder` nor the boxed terms that
+  encoder produces - a nested array says the same thing, and the client gets it already parsed
+  out of the response body.
+
+  A node's shape is what tells the client what it is, so nothing carries a constructor name it
+  does not need. An element is `[tag_name, attributes, children]` and is the only node of length
+  three. Attributes are one flat run of alternating names and values, with `nil` for an attribute
+  that has no value. Text is a bare string. A comment is `["c", children]` and a doctype
+  `["d", content]`, both of length two.
+
+  Unlike `print_dom/1` this is not a markup projection, so nothing is escaped and nothing is
+  dropped: `$key` travels, because it is what carries element identity across a navigation, and a
+  void element keeps the children the tree gave it.
+
+  The result is always a list, even for a single node or for a tag that rendered nothing, so the
+  client never has to tell a node apart from a list of them.
+
+  For why this shape and not one of the other 111 measured, see:
+  docs/navigation_payload_wire_format.md
+
+  ## Examples
+
+      iex> tree = {:element, "div", [{"class", [text: "big"]}], [{:text, "Hologram"}]}
+      iex> encode_tree(tree)
+      [["div", ["class", "big"], ["Hologram"]]]
   """
-  @spec interpolate_js_in_tree(tree, String.t(), String.t()) :: tree
-  def interpolate_js_in_tree(tree, placeholder, js)
-
-  def interpolate_js_in_tree({:element, "script", attributes, children}, placeholder, js) do
-    interpolated_children =
-      Enum.map(children, fn
-        {:text, text} -> {:text, String.replace(text, placeholder, js)}
-        child -> interpolate_js_in_tree(child, placeholder, js)
-      end)
-
-    {:element, "script", attributes, interpolated_children}
+  @spec encode_tree(tree) :: [term]
+  def encode_tree(tree) do
+    tree
+    |> List.wrap()
+    |> Enum.map(&encode_node/1)
   end
-
-  def interpolate_js_in_tree({:element, tag_name, attributes, children}, placeholder, js) do
-    {:element, tag_name, attributes, interpolate_js_in_tree(children, placeholder, js)}
-  end
-
-  def interpolate_js_in_tree(nodes, placeholder, js) when is_list(nodes) do
-    Enum.map(nodes, &interpolate_js_in_tree(&1, placeholder, js))
-  end
-
-  def interpolate_js_in_tree(node, _placeholder, _js), do: node
 
   @doc """
   Substitutes the `$SELF_ECHOES_JS_PLACEHOLDER` token in the given HTML with
@@ -170,22 +185,41 @@ defmodule Hologram.Template.Renderer do
   # (it would be possible to pass page state as layout props this way).
   @doc """
   Renders the given page as its two projections: the HTML a document load is served, and the
-  evaluated tree the same render is described by as data. Both carry the same interpolated
-  runtime JS, and both leave the Realtime placeholders for the caller to substitute.
+  evaluated tree the same render is described by as data.
+
+  Only the HTML has the mount data interpolated into it, since a cold document has no channel for
+  that state but the markup it is sent. The tree keeps the placeholders verbatim and the mount
+  data is returned beside it, for a caller that carries the two as separate fields. Both
+  projections leave the Realtime placeholders for the caller to substitute.
 
   ## Examples
 
       iex> render_page(MyPage, %{param: "value"}, %Server{}, initial_page?: true)
-      {
-        "<div>full page content including layout</div>",
-        [{:element, "div", [{"$key", [text: "k2xq91:0"]}], [{:text, "full page content including layout"}]}],
-        %{"page" => %{module: MyPage, struct: %Component{state: %{a: 1, b: 2}}}},
-        %Server{session: %{user_id: 123}}
+      %{
+        component_registry: %{"page" => %{module: MyPage, struct: %Component{state: %{a: 1, b: 2}}}},
+        html: "<div>full page content including layout</div>",
+        mount_data: %{
+          asset_manifest: "{...}",
+          component_registry: "Type.map([...])",
+          page_module: "Type.atom(...)",
+          page_params: "Type.map([...])"
+        },
+        server_struct: %Server{session: %{user_id: 123}},
+        tree: [{:element, "div", [{"$key", [text: "k2xq91:0"]}], [{:text, "full page content including layout"}]}]
       }
   """
-  @spec render_page(module, %{atom => any}, Server.t(), T.opts()) ::
-          {String.t(), tree, %{String.t() => %{module: module, struct: Component.t()}},
-           Server.t()}
+  @spec render_page(module, %{atom => any}, Server.t(), T.opts()) :: %{
+          component_registry: %{String.t() => %{module: module, struct: Component.t()}},
+          html: String.t(),
+          mount_data: %{
+            asset_manifest: String.t(),
+            component_registry: String.t(),
+            page_module: String.t(),
+            page_params: String.t()
+          },
+          server_struct: Server.t(),
+          tree: tree
+        }
   def render_page(page_module, params, server_struct, opts) do
     initial_page? = opts[:initial_page?] || false
 
@@ -224,34 +258,41 @@ defmodule Hologram.Template.Renderer do
         %{module: page_module, struct: page_component_struct_with_emitted_context_after_rendering}
       )
 
-    # `$SELF_ECHOES_JS_PLACEHOLDER` is intentionally left in both projections
-    # for the caller to substitute via `interpolate_self_echoes_js/2` or
-    # `interpolate_js_in_tree/3`. The value depends on the post-render
-    # `server.broadcasts`, which is a `Hologram.Realtime` concern - keeping the
-    # renderer Realtime-agnostic means the controller does the final
-    # substitution after `Realtime.get_self_echoes/1`.
-    asset_manifest_js = AssetManifestCache.get_manifest_js()
-    component_registry_js = Encoder.encode_term!(component_registry_with_page_struct)
-    page_module_js = Encoder.encode_term!(page_module)
-    page_params_js = Encoder.encode_term!(params)
+    # `$SELF_ECHOES_JS_PLACEHOLDER` is intentionally left unsubstituted. Its value depends on the
+    # post-render `server.broadcasts`, which is a `Hologram.Realtime` concern - keeping the renderer
+    # Realtime-agnostic means the controller supplies it after `Realtime.get_self_echoes/1`, into
+    # the HTML through `interpolate_self_echoes_js/2` and into the navigation payload as a field.
+
+    # The values a mount reads, grouped because they travel together. The HTML projection inlines
+    # all four, since a loaded document has no other channel for them. A navigation carries three of
+    # them as payload fields instead - not the asset manifest, which is a global the initial
+    # document sets once and a navigation therefore already has.
+    mount_data_js = %{
+      asset_manifest: AssetManifestCache.get_manifest_js(),
+      component_registry: Encoder.encode_term!(component_registry_with_page_struct),
+      page_module: Encoder.encode_term!(page_module),
+      page_params: Encoder.encode_term!(params)
+    }
 
     html_with_interpolated_js =
       initial_tree
       |> print_dom()
-      |> String.replace("$ASSET_MANIFEST_JS_PLACEHOLDER", asset_manifest_js)
-      |> String.replace("$COMPONENT_REGISTRY_JS_PLACEHOLDER", component_registry_js)
-      |> String.replace("$PAGE_MODULE_JS_PLACEHOLDER", page_module_js)
-      |> String.replace("$PAGE_PARAMS_JS_PLACEHOLDER", page_params_js)
+      |> String.replace("$ASSET_MANIFEST_JS_PLACEHOLDER", mount_data_js.asset_manifest)
+      |> String.replace("$COMPONENT_REGISTRY_JS_PLACEHOLDER", mount_data_js.component_registry)
+      |> String.replace("$PAGE_MODULE_JS_PLACEHOLDER", mount_data_js.page_module)
+      |> String.replace("$PAGE_PARAMS_JS_PLACEHOLDER", mount_data_js.page_params)
 
-    tree_with_interpolated_js =
-      initial_tree
-      |> interpolate_js_in_tree("$ASSET_MANIFEST_JS_PLACEHOLDER", asset_manifest_js)
-      |> interpolate_js_in_tree("$COMPONENT_REGISTRY_JS_PLACEHOLDER", component_registry_js)
-      |> interpolate_js_in_tree("$PAGE_MODULE_JS_PLACEHOLDER", page_module_js)
-      |> interpolate_js_in_tree("$PAGE_PARAMS_JS_PLACEHOLDER", page_params_js)
-
-    {html_with_interpolated_js, tree_with_interpolated_js, component_registry_with_page_struct,
-     final_server_struct}
+    # The tree keeps its placeholders. A navigation carries the mount data beside the tree rather
+    # than inside it, so nothing on that path ever substitutes them - and folding the state into a
+    # script element's text would only mean escaping encoder output into the tree's encoding and
+    # unescaping it again on arrival.
+    %{
+      component_registry: component_registry_with_page_struct,
+      html: html_with_interpolated_js,
+      mount_data: mount_data_js,
+      server_struct: final_server_struct,
+      tree: initial_tree
+    }
   end
 
   @doc """
@@ -456,6 +497,28 @@ defmodule Hologram.Template.Renderer do
   # HTML attribute names are dash-separated, while Elixir identifiers can't contain dashes, so each
   # name segment converts to the convention of the namespace it lands in. Nesting composes the
   # segments with hyphens, e.g. %{data: %{user_id: 1}} becomes "data-user-id".
+  # A flat run of alternating names and values rather than a pair per attribute: the run allocates
+  # one array where pairs allocate one per attribute, and it is the cheapest source for the
+  # attribute object the client builds out of it.
+  defp encode_attributes(attributes) do
+    Enum.flat_map(attributes, fn
+      {name, [text: value]} -> [name, value]
+      {name, []} -> [name, nil]
+    end)
+  end
+
+  defp encode_node({:doctype, content}), do: ["d", content]
+
+  defp encode_node({:element, tag_name, attributes, children}) do
+    [tag_name, encode_attributes(attributes), Enum.map(children, &encode_node/1)]
+  end
+
+  defp encode_node({:public_comment, children}) do
+    ["c", Enum.map(children, &encode_node/1)]
+  end
+
+  defp encode_node({:text, text}), do: text
+
   defp compose_attribute_name(key, name_prefix) do
     segment =
       key

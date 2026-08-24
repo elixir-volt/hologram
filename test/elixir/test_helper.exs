@@ -16,7 +16,9 @@ System.put_env(
 # Exclude assertions whose semantics are intentionally platform-specific.
 exclude_opts =
   case :os.type() do
-    {:unix, _name} -> []
+    {:unix, _name} ->
+      []
+
     {:win32, _name} ->
       [
         :erlang_stacktrace_source_metadata,
@@ -57,6 +59,7 @@ if javascript_tests_requested? do
     test/javascript/events/submit_event_test.mjs
     test/javascript/hologram_test.mjs
     test/javascript/intl_pluralrules_test.mjs
+    test/javascript/renderer_test.mjs
     test/javascript/vdom_test.mjs
   ]
 

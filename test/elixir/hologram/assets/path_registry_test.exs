@@ -30,12 +30,23 @@ defmodule Hologram.Assets.PathRegistryTest do
     end
   end
 
-  test "init/1", %{mapping: mapping} do
-    ets_table_name = AssetPathRegistryStub.ets_table_name()
+  describe "init/1" do
+    test "populates the registry from the static directory", %{mapping: mapping} do
+      ets_table_name = AssetPathRegistryStub.ets_table_name()
 
-    assert init(nil) == {:ok, nil}
-    assert ets_table_exists?(ets_table_name)
-    assert ETS.get_all(ets_table_name) == mapping
+      assert init(nil) == {:ok, nil}
+      assert ets_table_exists?(ets_table_name)
+      assert ETS.get_all(ets_table_name) == mapping
+    end
+
+    test "allows the static directory to be absent" do
+      File.rm_rf!(AssetPathRegistryStub.static_dir())
+      ets_table_name = AssetPathRegistryStub.ets_table_name()
+
+      assert init(nil) == {:ok, nil}
+      assert ets_table_exists?(ets_table_name)
+      assert ETS.get_all(ets_table_name) == %{}
+    end
   end
 
   describe "lookup/2" do

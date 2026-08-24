@@ -111,6 +111,14 @@ defmodule Hologram.Assets.PathRegistry do
   end
 
   defp find_assets(static_dir) do
+    if File.dir?(static_dir) do
+      find_assets_in_existing_dir(static_dir)
+    else
+      []
+    end
+  end
+
+  defp find_assets_in_existing_dir(static_dir) do
     static_files =
       static_dir
       |> FileUtils.list_files_recursively()

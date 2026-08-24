@@ -50,7 +50,10 @@ const SCRIPT_TEXT_ESCAPES = {
 };
 
 // One character class over the keys above, so the replace is a single pass.
-const SCRIPT_TEXT_ESCAPABLE_CHARS = /[\\"'`$\n\r\0<]/g;
+const SCRIPT_TEXT_ESCAPABLE_CHARS = new RegExp(
+  "[\\\\\"'`$\\n\\r" + String.fromCharCode(0) + "<]",
+  "g",
+);
 
 export default class Renderer {
   // Event listener bindings collected during the current render, each a {target, key, attach,
@@ -793,10 +796,7 @@ export default class Renderer {
 
   // Based on stringify_for_script_interpolation/1
   static #escapeScriptText(text) {
-    return text.replace(
-      SCRIPT_TEXT_ESCAPABLE_CHARS,
-      (char) => SCRIPT_TEXT_ESCAPES[char],
-    );
+    return text.replace(SCRIPT_TEXT_ESCAPABLE_CHARS, (char) => SCRIPT_TEXT_ESCAPES[char]);
   }
 
   // A spread entry is {:spread, {value}} - its name slot holds the :spread atom rather than a

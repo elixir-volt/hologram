@@ -243,7 +243,7 @@ export default class Bitstring {
       case "utf8":
         $.maybeSetBytesFromText(chunk);
 
-        return Type.integer($.#decoder.decode(chunk.bytes).codePointAt(0));
+        return Type.integer($.#textDecoder.decode(chunk.bytes).codePointAt(0));
 
       default:
         throw new HologramInterpreterError(
@@ -866,7 +866,7 @@ export default class Bitstring {
     try {
       // The decoder is fatal, so it rejects everything the leader byte alone
       // can't rule out.
-      $.#decoder.decode(sequenceChunk.bytes);
+      $.#textDecoder.decode(sequenceChunk.bytes);
     } catch {
       return null;
     }

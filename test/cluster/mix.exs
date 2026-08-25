@@ -23,10 +23,10 @@ defmodule HologramClusterTests.MixProject do
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:hologram,
-       git: "https://github.com/bartblast/hologram.git",
-       ref: "451db68cf2fc7f54304635f0b07b03b269985e69"},
+       git: "https://github.com/elixir-volt/hologram.git",
+       ref: "8494da0f97f4f5cd628f8a9e00c7d806093a8233"},
       {:jason, "~> 1.0"},
-      {:mint, "~> 1.0", only: :test},
+      {:mint, "~> 1.0"},
       {:phoenix, "~> 1.7"},
       {:plug_cowboy, "~> 2.0"},
       {:wallaby, "~> 0.30", only: :test}

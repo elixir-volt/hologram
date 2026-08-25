@@ -4,8 +4,8 @@ defmodule App3.MixProject do
   defp deps do
     [
       {:hologram,
-       git: "https://github.com/bartblast/hologram.git",
-       ref: "451db68cf2fc7f54304635f0b07b03b269985e69"}
+       git: "https://github.com/elixir-volt/hologram.git",
+       ref: "8494da0f97f4f5cd628f8a9e00c7d806093a8233"}
     ]
   end
 

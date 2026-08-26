@@ -5,7 +5,7 @@ defmodule App3.MixProject do
     [
       {:hologram,
        git: "https://github.com/elixir-volt/hologram.git",
-       ref: "0a0799f2d70ea4abf7b77146626c23bb85206d63"}
+       ref: "3baffa0199463eea5a69a7a4d9094b5473d618bd"}
     ]
   end
 

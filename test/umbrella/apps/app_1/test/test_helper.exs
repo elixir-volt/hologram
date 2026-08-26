@@ -1,6 +1,22 @@
 Hologram.Test.setup()
 
 if System.get_env("GITHUB_ACTIONS") == "true" do
+  owner = :ets.info(Hologram.Assets.BundleManifest, :owner)
+
+  spawn(fn ->
+    ref = Process.monitor(owner)
+
+    receive do
+      {:DOWN, ^ref, :process, ^owner, reason} ->
+        IO.inspect(
+          {reason, Application.started_applications(), Process.whereis(Hologram.Supervisor)},
+          label: "bundle manifest owner exited"
+        )
+    end
+  end)
+end
+
+if System.get_env("GITHUB_ACTIONS") == "true" do
   ExUnit.configure(max_cases: 1)
 end
 

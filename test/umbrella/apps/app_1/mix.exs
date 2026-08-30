@@ -14,7 +14,7 @@ defmodule App1.MixProject do
       {:app_3, in_umbrella: true},
       {:hologram,
        git: "https://github.com/elixir-volt/hologram.git",
-       ref: "3baffa0199463eea5a69a7a4d9094b5473d618bd"},
+       ref: "09d25925f0975d60bc5b0758d15c0d71659a4e4a"},
       {:jason, "~> 1.0"},
       {:phoenix, "~> 1.7"},
       {:plug_cowboy, "~> 2.0"},

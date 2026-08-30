@@ -36,6 +36,35 @@ defmodule Hologram.ApplicationTest do
     end)
   end
 
+  describe "restart_children/0" do
+    test "starts the full child tree without restarting the root supervisor" do
+      System.delete_env("HOLOGRAM_START")
+
+      assert {:ok, supervisor} = start(:my_app, :temporary)
+      assert Supervisor.which_children(supervisor) == []
+
+      System.put_env("HOLOGRAM_START", "1")
+      assert :ok = restart_children()
+      assert Process.whereis(Hologram.Supervisor) == supervisor
+
+      child_modules =
+        supervisor
+        |> Supervisor.which_children()
+        |> Enum.map(fn {module, _pid, _type, _modules} -> module end)
+
+      assert Hologram.Assets.BundleManifest in child_modules
+      assert Hologram.Assets.PathRegistry in child_modules
+      assert Hologram.Assets.ManifestCache in child_modules
+      assert Hologram.Realtime.SubscriptionRegistry in child_modules
+      assert Hologram.Router.PageModuleResolver in child_modules
+
+      original_children = Supervisor.which_children(supervisor)
+      assert :ok = restart_children()
+      assert Process.whereis(Hologram.Supervisor) == supervisor
+      refute Supervisor.which_children(supervisor) == original_children
+    end
+  end
+
   describe "start/2" do
     test "starts full supervisor when HOLOGRAM_START is set" do
       System.put_env("HOLOGRAM_START", "1")

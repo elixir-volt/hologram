@@ -12,6 +12,23 @@ defmodule Hologram.Application do
     |> Supervisor.start_link(opts)
   end
 
+  @doc false
+  @spec restart_children() :: :ok
+  def restart_children do
+    Hologram.Supervisor
+    |> Supervisor.which_children()
+    |> Enum.each(fn {child_id, _pid, _type, _modules} ->
+      :ok = Supervisor.terminate_child(Hologram.Supervisor, child_id)
+      :ok = Supervisor.delete_child(Hologram.Supervisor, child_id)
+    end)
+
+    Hologram.env()
+    |> children()
+    |> Enum.each(fn child_spec ->
+      {:ok, _pid} = Supervisor.start_child(Hologram.Supervisor, child_spec)
+    end)
+  end
+
   defp children(:dev) do
     if Hologram.enabled?() do
       # credo:disable-for-next-line Credo.Check.Refactor.AppendSingleItem
